@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -9,6 +10,7 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
+const { SocketService } = require('./websocket');
 
 // Load environment variables
 require('dotenv').config();
@@ -29,7 +31,11 @@ const openApiPath = path.join(__dirname, 'openapi.yaml');
 const openApiSpec = YAML.load(fs.readFileSync(openApiPath, 'utf8'));
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
+
+// WebSocket service will be initialized after Redis connection
+let socketService;
 
 // Middleware
 app.use(helmet());
@@ -85,6 +91,10 @@ let redisClient;
 
     // Data Management Routes (protected)
     app.use('/api/data', dataRoutes);
+
+    // Initialize WebSocket service
+    socketService = new SocketService(server, redisClient);
+    logger.info('WebSocket service initialized and ready');
   } catch (err) {
     logger.error('Redis connection error', { service: 'redis', error: err.message });
   }
@@ -114,6 +124,7 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       docs: '/api-docs',
       data: '/api/data',
+      websocket: 'ws://localhost:' + PORT,
     },
   });
 });
@@ -124,6 +135,23 @@ app.use('/api/auth', authRoutes);
 // API Routes
 // Apply general rate limiting to API routes
 app.use('/api', apiLimiter);
+
+// WebSocket stats endpoint
+app.get('/api/websocket/stats', (req, res) => {
+  if (!socketService) {
+    return res.status(503).json({
+      success: false,
+      message: 'WebSocket service not initialized',
+    });
+  }
+
+  const stats = socketService.getStats();
+  res.json({
+    success: true,
+    stats,
+  });
+});
+
 app.get('/api/status', async (req, res) => {
   try {
     // Test MongoDB
@@ -183,18 +211,24 @@ app.use((err, req, res, _next) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
   logger.info('xRat Backend server started', {
     port: PORT,
     environment: process.env.NODE_ENV || 'development',
     healthCheckUrl: `http://localhost:${PORT}/health`,
     apiDocsUrl: `http://localhost:${PORT}/api-docs`,
+    websocketUrl: `ws://localhost:${PORT}`,
   });
 });
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully...');
+
+  if (socketService) {
+    await socketService.shutdown();
+    logger.info('WebSocket service closed');
+  }
 
   if (redisClient) {
     await redisClient.quit();
@@ -203,5 +237,12 @@ process.on('SIGTERM', async () => {
 
   await mongoose.connection.close();
   logger.info('MongoDB connection closed');
-  process.exit(0);
+  
+  server.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
 });
+
+// Export socketService for use in other modules
+module.exports = { app, server, socketService: () => socketService };
