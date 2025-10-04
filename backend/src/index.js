@@ -237,7 +237,7 @@ process.on('SIGTERM', async () => {
 
   await mongoose.connection.close();
   logger.info('MongoDB connection closed');
-  
+
   server.close(() => {
     logger.info('HTTP server closed');
     process.exit(0);

@@ -14,7 +14,7 @@ describe('SocketService Unit Tests', () => {
   afterAll(async () => {
     // Give time for all async operations to complete
     await new Promise((resolve) => setTimeout(resolve, 100));
-    
+
     if (httpServer) {
       await new Promise((resolve) => {
         httpServer.close(resolve);
@@ -97,7 +97,7 @@ describe('SocketService Unit Tests', () => {
 
     test('should track request count', () => {
       const socketId = 'test-socket-2';
-      
+
       for (let i = 0; i < 50; i++) {
         socketService.checkRateLimit(socketId);
       }
@@ -108,7 +108,7 @@ describe('SocketService Unit Tests', () => {
 
     test('should enforce rate limit', () => {
       const socketId = 'test-socket-3';
-      
+
       // Send 100 requests (limit)
       for (let i = 0; i < 100; i++) {
         const result = socketService.checkRateLimit(socketId);
@@ -122,7 +122,7 @@ describe('SocketService Unit Tests', () => {
 
     test('should reset rate limit after window', () => {
       const socketId = 'test-socket-4';
-      
+
       // Use up limit
       for (let i = 0; i < 100; i++) {
         socketService.checkRateLimit(socketId);

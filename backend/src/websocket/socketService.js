@@ -14,7 +14,7 @@ class SocketService {
     this.connectedUsers = new Map(); // userId -> Set of socket IDs
     this.userRooms = new Map(); // socketId -> Set of rooms
     this.rateLimiters = new Map(); // socketId -> { count, resetTime }
-    
+
     this.initialize(httpServer);
   }
 
@@ -34,7 +34,9 @@ class SocketService {
     // Authentication middleware
     this.io.use(async (socket, next) => {
       try {
-        const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
+        const token =
+          socket.handshake.auth.token ||
+          socket.handshake.headers.authorization?.replace('Bearer ', '');
 
         if (!token) {
           logger.warn('WebSocket connection attempt without token', {
@@ -233,7 +235,7 @@ class SocketService {
    */
   broadcastDataUpdate(entity, data) {
     const roomName = this.buildRoomName(entity);
-    
+
     this.io.to(roomName).emit('data:updated', {
       entity,
       data,
@@ -252,7 +254,7 @@ class SocketService {
    */
   sendNotificationToUser(userId, notification) {
     const socketIds = this.connectedUsers.get(userId);
-    
+
     if (!socketIds || socketIds.size === 0) {
       // User is offline, queue notification
       this.queueNotification(userId, notification);
@@ -431,12 +433,12 @@ class SocketService {
    */
   async shutdown() {
     logger.info('Shutting down WebSocket service...');
-    
+
     this.io.disconnectSockets();
     this.connectedUsers.clear();
     this.userRooms.clear();
     this.rateLimiters.clear();
-    
+
     logger.info('WebSocket service shutdown complete');
   }
 }
