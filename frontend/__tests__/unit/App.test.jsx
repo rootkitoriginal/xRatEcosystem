@@ -1,184 +1,48 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 import App from '../../src/App';
 
 describe('App Component', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
+    localStorage.clear();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('renders the app header', async () => {
-    global.fetch.mockResolvedValueOnce({
-      json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } }),
-    });
-
-    await act(async () => {
-      render(<App />);
-    });
+  it('renders the app header', () => {
+    render(<App />);
 
     expect(screen.getByText('🐀 xRat Ecosystem')).toBeDefined();
     expect(screen.getByText('Docker Isolated Environment')).toBeDefined();
   });
 
-  it('displays loading state initially', async () => {
-    global.fetch.mockImplementation(() => new Promise(() => {}));
-
-    await act(async () => {
-      render(<App />);
-    });
-
-    expect(screen.getByText('Loading...')).toBeDefined();
-  });
-
-  it('fetches and displays status on mount', async () => {
-    const mockStatus = {
-      success: true,
-      ecosystem: 'xRat',
-      database: {
-        mongodb: 'connected',
-        redis: 'connected',
-      },
-    };
-
-    global.fetch.mockResolvedValueOnce({
-      json: async () => mockStatus,
-    });
-
-    await act(async () => {
-      render(<App />);
-    });
+  it('shows login page when not authenticated', async () => {
+    render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('🗄️ MongoDB')).toBeDefined();
-      expect(screen.getByText('🔴 Redis')).toBeDefined();
+      expect(screen.getByText('🔐 Login')).toBeDefined();
     });
   });
 
-  it('displays error message when fetch fails', async () => {
-    global.fetch.mockRejectedValueOnce(new Error('Network error'));
+  it('shows login and register buttons when not authenticated', () => {
+    render(<App />);
 
-    await act(async () => {
-      render(<App />);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Failed to connect to backend')).toBeDefined();
-    });
+    const loginButtons = screen.getAllByRole('button', { name: /login/i });
+    expect(loginButtons.length).toBeGreaterThan(0);
+    
+    const registerButtons = screen.getAllByRole('button', { name: /register/i });
+    expect(registerButtons.length).toBeGreaterThan(0);
   });
 
-  it('refreshes status when refresh button is clicked', async () => {
-    const mockStatus = {
-      database: { mongodb: 'connected', redis: 'connected' },
-    };
-
-    global.fetch.mockResolvedValue({
-      json: async () => mockStatus,
-    });
-
-    await act(async () => {
-      render(<App />);
-    });
+  it('redirects to login when accessing protected route without auth', async () => {
+    // App has its own BrowserRouter, so we just render it directly
+    render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('🔄 Refresh Status')).toBeDefined();
+      expect(screen.getByText('🔐 Login')).toBeDefined();
     });
-
-    const refreshButton = screen.getByText('🔄 Refresh Status');
-
-    await act(async () => {
-      fireEvent.click(refreshButton);
-    });
-
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  it('submits form data successfully', async () => {
-    const mockStatus = {
-      database: { mongodb: 'connected', redis: 'connected' },
-    };
-
-    const mockSubmitResponse = {
-      success: true,
-      message: 'Data stored successfully',
-    };
-
-    global.fetch
-      .mockResolvedValueOnce({ json: async () => mockStatus })
-      .mockResolvedValueOnce({ json: async () => mockSubmitResponse });
-
-    const user = userEvent.setup();
-
-    await act(async () => {
-      render(<App />);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('Key:')).toBeDefined();
-    });
-
-    const keyInput = screen.getByLabelText('Key:');
-    const valueInput = screen.getByLabelText('Value:');
-    const submitButton = screen.getByText('💾 Save to Cache');
-
-    await user.type(keyInput, 'test-key');
-    await user.type(valueInput, 'test-value');
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('✅ Data saved successfully!')).toBeDefined();
-    });
-  });
-
-  it('displays error message when form submission fails', async () => {
-    const mockStatus = {
-      database: { mongodb: 'connected', redis: 'connected' },
-    };
-
-    global.fetch
-      .mockResolvedValueOnce({ json: async () => mockStatus })
-      .mockRejectedValueOnce(new Error('Submit failed'));
-
-    const user = userEvent.setup();
-
-    await act(async () => {
-      render(<App />);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('Key:')).toBeDefined();
-    });
-
-    const keyInput = screen.getByLabelText('Key:');
-    const valueInput = screen.getByLabelText('Value:');
-    const submitButton = screen.getByText('💾 Save to Cache');
-
-    await user.type(keyInput, 'test-key');
-    await user.type(valueInput, 'test-value');
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('❌ Error saving data')).toBeDefined();
-    });
-  });
-
-  it('renders ecosystem info section', async () => {
-    global.fetch.mockResolvedValueOnce({
-      json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } }),
-    });
-
-    await act(async () => {
-      render(<App />);
-    });
-
-    expect(screen.getByText('📋 Ecosystem Info')).toBeDefined();
-    expect(screen.getByText(/Backend API exposed on port 3000/)).toBeDefined();
-    expect(screen.getByText(/MongoDB internal only/)).toBeDefined();
   });
 });
