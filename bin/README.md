@@ -5,10 +5,13 @@ Monitor em tempo real para acompanhar Pull Requests abertos no repositório xRat
 ## 📋 Características
 
 - ✨ **Monitoramento em Tempo Real**: Atualização automática a cada 10 segundos
-- 📊 **Estatísticas Completas**: Visualize métricas agregadas de todos os PRs
+- 📊 **Tabela Compacta**: Visualização em formato tabular de todos os PRs
+- 🎯 **Detecção Inteligente**: Identifica automaticamente mudanças importantes
+- 🛑 **Pausa Automática**: Para o monitor quando houver mudanças críticas
+- 📝 **Instruções Contextuais**: Mostra o que fazer quando um PR fica pronto
+- 📈 **Estatísticas Completas**: Visualize métricas agregadas de todos os PRs
 - 🎨 **Interface Colorida**: Terminal estilizado com cores e emojis
 - 🔄 **Auto-refresh**: Atualização automática sem intervenção manual
-- 📈 **Informações Detalhadas**: Status, commits, mudanças, reviews e mais
 
 ## 🚀 Como Usar
 
@@ -38,7 +41,80 @@ ou
 
 ## 📊 Informações Exibidas
 
-Para cada Pull Request, o monitor exibe:
+### Tabela Compacta
+
+Uma visão geral de todos os PRs em formato tabular:
+
+```
+╔════╦══════════════════════════════════════════╦═══════════╦══════════╦═════════╗
+║ #  ║ Título                                   ║ Status    ║ Commits  ║ Changes ║
+╠════╬══════════════════════════════════════════╬═══════════╬══════════╬═════════╣
+║ #30 ║ ✨ feat: add real-time monitoring...     ║ ✅ Ready  ║     12   ║ +487/-1 ║
+║ #29 ║ 📚 docs: create API documentation...    ║ 🚧 Draft  ║      0   ║ +0/-0   ║
+╚════╩══════════════════════════════════════════╩═══════════╩══════════╩═════════╝
+```
+
+### Estatísticas Gerais
+
+- Total de PRs abertos
+- Quantidade de PRs em Draft
+- Quantidade de PRs Prontos
+- Total de Commits
+- Total de Mudanças (linhas)
+
+## 🎯 Detecção de Mudanças
+
+O monitor detecta automaticamente:
+
+- 🆕 **Novos PRs**: Quando um novo PR é criado
+- 🎉 **PR pronto**: Quando um Draft vira Ready
+- 📝 **Novos commits**: Quando commits são adicionados
+- 💻 **Mudanças de código**: Quando há alterações (+/-)
+- ✅ **Pronto para merge**: Quando o mergeable_state fica "clean"
+
+### 🛑 Pausa Automática
+
+Quando um PR importante muda de status (Draft → Ready ou fica pronto para merge), o monitor:
+
+1. **Para automaticamente** a execução
+2. **Mostra instruções detalhadas** do que fazer
+3. **Exibe comandos prontos** para copiar e executar
+
+### 📋 Exemplo de Instruções Automáticas
+
+Quando um PR fica pronto, você verá:
+
+```
+🎉 MUDANÇAS DETECTADAS!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ PR #26 mudou para READY! 🎉
+
+Título: feat: implement structured logging with Winston
+URL:    https://github.com/xLabInternet/xRatEcosystem/pull/26
+
+📋 PRÓXIMOS PASSOS:
+  1. Revisar o código do PR:
+     gh pr view 26
+
+  2. Fazer checkout do branch:
+     gh pr checkout 26
+
+  3. Rodar os testes localmente:
+     npm test
+
+  4. Se tudo estiver OK, aprovar e fazer merge:
+     gh pr review 26 --approve
+     gh pr merge 26 --squash --delete-branch
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Monitor pausado devido a mudanças importantes.
+Execute npm run monitor novamente para continuar.
+```
+
+## 📊 Informações Detalhadas (Modo Completo)
+
+Se precisar de mais detalhes, o script também mantém a função `renderPR()` que pode mostrar:
 
 - **Número e Título**: Identificação do PR com emoji apropriado
 - **Status**: Draft ou Ready para merge
