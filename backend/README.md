@@ -106,8 +106,24 @@ npm start
 
 ### Data Management
 
-- `POST /api/data` - Store key-value data in cache (protected)
-- `GET /api/data/:key` - Retrieve data by key (protected)
+- `POST /api/data` - Create new data entity (protected)
+- `GET /api/data` - List all data with pagination (protected)
+- `GET /api/data/:id` - Get data by ID (protected, cached)
+- `PUT /api/data/:id` - Update data by ID (protected)
+- `DELETE /api/data/:id` - Delete data by ID (protected)
+- `GET /api/data/search` - Search data with filters (protected)
+- `POST /api/data/bulk` - Bulk operations (protected)
+- `GET /api/data/export` - Export data (JSON/CSV) (protected)
+- `GET /api/data/analytics` - Get data analytics (protected)
+
+**Features:**
+- ✅ CRUD operations with validation
+- ✅ Redis caching for read operations
+- ✅ Full-text search capability
+- ✅ Pagination and filtering
+- ✅ Bulk operations (create/update/delete)
+- ✅ Data export (JSON/CSV)
+- ✅ Analytics and insights
 
 **Note:** Protected endpoints require a valid JWT token in the Authorization header.
 
