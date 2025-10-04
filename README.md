@@ -1,5 +1,13 @@
 # 🐀 xRat Ecosystem
 
+[![Tests](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/test.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/test.yml)
+[![Build](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/build.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/build.yml)
+[![CodeQL](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/codeql.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/docker-%3E%3D20.10-blue.svg)](https://www.docker.com/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md)
+
 Um ambiente Docker isolado completo com Node.js, MongoDB, Redis, Backend API e Frontend React.
 
 ## 📋 Visão Geral
@@ -392,35 +400,77 @@ FRONTEND_PORT=5174
 
 ## 🤝 Contribuindo
 
-1. Faça suas alterações
-2. Teste localmente com `docker-compose up --build`
-3. Commit suas mudanças
-4. Envie um pull request
+Contribuições são bem-vindas! Por favor, leia nosso [Guia de Contribuição](docs/CONTRIBUTING.md) antes de submeter pull requests.
+
+### Como Contribuir
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Faça commit das suas mudanças (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+Veja também:
+- [Guia de Testes](docs/TESTING.md)
+- [Documentação da API](docs/API.md)
+- [Arquitetura](docs/ARCHITECTURE.md)
+
+---
+
+## 📚 Documentação
+
+- [📖 Architecture](docs/ARCHITECTURE.md) - Arquitetura do sistema
+- [📡 API Documentation](docs/API.md) - Documentação dos endpoints
+- [🧪 Testing Guide](docs/TESTING.md) - Guia de testes
+- [🤝 Contributing](docs/CONTRIBUTING.md) - Como contribuir
+- [🚀 Deployment](docs/DEPLOYMENT.md) - Guia de deployment
+- [🔐 Security](docs/SECURITY.md) - Políticas de segurança
+- [📝 ACT Testing](docs/ACT_TESTING.md) - Teste local de workflows
 
 ---
 
 ## 📄 Licença
 
-MIT License
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
 
-## 👨‍💻 Autor
+## 👥 Contribuidores
 
-Criado para o xRat Ecosystem Project
+Agradecimentos a todos que contribuíram para este projeto:
 
----
-
-## 🎯 Próximos Passos
-
-- [ ] Adicionar autenticação JWT
-- [ ] Implementar mais endpoints da API
-- [ ] Adicionar testes automatizados
-- [ ] Configurar CI/CD
-- [ ] Adicionar logs centralizados
-- [ ] Implementar rate limiting
-- [ ] Adicionar Swagger documentation
+<a href="https://github.com/xLabInternet/xRatEcosystem/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=xLabInternet/xRatEcosystem" />
+</a>
 
 ---
 
-**Aproveite o xRat Ecosystem! 🐀✨**
+## 📊 Status do Projeto
+
+- ✅ **Fase 1:** Setup inicial e infraestrutura básica - Completo
+- ✅ **Fase 2:** Testes, documentação e CI/CD - Completo
+- ⏳ **Fase 3:** Autenticação e autorização - Em planejamento
+- ⏳ **Fase 4:** Features avançadas - Em planejamento
+
+---
+
+## 🔗 Links Úteis
+
+- [GitHub Repository](https://github.com/xLabInternet/xRatEcosystem)
+- [Issue Tracker](https://github.com/xLabInternet/xRatEcosystem/issues)
+- [Pull Requests](https://github.com/xLabInternet/xRatEcosystem/pulls)
+- [Changelog](CHANGELOG.md)
+
+---
+
+## 📞 Suporte
+
+Precisa de ajuda? 
+
+- 📖 Confira a [documentação](docs/)
+- 🐛 Abra uma [issue](https://github.com/xLabInternet/xRatEcosystem/issues)
+- 💬 Participe das [discussões](https://github.com/xLabInternet/xRatEcosystem/discussions)
+
+---
+
+**Desenvolvido com ❤️ para a comunidade | xRat Ecosystem 🐀✨**

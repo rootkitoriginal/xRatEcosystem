@@ -1,0 +1,26 @@
+documentation:
+  - docs/**/*
+  - '**/*.md'
+
+backend:
+  - backend/**/*
+
+frontend:
+  - frontend/**/*
+
+ci/cd:
+  - .github/workflows/**/*
+  - .github/**/*.yml
+
+dependencies:
+  - '**/package.json'
+  - '**/package-lock.json'
+
+docker:
+  - '**/Dockerfile'
+  - docker-compose*.yml
+
+tests:
+  - '**/*.test.js'
+  - '**/*.test.jsx'
+  - '**/__tests__/**/*'

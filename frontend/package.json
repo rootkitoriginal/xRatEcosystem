@@ -8,7 +8,11 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src __tests__",
+    "lint:fix": "eslint src __tests__ --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx}\" \"__tests__/**/*.{js,jsx}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx}\" \"__tests__/**/*.{js,jsx}\""
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -22,7 +26,12 @@
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/ui": "^3.2.4",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^6.1.1",
     "jsdom": "^27.0.0",
+    "prettier": "^3.6.2",
     "vite": "^5.0.8",
     "vitest": "^3.2.4"
   }

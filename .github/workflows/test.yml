@@ -1,0 +1,177 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run linter
+        run: |
+          cd backend
+          npm run lint || echo "Linter not configured yet"
+
+      - name: Run tests
+        run: |
+          cd backend
+          npm test
+        env:
+          MONGODB_URI: mongodb://localhost:27017/xrat-test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          NODE_ENV: test
+
+      - name: Generate coverage report
+        run: |
+          cd backend
+          npm run test:coverage
+
+      - name: Upload backend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./backend/coverage/coverage-final.json
+          flags: backend
+          name: backend-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run linter
+        run: |
+          cd frontend
+          npm run lint || echo "Linter not configured yet"
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm test -- --run
+
+      - name: Generate coverage report
+        run: |
+          cd frontend
+          npm run test:coverage -- --run
+
+      - name: Upload frontend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start services
+        run: |
+          cp .env.example .env
+          docker-compose up -d
+          sleep 10
+
+      - name: Check services health
+        run: |
+          docker-compose ps
+          curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:3000/health
+          curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:5173
+
+      - name: Run integration tests
+        run: |
+          docker-compose exec -T backend npm test
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down -v
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run npm audit (backend)
+        run: |
+          cd backend
+          npm audit --audit-level=moderate || true
+
+      - name: Run npm audit (frontend)
+        run: |
+          cd frontend
+          npm audit --audit-level=moderate || true

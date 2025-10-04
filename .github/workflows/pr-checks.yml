@@ -1,0 +1,168 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-title-check:
+    name: Check PR Title Format
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check PR title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            perf
+            ci
+          requireScope: false
+
+  branch-name-check:
+    name: Check Branch Name
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|docs|refactor|test|chore)/.+ ]]; then
+            echo "❌ Branch name must start with: feature/, fix/, docs/, refactor/, test/, or chore/"
+            echo "Current branch: $BRANCH_NAME"
+            exit 1
+          fi
+          echo "✅ Branch name is valid: $BRANCH_NAME"
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Check for console.log in production code
+        run: |
+          echo "Checking for console.log statements..."
+          if grep -r "console\.log" backend/src frontend/src --exclude-dir=test --exclude="*.test.*"; then
+            echo "⚠️  Warning: Found console.log statements in production code"
+          else
+            echo "✅ No console.log statements found"
+          fi
+
+      - name: Check for TODO comments
+        run: |
+          echo "Checking for TODO comments..."
+          if grep -r "TODO\|FIXME" backend/src frontend/src; then
+            echo "⚠️  Warning: Found TODO/FIXME comments"
+          else
+            echo "✅ No TODO/FIXME comments found"
+          fi
+
+  test-coverage:
+    name: Test Coverage Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run backend tests with coverage
+        run: |
+          cd backend
+          npm run test:coverage
+
+      - name: Run frontend tests with coverage
+        run: |
+          cd frontend
+          npm run test:coverage -- --run
+
+      - name: Comment PR with coverage
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          lcov-file: ./backend/coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  size-check:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Check bundle size
+        run: |
+          cd frontend/dist
+          SIZE=$(du -sh . | cut -f1)
+          echo "Bundle size: $SIZE"
+          echo "📦 Frontend bundle size: $SIZE" >> $GITHUB_STEP_SUMMARY
+
+  pr-labeler:
+    name: Auto Label PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Label PR based on files
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
