@@ -263,7 +263,7 @@ describe('Data Model', () => {
       data.type = undefined;
 
       // Simulate the pre-save hook
-      const preSaveHook = function(next) {
+      const preSaveHook = function (next) {
         if (this.isNew && !this.type) {
           const contentType = typeof this.content;
           if (Array.isArray(this.content)) {
@@ -295,7 +295,7 @@ describe('Data Model', () => {
       data.type = undefined;
 
       // Simulate the pre-save hook
-      const preSaveHook = function(next) {
+      const preSaveHook = function (next) {
         if (this.isNew && !this.type) {
           const contentType = typeof this.content;
           if (Array.isArray(this.content)) {
@@ -327,7 +327,7 @@ describe('Data Model', () => {
       data.type = undefined;
 
       // Simulate the pre-save hook
-      const preSaveHook = function(next) {
+      const preSaveHook = function (next) {
         if (this.isNew && !this.type) {
           const contentType = typeof this.content;
           if (Array.isArray(this.content)) {
@@ -359,7 +359,7 @@ describe('Data Model', () => {
       data.type = undefined;
 
       // Simulate the pre-save hook
-      const preSaveHook = function(next) {
+      const preSaveHook = function (next) {
         if (this.isNew && !this.type) {
           const contentType = typeof this.content;
           if (Array.isArray(this.content)) {
@@ -391,7 +391,7 @@ describe('Data Model', () => {
       data.isNew = true;
 
       // Simulate the pre-save hook
-      const preSaveHook = function(next) {
+      const preSaveHook = function (next) {
         if (this.isNew && !this.type) {
           const contentType = typeof this.content;
           if (Array.isArray(this.content)) {
@@ -423,7 +423,7 @@ describe('Data Model', () => {
       data.type = undefined;
 
       // Simulate the pre-save hook
-      const preSaveHook = function(next) {
+      const preSaveHook = function (next) {
         if (this.isNew && !this.type) {
           const contentType = typeof this.content;
           if (Array.isArray(this.content)) {

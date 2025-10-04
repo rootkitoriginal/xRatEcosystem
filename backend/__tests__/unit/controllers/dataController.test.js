@@ -486,9 +486,7 @@ describe('Data Controller', () => {
         expect.objectContaining({
           success: true,
           count: 1, // Only one item in date range
-          data: expect.arrayContaining([
-            expect.objectContaining({ _id: '123' }),
-          ]),
+          data: expect.arrayContaining([expect.objectContaining({ _id: '123' })]),
         })
       );
     });
