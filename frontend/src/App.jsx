@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -67,13 +67,17 @@ function App() {
             <div className="status-grid">
               <div className="status-card">
                 <h3>🗄️ MongoDB</h3>
-                <span className={`badge ${status.database?.mongodb === 'connected' ? 'success' : 'error'}`}>
+                <span
+                  className={`badge ${status.database?.mongodb === 'connected' ? 'success' : 'error'}`}
+                >
                   {status.database?.mongodb || 'unknown'}
                 </span>
               </div>
               <div className="status-card">
                 <h3>🔴 Redis</h3>
-                <span className={`badge ${status.database?.redis === 'connected' ? 'success' : 'error'}`}>
+                <span
+                  className={`badge ${status.database?.redis === 'connected' ? 'success' : 'error'}`}
+                >
                   {status.database?.redis || 'unknown'}
                 </span>
               </div>
@@ -136,7 +140,7 @@ function App() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

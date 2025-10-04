@@ -3,5 +3,5 @@ const createHealthRouter = require('./healthRouter');
 
 module.exports = {
   HealthService,
-  createHealthRouter
+  createHealthRouter,
 };

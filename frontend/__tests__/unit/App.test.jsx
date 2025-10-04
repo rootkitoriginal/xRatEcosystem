@@ -14,24 +14,24 @@ describe('App Component', () => {
 
   it('renders the app header', async () => {
     global.fetch.mockResolvedValueOnce({
-      json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } })
+      json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } }),
     });
 
     await act(async () => {
       render(<App />);
     });
-    
+
     expect(screen.getByText('🐀 xRat Ecosystem')).toBeDefined();
     expect(screen.getByText('Docker Isolated Environment')).toBeDefined();
   });
 
   it('displays loading state initially', async () => {
     global.fetch.mockImplementation(() => new Promise(() => {}));
-    
+
     await act(async () => {
       render(<App />);
     });
-    
+
     expect(screen.getByText('Loading...')).toBeDefined();
   });
 
@@ -41,12 +41,12 @@ describe('App Component', () => {
       ecosystem: 'xRat',
       database: {
         mongodb: 'connected',
-        redis: 'connected'
-      }
+        redis: 'connected',
+      },
     };
 
     global.fetch.mockResolvedValueOnce({
-      json: async () => mockStatus
+      json: async () => mockStatus,
     });
 
     await act(async () => {
@@ -73,11 +73,11 @@ describe('App Component', () => {
 
   it('refreshes status when refresh button is clicked', async () => {
     const mockStatus = {
-      database: { mongodb: 'connected', redis: 'connected' }
+      database: { mongodb: 'connected', redis: 'connected' },
     };
 
     global.fetch.mockResolvedValue({
-      json: async () => mockStatus
+      json: async () => mockStatus,
     });
 
     await act(async () => {
@@ -89,7 +89,7 @@ describe('App Component', () => {
     });
 
     const refreshButton = screen.getByText('🔄 Refresh Status');
-    
+
     await act(async () => {
       fireEvent.click(refreshButton);
     });
@@ -101,12 +101,12 @@ describe('App Component', () => {
 
   it('submits form data successfully', async () => {
     const mockStatus = {
-      database: { mongodb: 'connected', redis: 'connected' }
+      database: { mongodb: 'connected', redis: 'connected' },
     };
 
     const mockSubmitResponse = {
       success: true,
-      message: 'Data stored successfully'
+      message: 'Data stored successfully',
     };
 
     global.fetch
@@ -114,7 +114,7 @@ describe('App Component', () => {
       .mockResolvedValueOnce({ json: async () => mockSubmitResponse });
 
     const user = userEvent.setup();
-    
+
     await act(async () => {
       render(<App />);
     });
@@ -138,7 +138,7 @@ describe('App Component', () => {
 
   it('displays error message when form submission fails', async () => {
     const mockStatus = {
-      database: { mongodb: 'connected', redis: 'connected' }
+      database: { mongodb: 'connected', redis: 'connected' },
     };
 
     global.fetch
@@ -146,7 +146,7 @@ describe('App Component', () => {
       .mockRejectedValueOnce(new Error('Submit failed'));
 
     const user = userEvent.setup();
-    
+
     await act(async () => {
       render(<App />);
     });
@@ -170,13 +170,13 @@ describe('App Component', () => {
 
   it('renders ecosystem info section', async () => {
     global.fetch.mockResolvedValueOnce({
-      json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } })
+      json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } }),
     });
 
     await act(async () => {
       render(<App />);
     });
-    
+
     expect(screen.getByText('📋 Ecosystem Info')).toBeDefined();
     expect(screen.getByText(/Backend API exposed on port 3000/)).toBeDefined();
     expect(screen.getByText(/MongoDB internal only/)).toBeDefined();

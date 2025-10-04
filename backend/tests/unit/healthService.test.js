@@ -9,20 +9,20 @@ describe('HealthService', () => {
     // Mock MongoDB client
     mockMongoClient = {
       topology: {
-        isConnected: jest.fn().mockReturnValue(true)
+        isConnected: jest.fn().mockReturnValue(true),
       },
       db: jest.fn().mockReturnValue({
         admin: jest.fn().mockReturnValue({
-          ping: jest.fn().mockResolvedValue({})
+          ping: jest.fn().mockResolvedValue({}),
         }),
-        databaseName: 'test-db'
-      })
+        databaseName: 'test-db',
+      }),
     };
 
     // Mock Redis client
     mockRedisClient = {
       isOpen: true,
-      ping: jest.fn().mockResolvedValue('PONG')
+      ping: jest.fn().mockResolvedValue('PONG'),
     };
 
     healthService = new HealthService(mockMongoClient, mockRedisClient);
@@ -35,7 +35,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'ok',
         service: 'xRat Backend',
-        environment: expect.any(String)
+        environment: expect.any(String),
       });
       expect(result.timestamp).toBeDefined();
       expect(result.uptime).toBeGreaterThanOrEqual(0);
@@ -48,7 +48,7 @@ describe('HealthService', () => {
 
       expect(result).toMatchObject({
         status: 'connected',
-        database: 'test-db'
+        database: 'test-db',
       });
       expect(result.latency).toMatch(/\d+ms/);
     });
@@ -60,7 +60,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'error',
         message: 'MongoDB client not initialized',
-        latency: null
+        latency: null,
       });
     });
 
@@ -71,7 +71,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'error',
         message: 'MongoDB not connected',
-        latency: null
+        latency: null,
       });
     });
 
@@ -82,7 +82,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'error',
         message: 'Connection timeout',
-        latency: null
+        latency: null,
       });
     });
   });
@@ -92,7 +92,7 @@ describe('HealthService', () => {
       const result = await healthService.checkRedis();
 
       expect(result).toMatchObject({
-        status: 'connected'
+        status: 'connected',
       });
       expect(result.latency).toMatch(/\d+ms/);
     });
@@ -104,7 +104,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'error',
         message: 'Redis client not initialized',
-        latency: null
+        latency: null,
       });
     });
 
@@ -115,7 +115,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'error',
         message: 'Redis not connected',
-        latency: null
+        latency: null,
       });
     });
 
@@ -126,7 +126,7 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'error',
         message: 'Redis timeout',
-        latency: null
+        latency: null,
       });
     });
   });
@@ -140,8 +140,8 @@ describe('HealthService', () => {
         ready: true,
         services: {
           mongodb: { status: 'connected' },
-          redis: { status: 'connected' }
-        }
+          redis: { status: 'connected' },
+        },
       });
     });
 
@@ -154,8 +154,8 @@ describe('HealthService', () => {
         ready: false,
         services: {
           mongodb: { status: 'error' },
-          redis: { status: 'connected' }
-        }
+          redis: { status: 'connected' },
+        },
       });
     });
 
@@ -168,8 +168,8 @@ describe('HealthService', () => {
         ready: false,
         services: {
           mongodb: { status: 'connected' },
-          redis: { status: 'error' }
-        }
+          redis: { status: 'error' },
+        },
       });
     });
   });
@@ -185,13 +185,13 @@ describe('HealthService', () => {
           memory: {
             used: expect.any(Number),
             total: expect.any(Number),
-            utilization: expect.any(Number)
+            utilization: expect.any(Number),
           },
           cpu: {
             user: expect.any(Number),
-            system: expect.any(Number)
-          }
-        }
+            system: expect.any(Number),
+          },
+        },
       });
       expect(result.metrics.memory.utilization).toBeLessThan(100);
     });
@@ -206,12 +206,12 @@ describe('HealthService', () => {
         service: 'xRat Backend',
         readiness: {
           ready: true,
-          services: expect.any(Object)
+          services: expect.any(Object),
         },
         liveness: {
           alive: true,
-          metrics: expect.any(Object)
-        }
+          metrics: expect.any(Object),
+        },
       });
       expect(result.timestamp).toBeDefined();
       expect(result.uptime).toBeGreaterThanOrEqual(0);
@@ -226,11 +226,11 @@ describe('HealthService', () => {
       expect(result).toMatchObject({
         status: 'unhealthy',
         readiness: {
-          ready: false
+          ready: false,
         },
         liveness: {
-          alive: true
-        }
+          alive: true,
+        },
       });
     });
   });

@@ -13,20 +13,20 @@ describe('Health Endpoints Integration', () => {
     // Mock MongoDB client
     mockMongoClient = {
       topology: {
-        isConnected: jest.fn().mockReturnValue(true)
+        isConnected: jest.fn().mockReturnValue(true),
       },
       db: jest.fn().mockReturnValue({
         admin: jest.fn().mockReturnValue({
-          ping: jest.fn().mockResolvedValue({})
+          ping: jest.fn().mockResolvedValue({}),
         }),
-        databaseName: 'test-db'
-      })
+        databaseName: 'test-db',
+      }),
     };
 
     // Mock Redis client
     mockRedisClient = {
       isOpen: true,
-      ping: jest.fn().mockResolvedValue('PONG')
+      ping: jest.fn().mockResolvedValue('PONG'),
     };
 
     app.use('/health', createHealthRouter(mockMongoClient, mockRedisClient));
@@ -34,14 +34,12 @@ describe('Health Endpoints Integration', () => {
 
   describe('GET /health', () => {
     test('should return basic health status', async () => {
-      const response = await request(app)
-        .get('/health')
-        .expect(200);
+      const response = await request(app).get('/health').expect(200);
 
       expect(response.body).toMatchObject({
         status: 'ok',
         service: 'xRat Backend',
-        environment: expect.any(String)
+        environment: expect.any(String),
       });
       expect(response.body.timestamp).toBeDefined();
       expect(response.body.uptime).toBeGreaterThanOrEqual(0);
@@ -53,86 +51,74 @@ describe('Health Endpoints Integration', () => {
       const brokenHealthRouter = createHealthRouter(null, null);
       errorApp.use('/health', brokenHealthRouter);
 
-      const response = await request(errorApp)
-        .get('/health')
-        .expect(200);
+      const response = await request(errorApp).get('/health').expect(200);
 
       expect(response.body).toMatchObject({
         status: 'ok',
-        service: 'xRat Backend'
+        service: 'xRat Backend',
       });
     });
   });
 
   describe('GET /health/ready', () => {
     test('should return ready status when all services are healthy', async () => {
-      const response = await request(app)
-        .get('/health/ready')
-        .expect(200);
+      const response = await request(app).get('/health/ready').expect(200);
 
       expect(response.body).toMatchObject({
         status: 'ready',
         ready: true,
         services: {
           mongodb: { status: 'connected' },
-          redis: { status: 'connected' }
-        }
+          redis: { status: 'connected' },
+        },
       });
     });
 
     test('should return not ready when MongoDB is down', async () => {
       mockMongoClient.topology.isConnected.mockReturnValue(false);
 
-      const response = await request(app)
-        .get('/health/ready')
-        .expect(503);
+      const response = await request(app).get('/health/ready').expect(503);
 
       expect(response.body).toMatchObject({
         status: 'not_ready',
         ready: false,
         services: {
           mongodb: { status: 'error' },
-          redis: { status: 'connected' }
-        }
+          redis: { status: 'connected' },
+        },
       });
     });
 
     test('should return not ready when Redis is down', async () => {
       mockRedisClient.isOpen = false;
 
-      const response = await request(app)
-        .get('/health/ready')
-        .expect(503);
+      const response = await request(app).get('/health/ready').expect(503);
 
       expect(response.body).toMatchObject({
         status: 'not_ready',
         ready: false,
         services: {
           mongodb: { status: 'connected' },
-          redis: { status: 'error' }
-        }
+          redis: { status: 'error' },
+        },
       });
     });
 
     test('should handle service check errors', async () => {
       mockMongoClient.db().admin().ping.mockRejectedValue(new Error('Connection lost'));
 
-      const response = await request(app)
-        .get('/health/ready')
-        .expect(503);
+      const response = await request(app).get('/health/ready').expect(503);
 
       expect(response.body).toMatchObject({
         status: 'not_ready',
-        ready: false
+        ready: false,
       });
     });
   });
 
   describe('GET /health/live', () => {
     test('should return alive status when application is healthy', async () => {
-      const response = await request(app)
-        .get('/health/live')
-        .expect(200);
+      const response = await request(app).get('/health/live').expect(200);
 
       expect(response.body).toMatchObject({
         status: 'alive',
@@ -141,13 +127,13 @@ describe('Health Endpoints Integration', () => {
           memory: {
             used: expect.any(Number),
             total: expect.any(Number),
-            utilization: expect.any(Number)
+            utilization: expect.any(Number),
           },
           cpu: {
             user: expect.any(Number),
-            system: expect.any(Number)
-          }
-        }
+            system: expect.any(Number),
+          },
+        },
       });
     });
 
@@ -157,23 +143,19 @@ describe('Health Endpoints Integration', () => {
       const brokenHealthRouter = createHealthRouter(null, null);
       errorApp.use('/health', brokenHealthRouter);
 
-      const response = await request(errorApp)
-        .get('/health/live')
-        .expect(200);
+      const response = await request(errorApp).get('/health/live').expect(200);
 
       expect(response.body).toMatchObject({
         status: 'alive',
         alive: true,
-        metrics: expect.any(Object)
+        metrics: expect.any(Object),
       });
     });
   });
 
   describe('GET /health/complete', () => {
     test('should return complete health status', async () => {
-      const response = await request(app)
-        .get('/health/complete')
-        .expect(200);
+      const response = await request(app).get('/health/complete').expect(200);
 
       expect(response.body).toMatchObject({
         status: 'healthy',
@@ -182,13 +164,13 @@ describe('Health Endpoints Integration', () => {
           ready: true,
           services: {
             mongodb: { status: 'connected' },
-            redis: { status: 'connected' }
-          }
+            redis: { status: 'connected' },
+          },
         },
         liveness: {
           alive: true,
-          metrics: expect.any(Object)
-        }
+          metrics: expect.any(Object),
+        },
       });
     });
 
@@ -196,18 +178,16 @@ describe('Health Endpoints Integration', () => {
       mockMongoClient.topology.isConnected.mockReturnValue(false);
       mockRedisClient.isOpen = false;
 
-      const response = await request(app)
-        .get('/health/complete')
-        .expect(503);
+      const response = await request(app).get('/health/complete').expect(503);
 
       expect(response.body).toMatchObject({
         status: 'unhealthy',
         readiness: {
-          ready: false
+          ready: false,
         },
         liveness: {
-          alive: true
-        }
+          alive: true,
+        },
       });
     });
 
@@ -216,18 +196,16 @@ describe('Health Endpoints Integration', () => {
       const brokenHealthRouter = createHealthRouter(null, null);
       errorApp.use('/health', brokenHealthRouter);
 
-      const response = await request(errorApp)
-        .get('/health/complete')
-        .expect(503);
+      const response = await request(errorApp).get('/health/complete').expect(503);
 
       expect(response.body).toMatchObject({
         status: 'unhealthy',
         readiness: {
-          ready: false
+          ready: false,
         },
         liveness: {
-          alive: true
-        }
+          alive: true,
+        },
       });
     });
   });

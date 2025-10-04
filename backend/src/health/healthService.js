@@ -19,7 +19,7 @@ class HealthService {
       service: 'xRat Backend',
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
-      uptime: Math.floor(process.uptime())
+      uptime: Math.floor(process.uptime()),
     };
   }
 
@@ -34,7 +34,7 @@ class HealthService {
         return {
           status: 'error',
           message: 'MongoDB client not initialized',
-          latency: null
+          latency: null,
         };
       }
 
@@ -44,7 +44,7 @@ class HealthService {
         return {
           status: 'error',
           message: 'MongoDB not connected',
-          latency: null
+          latency: null,
         };
       }
 
@@ -55,13 +55,13 @@ class HealthService {
       return {
         status: 'connected',
         latency: `${latency}ms`,
-        database: this.mongoClient.db().databaseName
+        database: this.mongoClient.db().databaseName,
       };
     } catch (error) {
       return {
         status: 'error',
         message: error.message,
-        latency: null
+        latency: null,
       };
     }
   }
@@ -77,7 +77,7 @@ class HealthService {
         return {
           status: 'error',
           message: 'Redis client not initialized',
-          latency: null
+          latency: null,
         };
       }
 
@@ -86,7 +86,7 @@ class HealthService {
         return {
           status: 'error',
           message: 'Redis not connected',
-          latency: null
+          latency: null,
         };
       }
 
@@ -95,13 +95,13 @@ class HealthService {
       const latency = Date.now() - startTime;
       return {
         status: 'connected',
-        latency: `${latency}ms`
+        latency: `${latency}ms`,
       };
     } catch (error) {
       return {
         status: 'error',
         message: error.message,
-        latency: null
+        latency: null,
       };
     }
   }
@@ -115,24 +115,24 @@ class HealthService {
     const [basicHealth, mongoHealth, redisHealth] = await Promise.all([
       this.getBasicHealth(),
       this.checkMongoDB(),
-      this.checkRedis()
+      this.checkRedis(),
     ]);
 
     const services = {
       mongodb: mongoHealth,
-      redis: redisHealth
+      redis: redisHealth,
     };
 
     // Determine overall status
     const allServicesHealthy = Object.values(services).every(
-      service => service.status === 'connected'
+      (service) => service.status === 'connected'
     );
 
     return {
       ...basicHealth,
       status: allServicesHealthy ? 'ready' : 'not_ready',
       services,
-      ready: allServicesHealthy
+      ready: allServicesHealthy,
     };
   }
 
@@ -160,13 +160,13 @@ class HealthService {
         memory: {
           used: Math.round(memoryUsage.heapUsed / 1024 / 1024), // MB
           total: Math.round(memoryUsage.heapTotal / 1024 / 1024), // MB
-          utilization: Math.round(memoryUtilization * 100) // percentage
+          utilization: Math.round(memoryUtilization * 100), // percentage
         },
         cpu: {
           user: cpuUsage.user,
-          system: cpuUsage.system
-        }
-      }
+          system: cpuUsage.system,
+        },
+      },
     };
   }
 
@@ -177,7 +177,7 @@ class HealthService {
   async getCompleteHealth() {
     const [readiness, liveness] = await Promise.all([
       this.getReadinessCheck(),
-      this.getLivenessCheck()
+      this.getLivenessCheck(),
     ]);
 
     return {
@@ -189,12 +189,12 @@ class HealthService {
       status: readiness.ready && liveness.alive ? 'healthy' : 'unhealthy',
       readiness: {
         ready: readiness.ready,
-        services: readiness.services
+        services: readiness.services,
       },
       liveness: {
         alive: liveness.alive,
-        metrics: liveness.metrics
-      }
+        metrics: liveness.metrics,
+      },
     };
   }
 }

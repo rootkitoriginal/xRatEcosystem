@@ -22,7 +22,7 @@ function createHealthRouter(mongoClient, redisClient) {
       res.status(503).json({
         status: 'error',
         timestamp: new Date().toISOString(),
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -42,7 +42,7 @@ function createHealthRouter(mongoClient, redisClient) {
         status: 'not_ready',
         timestamp: new Date().toISOString(),
         ready: false,
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -62,7 +62,7 @@ function createHealthRouter(mongoClient, redisClient) {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         alive: false,
-        message: error.message
+        message: error.message,
       });
     }
   });
@@ -81,7 +81,7 @@ function createHealthRouter(mongoClient, redisClient) {
       res.status(503).json({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        message: error.message
+        message: error.message,
       });
     }
   });
