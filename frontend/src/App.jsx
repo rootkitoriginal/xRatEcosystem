@@ -4,6 +4,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import AuthButtons from './components/auth/AuthButtons';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
+import DataManagement from './pages/DataManagement';
 import './App.css';
 
 function App() {
@@ -27,6 +28,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/data"
+              element={
+                <ProtectedRoute>
+                  <DataManagement />
                 </ProtectedRoute>
               }
             />

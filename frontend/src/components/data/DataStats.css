@@ -1,0 +1,147 @@
+.data-stats {
+  background: var(--card-bg, #1a1a1a);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: var(--stat-bg, #2a2a2a);
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.stat-primary {
+  border-left: 4px solid var(--primary-color, #646cff);
+}
+
+.stat-primary .stat-value {
+  color: var(--primary-color, #646cff);
+}
+
+.stat-success {
+  border-left: 4px solid #4ade80;
+}
+
+.stat-success .stat-value {
+  color: #4ade80;
+}
+
+.stat-info {
+  border-left: 4px solid #60a5fa;
+}
+
+.stat-info .stat-value {
+  color: #60a5fa;
+}
+
+.stat-warning {
+  border-left: 4px solid #fbbf24;
+}
+
+.stat-warning .stat-value {
+  color: #fbbf24;
+}
+
+.stats-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.breakdown-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-color, rgba(255, 255, 255, 0.87));
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.breakdown-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--stat-bg, #2a2a2a);
+  border-radius: 4px;
+}
+
+.breakdown-label {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: 0.9rem;
+}
+
+.breakdown-value {
+  font-weight: 600;
+  color: var(--text-color, rgba(255, 255, 255, 0.87));
+  background: var(--primary-color, #646cff);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stats-breakdown {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
