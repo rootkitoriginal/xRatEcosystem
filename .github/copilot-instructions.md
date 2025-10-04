@@ -1,10 +1,42 @@
 # xRat Ecosystem Project Setup
 
 ## Project Overview
+
 Docker-based isolated ecosystem with Node.js backend, React frontend, MongoDB, and Redis.
 
 ## Current Branch
-🌿 **feature/testing-docs-workflows** - Implementing comprehensive testing, documentation, and CI/CD workflows
+
+🌿 **main** - All Phase 2 infrastructure complete, ready for Phase 3 parallel development
+
+## 🚀 ACTIVE DEVELOPMENT - Phase 3 Production Features
+
+**Status**: 🟡 **3 Issues IN PROGRESS** - Parallel development active
+
+### Current Active Issues:
+
+#### Issue #14 - Health Check Endpoints ⚡ ALTA PRIORIDADE
+
+- **Branch**: `feature/health-checks`
+- **Status**: 🟡 IN PROGRESS
+- **Milestone**: Phase 3 - Production Features
+- **ETA**: 3-5 dias
+- **Scope**: `/health`, `/health/ready`, `/health/live` endpoints with MongoDB/Redis connectivity checks
+
+#### Issue #16 - JWT Authentication Backend 🔐 MÉDIA PRIORIDADE
+
+- **Branch**: `feature/jwt-auth-backend`
+- **Status**: 🟡 IN PROGRESS
+- **Milestone**: Phase 4 - Authentication System
+- **ETA**: 5-7 dias
+- **Scope**: JWT middleware, auth endpoints, user management, password hashing
+
+#### Issue #17 - Authentication UI Components ⚛️ MÉDIA PRIORIDADE
+
+- **Branch**: `feature/auth-ui-components`
+- **Status**: 🟡 IN PROGRESS
+- **Milestone**: Phase 4 - Authentication System
+- **ETA**: 4-6 dias
+- **Scope**: Login/Register forms, AuthContext, protected routes, token management
 
 ## Initial Setup Progress
 
@@ -22,6 +54,7 @@ Docker-based isolated ecosystem with Node.js backend, React frontend, MongoDB, a
 ## ✅ Initial Setup Complete!
 
 All services are running successfully:
+
 - Backend: http://localhost:3000
 - Frontend: http://localhost:5173
 - MongoDB: Connected (internal only)
@@ -35,6 +68,7 @@ All services are running successfully:
 ### ✅ Completed Tasks
 
 #### Gemini CLI Integration
+
 - [x] Install and configure Gemini CLI workflows
   - [x] gemini-dispatch.yml - Central command dispatcher
   - [x] gemini-invoke.yml - General AI assistant
@@ -46,6 +80,7 @@ All services are running successfully:
 - [x] Add .gemini/ to .gitignore
 
 #### Local Testing with act
+
 - [x] Install and configure act (GitHub Actions runner)
 - [x] Create .actrc configuration file
 - [x] Create .secrets file for local testing
@@ -53,6 +88,7 @@ All services are running successfully:
 - [x] Test workflow detection and dry runs
 
 #### Documentation Infrastructure
+
 - [x] Create docs/ directory structure
 - [x] Create docs/README.md with documentation index
 - [x] Create docs/ACT_TESTING.md - Local testing guide
@@ -63,6 +99,7 @@ All services are running successfully:
 All tasks from Phase 2 have been successfully completed:
 
 #### Testing Infrastructure
+
 - [x] Backend Testing (Node.js + Express)
   - [x] Install and configure Jest
   - [x] Add jest, supertest, @types/jest
@@ -83,6 +120,7 @@ All tasks from Phase 2 have been successfully completed:
   - [x] Add test coverage reporting (80% threshold)
 
 #### Documentation
+
 - [x] Technical Documentation
   - [x] ARCHITECTURE.md - System design and architecture with diagrams
   - [x] API.md - Complete API endpoints documentation
@@ -97,6 +135,7 @@ All tasks from Phase 2 have been successfully completed:
   - [x] docs/README.md (already exists)
 
 #### CI/CD Workflows (GitHub Actions)
+
 - [x] Core Workflows
   - [x] test.yml - Automated testing (backend, frontend, integration, security)
   - [x] build.yml - Docker image builds and GHCR publishing
@@ -107,6 +146,7 @@ All tasks from Phase 2 have been successfully completed:
   - [x] labeler.yml - Automatic PR labeling based on files
 
 #### Quality Assurance
+
 - [x] Code Quality Tools
   - [x] ESLint configuration (backend and frontend)
   - [x] Prettier configuration (.prettierrc, .prettierignore)
@@ -114,6 +154,7 @@ All tasks from Phase 2 have been successfully completed:
   - [x] Lint and format scripts added to package.json
 
 #### Repository Configuration
+
 - [x] GitHub Templates
   - [x] Bug report template
   - [x] Feature request template
@@ -135,6 +176,7 @@ All tasks from Phase 2 have been successfully completed:
 ### 📊 Phase 2 Summary
 
 **Completed:**
+
 - ✅ 16 passing tests (8 backend + 8 frontend)
 - ✅ 8 comprehensive documentation files
 - ✅ 4 GitHub Actions workflows
@@ -142,62 +184,113 @@ All tasks from Phase 2 have been successfully completed:
 - ✅ Complete code quality tooling setup
 - ✅ Professional README with badges and sections
 
-**Future Enhancements (Phase 3+):**
-- [ ] JWT Authentication
-- [ ] Swagger/OpenAPI integration
-- [ ] Playwright E2E tests
-- [ ] Husky + lint-staged pre-commit hooks
-- [ ] Winston structured logging
-- [ ] Enhanced health check endpoints (/ready, /live)
-- [ ] Prometheus metrics
-- [ ] Deployment workflows (staging/production)
-- [ ] Documentation site (GitHub Pages)
-- [ ] Dependency update automation
-### 🔄 In Progress Tasks
+**Next Phases Pipeline:**
 
-### Testing Infrastructure
+- 🟡 **Phase 3 - IN PROGRESS**: Health checks (#14), Logging (#13)
+- 🟡 **Phase 4 - IN PROGRESS**: JWT Auth Backend (#16), Auth UI (#17)
+- ⏳ **Phase 5 - PLANNED**: Data Management API (#18), Data UI (#19)
+- ⏳ **Phase 6 - PLANNED**: WebSocket Backend (#20), Real-time UI (#21)
+- ⏳ **Documentation**: API Documentation with Swagger (#11)
 
-#### Backend Testing (Node.js + Express)
-- [ ] Install and configure Jest
-  - [ ] Add jest, supertest, @types/jest
-  - [ ] Create jest.config.js
-  - [ ] Add test scripts to package.json
-- [ ] Create test structure
-  - [ ] `backend/__tests__/unit/` - Unit tests
-  - [ ] `backend/__tests__/integration/` - Integration tests
-  - [ ] `backend/__tests__/e2e/` - End-to-end tests
-  - [ ] `backend/__tests__/fixtures/` - Test data
-- [ ] Implement unit tests
-  - [ ] Test utility functions
-  - [ ] Test middleware
-  - [ ] Test services/controllers
-- [ ] Implement integration tests
-  - [ ] Test API endpoints
-  - [ ] Test database operations
-  - [ ] Test Redis cache operations
-- [ ] Implement E2E tests
-  - [ ] Test complete user flows
-  - [ ] Test authentication flows
-  - [ ] Test error scenarios
-- [ ] Add test coverage reporting
-  - [ ] Configure Istanbul/NYC
-  - [ ] Set minimum coverage thresholds (80%)
+---
 
-#### Frontend Testing (React + Vite)
-- [ ] Install and configure Vitest
-  - [ ] Add vitest, @testing-library/react, @testing-library/jest-dom
-  - [ ] Add @testing-library/user-event, jsdom
-  - [ ] Create vitest.config.js
-  - [ ] Add test scripts to package.json
-- [ ] Create test structure
-  - [ ] `frontend/__tests__/unit/` - Component unit tests
-  - [ ] `frontend/__tests__/integration/` - Integration tests
-  - [ ] `frontend/__tests__/e2e/` - E2E tests with Playwright
-  - [ ] `frontend/__tests__/mocks/` - API mocks
-- [ ] Implement unit tests
-  - [ ] Test individual components
-  - [ ] Test hooks
-  - [ ] Test utilities
+## � CURRENT DEVELOPMENT FOCUS
+
+### Phase 3 - Production Features (In Progress)
+
+#### Issue #14 - Health Check Endpoints 🏥
+
+**Branch**: `feature/health-checks` | **Priority**: HIGH | **ETA**: 3-5 days
+
+**Implementation Goals:**
+
+- Comprehensive health monitoring system
+- Production-ready endpoints for container orchestration
+- Database connectivity validation
+- Redis connectivity verification
+- Proper HTTP status codes and detailed responses
+
+**Technical Requirements:**
+
+```javascript
+// Endpoints to implement:
+GET /health          - Basic health check
+GET /health/ready    - Readiness probe (DB + Redis)
+GET /health/live     - Liveness probe
+
+// Response format:
+{
+  "status": "ok" | "error",
+  "timestamp": "2025-10-04T05:13:40Z",
+  "services": {
+    "mongodb": { "status": "connected", "latency": "12ms" },
+    "redis": { "status": "connected", "latency": "8ms" }
+  }
+}
+```
+
+### Phase 4 - Authentication System (In Progress)
+
+#### Issue #16 - JWT Authentication Backend 🔐
+
+**Branch**: `feature/jwt-auth-backend` | **Priority**: MEDIUM | **ETA**: 5-7 days
+
+**Implementation Goals:**
+
+- Secure JWT-based authentication system
+- User registration and login endpoints
+- Password hashing with bcrypt
+- Token refresh mechanism
+- Rate limiting and security headers
+
+**API Endpoints:**
+
+```javascript
+POST /api/auth/register  - User registration
+POST /api/auth/login     - User authentication
+POST /api/auth/refresh   - Token refresh
+POST /api/auth/logout    - User logout
+GET  /api/auth/profile   - Get user profile (protected)
+```
+
+#### Issue #17 - Authentication UI Components ⚛️
+
+**Branch**: `feature/auth-ui-components` | **Priority**: MEDIUM | **ETA**: 4-6 days
+
+**Implementation Goals:**
+
+- Complete authentication user interface
+- React components for login/register
+- Authentication context and state management
+- Protected routes and navigation
+- Form validation and error handling
+
+**Components Structure:**
+
+```javascript
+/src/components/auth/
+├── LoginForm.jsx         - Login form with validation
+├── RegisterForm.jsx      - User registration form
+├── ProtectedRoute.jsx    - Route protection wrapper
+├── UserProfile.jsx       - User profile display
+├── AuthButtons.jsx       - Login/logout navigation
+└── __tests__/
+    └── auth.test.jsx     - Component test suite
+```
+
+### Parallel Development Strategy
+
+**✅ Can Develop Simultaneously:**
+
+- Issue #14 (Health Checks) - Independent backend feature
+- Issue #16 (JWT Backend) - Independent authentication system
+- Issue #17 (Auth UI) - Can use mock authentication during development
+
+**🔗 Integration Points:**
+
+- Auth UI (#17) can start with mock authentication
+- Health checks (#14) can be integrated with auth system later
+- All features use existing Docker/database infrastructure
 - [ ] Implement integration tests
   - [ ] Test component interactions
   - [ ] Test API integration
@@ -211,6 +304,7 @@ All tasks from Phase 2 have been successfully completed:
   - [ ] Set minimum coverage thresholds (80%)
 
 #### Docker Testing
+
 - [ ] Create test docker-compose.yml
   - [ ] Isolated test database
   - [ ] Isolated test Redis
@@ -222,33 +316,30 @@ All tasks from Phase 2 have been successfully completed:
 ### Documentation
 
 #### Technical Documentation
+
 - [ ] Create `docs/` directory structure
   - [ ] `docs/architecture/` - System architecture
   - [ ] `docs/api/` - API documentation
   - [ ] `docs/guides/` - User guides
   - [ ] `docs/development/` - Development guides
-  
 - [ ] Create ARCHITECTURE.md
   - [ ] System overview diagram
   - [ ] Component architecture
   - [ ] Data flow diagrams
   - [ ] Technology stack details
   - [ ] Docker networking explanation
-  
 - [ ] Create API.md
   - [ ] API endpoints documentation
   - [ ] Request/Response examples
   - [ ] Authentication details
   - [ ] Error codes and handling
   - [ ] Rate limiting information
-  
 - [ ] Create TESTING.md
   - [ ] Testing philosophy
   - [ ] Running tests locally
   - [ ] Writing new tests
   - [ ] Test coverage requirements
   - [ ] Debugging tests
-  
 - [ ] Create CONTRIBUTING.md
   - [ ] Code of conduct
   - [ ] Development workflow
@@ -256,14 +347,12 @@ All tasks from Phase 2 have been successfully completed:
   - [ ] Commit message guidelines
   - [ ] Pull request process
   - [ ] Code review guidelines
-  
 - [ ] Create DEPLOYMENT.md
   - [ ] Local deployment
   - [ ] Production deployment
   - [ ] Environment variables
   - [ ] Troubleshooting
   - [ ] Monitoring and logs
-  
 - [ ] Create SECURITY.md
   - [ ] Security policies
   - [ ] Reporting vulnerabilities
@@ -271,18 +360,19 @@ All tasks from Phase 2 have been successfully completed:
   - [ ] Dependencies management
 
 #### API Documentation
+
 - [ ] Add Swagger/OpenAPI
   - [ ] Install swagger-ui-express
   - [ ] Create openapi.yaml
   - [ ] Add Swagger UI endpoint
   - [ ] Document all API endpoints
-  
 - [ ] Add JSDoc comments
   - [ ] Document all functions
   - [ ] Document all classes
   - [ ] Document all modules
 
 #### Code Documentation
+
 - [ ] Add inline comments for complex logic
 - [ ] Create README.md for each major directory
   - [ ] backend/README.md
@@ -292,8 +382,8 @@ All tasks from Phase 2 have been successfully completed:
 ### CI/CD Workflows (GitHub Actions)
 
 #### Core Workflows
+
 - [ ] Create `.github/workflows/` directory
-  
 - [ ] Create `test.yml` - Testing workflow
   - [ ] Run on: push, pull_request
   - [ ] Lint backend code
@@ -303,23 +393,19 @@ All tasks from Phase 2 have been successfully completed:
   - [ ] Run integration tests
   - [ ] Generate coverage reports
   - [ ] Upload coverage to Codecov
-  
 - [ ] Create `build.yml` - Build workflow
   - [ ] Build backend Docker image
   - [ ] Build frontend Docker image
   - [ ] Test Docker Compose setup
   - [ ] Push images to GitHub Container Registry (GHCR)
-  
 - [ ] Create `deploy.yml` - Deployment workflow
   - [ ] Deploy to staging on merge to develop
   - [ ] Deploy to production on release tags
   - [ ] Run health checks post-deployment
-  
 - [ ] Create `codeql.yml` - Security scanning
   - [ ] CodeQL analysis
   - [ ] Dependency scanning
   - [ ] Secret scanning
-  
 - [ ] Create `release.yml` - Release automation
   - [ ] Create release notes
   - [ ] Build and tag Docker images
@@ -327,17 +413,16 @@ All tasks from Phase 2 have been successfully completed:
   - [ ] Update changelog
 
 #### Additional Workflows
+
 - [ ] Create `pr-checks.yml` - PR validation
   - [ ] Check PR title format
   - [ ] Check branch naming
   - [ ] Verify tests pass
   - [ ] Check code coverage
-  
 - [ ] Create `docs.yml` - Documentation
   - [ ] Build documentation
   - [ ] Deploy to GitHub Pages
   - [ ] Check for broken links
-  
 - [ ] Create `dependency-update.yml` - Dependencies
   - [ ] Automated dependency updates
   - [ ] Security vulnerability checks
@@ -345,35 +430,32 @@ All tasks from Phase 2 have been successfully completed:
 ### Quality Assurance
 
 #### Code Quality Tools
+
 - [ ] ESLint configuration
   - [ ] Backend ESLint config
   - [ ] Frontend ESLint config
   - [ ] Shared ESLint rules
-  
 - [ ] Prettier configuration
   - [ ] .prettierrc
   - [ ] .prettierignore
   - [ ] Add format scripts
-  
 - [ ] Husky + lint-staged
   - [ ] Pre-commit hooks
   - [ ] Pre-push hooks
   - [ ] Commit message validation
-  
 - [ ] EditorConfig
   - [ ] .editorconfig for consistent coding style
 
 #### Monitoring & Logging
+
 - [ ] Add structured logging
   - [ ] Winston for backend
   - [ ] Log rotation
   - [ ] Log levels
-  
 - [ ] Add health check endpoints
   - [ ] `/health` - Basic health
   - [ ] `/health/ready` - Readiness check
   - [ ] `/health/live` - Liveness check
-  
 - [ ] Add monitoring
   - [ ] Prometheus metrics endpoint
   - [ ] Custom metrics
@@ -381,26 +463,25 @@ All tasks from Phase 2 have been successfully completed:
 ### Repository Configuration
 
 #### GitHub Repository Settings
+
 - [ ] Add branch protection rules
   - [ ] Require PR reviews
   - [ ] Require status checks
   - [ ] Require up-to-date branches
-  
 - [ ] Add issue templates
   - [ ] Bug report template
   - [ ] Feature request template
   - [ ] Question template
-  
 - [ ] Add PR template
   - [ ] PR description template
   - [ ] Checklist for PRs
-  
 - [ ] Add labels
   - [ ] bug, enhancement, documentation
   - [ ] good first issue, help wanted
   - [ ] priority labels
 
 #### README Enhancements
+
 - [ ] Add badges
   - [ ] CI/CD status
   - [ ] Code coverage
@@ -408,35 +489,32 @@ All tasks from Phase 2 have been successfully completed:
   - [ ] Version
   - [ ] Docker pulls
   - [ ] GitHub stars
-  
 - [ ] Add quick start GIF/video
 - [ ] Add contributors section
 - [ ] Add changelog link
 
 ### Final Steps
+
 - [ ] Update .gitignore
   - [ ] Test coverage reports
   - [ ] Test artifacts
   - [ ] IDE files
-  
 - [ ] Create CHANGELOG.md
   - [ ] Follow Keep a Changelog format
   - [ ] Document all changes
-  
 - [ ] Create LICENSE file
   - [ ] Choose appropriate license
-  
 - [ ] Final review and testing
   - [ ] Test all workflows locally
   - [ ] Verify documentation
   - [ ] Run full test suite
-  
 - [ ] Create pull request to main
   - [ ] Comprehensive PR description
   - [ ] Link related issues
   - [ ] Request reviews
 
 ## Project Structure
+
 - Backend: Node.js + Express + MongoDB + Redis
 - Frontend: React + Vite
 - Database: MongoDB (internal only)
