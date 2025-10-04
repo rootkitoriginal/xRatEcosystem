@@ -37,6 +37,6 @@ router.post('/logout', authenticate, authController.logout);
  * @desc    Get user profile
  * @access  Protected
  */
-router.get('/profile', authenticate, authController.getProfile);
+router.get('/profile', authenticate, authLimiter, authController.getProfile);
 
 module.exports = router;
