@@ -1,5 +1,6 @@
 const request = require('supertest');
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const User = require('../../src/models/User');
 const authController = require('../../src/auth/authController');
 const { authenticate } = require('../../src/middleware/auth');
@@ -23,14 +24,23 @@ describe('Auth API Endpoints', () => {
   let mockUsers = [];
 
   beforeAll(() => {
-    // Create Express app for testing (without rate limiting)
+    // Create Express app for testing
     app = express();
     app.use(express.json());
 
-    // Define auth routes directly without rate limiting
-    app.post('/api/auth/register', authController.register);
-    app.post('/api/auth/login', authController.login);
-    app.post('/api/auth/refresh', authController.refresh);
+    // Set up rate limiter for auth endpoints
+    const authLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // limit each IP to 100 requests per windowMs
+      standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+      legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    });
+
+    // Apply rate limiter specifically to sensitive auth endpoints
+    app.post('/api/auth/register', authLimiter, authController.register);
+    app.post('/api/auth/login', authLimiter, authController.login);
+    app.post('/api/auth/refresh', authLimiter, authController.refresh);
+    // Other endpoints (logout/profile) typically don't need limiting, but could add if desired
     app.post('/api/auth/logout', authenticate, authController.logout);
     app.get('/api/auth/profile', authenticate, authController.getProfile);
   });
