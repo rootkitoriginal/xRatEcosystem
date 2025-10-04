@@ -14,7 +14,9 @@ const logger = require('./config/logger');
 
 // Import routes and middleware
 const authRoutes = require('./auth/authRoutes');
-const { authenticate } = require('./middleware/auth');
+const createDataRoutes = require('./routes/dataRoutes');
+const DataService = require('./services/dataService');
+const dataController = require('./controllers/dataController');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { requestLogger, errorLogger } = require('./middleware/requestLogger');
 
@@ -68,6 +70,13 @@ let redisClient;
     });
 
     await redisClient.connect();
+
+    // Initialize data service after Redis connection
+    const dataService = new DataService(redisClient);
+    const dataRoutes = createDataRoutes(dataService, dataController);
+
+    // Data Management Routes (protected)
+    app.use('/api/data', dataRoutes);
   } catch (err) {
     logger.error('Redis connection error', { service: 'redis', error: err.message });
   }
@@ -85,6 +94,7 @@ app.get('/', (req, res) => {
       health: '/health',
       api: '/api',
       auth: '/api/auth',
+      data: '/api/data',
     },
   });
 });
@@ -119,68 +129,6 @@ app.get('/api/status', async (req, res) => {
       },
       cache_test: cacheTest,
       timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
-// Sample API endpoint with MongoDB and Redis (protected)
-app.post('/api/data', authenticate, async (req, res) => {
-  try {
-    const { key, value } = req.body;
-
-    if (!key || !value) {
-      return res.status(400).json({
-        success: false,
-        message: 'Key and value are required',
-      });
-    }
-
-    // Store in Redis cache
-    if (redisClient && redisClient.isOpen) {
-      await redisClient.set(`data:${key}`, JSON.stringify(value), {
-        EX: 3600, // Expire in 1 hour
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Data stored successfully',
-      key,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
-app.get('/api/data/:key', authenticate, async (req, res) => {
-  try {
-    const { key } = req.params;
-
-    // Get from Redis cache
-    if (redisClient && redisClient.isOpen) {
-      const cachedData = await redisClient.get(`data:${key}`);
-
-      if (cachedData) {
-        return res.json({
-          success: true,
-          data: JSON.parse(cachedData),
-          source: 'cache',
-        });
-      }
-    }
-
-    res.status(404).json({
-      success: false,
-      message: 'Data not found',
     });
   } catch (error) {
     res.status(500).json({

@@ -14,7 +14,7 @@ const register = async (req, res) => {
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Username, email, and password are required'
+        message: 'Username, email, and password are required',
       });
     }
 
@@ -22,7 +22,7 @@ const register = async (req, res) => {
     if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 8 characters'
+        message: 'Password must be at least 8 characters',
       });
     }
 
@@ -31,21 +31,20 @@ const register = async (req, res) => {
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         success: false,
-        message: 'Password must contain at least one letter and one number'
+        message: 'Password must contain at least one letter and one number',
       });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }]
+      $or: [{ email }, { username }],
     });
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: existingUser.email === email
-          ? 'Email already registered'
-          : 'Username already taken'
+        message:
+          existingUser.email === email ? 'Email already registered' : 'Username already taken',
       });
     }
 
@@ -53,7 +52,7 @@ const register = async (req, res) => {
     const user = new User({
       username,
       email,
-      password
+      password,
     });
 
     await user.save();
@@ -72,8 +71,8 @@ const register = async (req, res) => {
       data: {
         user: user.toJSON(),
         accessToken,
-        refreshToken
-      }
+        refreshToken,
+      },
     });
   } catch (error) {
     logger.error('Registration error', {
@@ -84,7 +83,7 @@ const register = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Registration failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -101,7 +100,7 @@ const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Email and password are required'
+        message: 'Email and password are required',
       });
     }
 
@@ -111,7 +110,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid email or password',
       });
     }
 
@@ -121,7 +120,7 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: 'Invalid email or password',
       });
     }
 
@@ -139,8 +138,8 @@ const login = async (req, res) => {
       data: {
         user: user.toJSON(),
         accessToken,
-        refreshToken
-      }
+        refreshToken,
+      },
     });
   } catch (error) {
     logger.error('Login error', {
@@ -151,7 +150,7 @@ const login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Login failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -167,7 +166,7 @@ const refresh = async (req, res) => {
     if (!refreshToken) {
       return res.status(400).json({
         success: false,
-        message: 'Refresh token is required'
+        message: 'Refresh token is required',
       });
     }
 
@@ -180,7 +179,7 @@ const refresh = async (req, res) => {
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid refresh token'
+        message: 'Invalid refresh token',
       });
     }
 
@@ -191,14 +190,14 @@ const refresh = async (req, res) => {
       success: true,
       message: 'Token refreshed successfully',
       data: {
-        accessToken
-      }
+        accessToken,
+      },
     });
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Invalid or expired refresh token'
+        message: 'Invalid or expired refresh token',
       });
     }
 
@@ -210,7 +209,7 @@ const refresh = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Token refresh failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -227,7 +226,7 @@ const logout = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'User not found',
       });
     }
 
@@ -237,7 +236,7 @@ const logout = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Logout successful'
+      message: 'Logout successful',
     });
   } catch (error) {
     logger.error('Logout error', {
@@ -248,7 +247,7 @@ const logout = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Logout failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -262,8 +261,8 @@ const getProfile = async (req, res) => {
     res.json({
       success: true,
       data: {
-        user: req.user
-      }
+        user: req.user,
+      },
     });
   } catch (error) {
     logger.error('Get profile error', {
@@ -274,7 +273,7 @@ const getProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve profile',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -284,5 +283,5 @@ module.exports = {
   login,
   refresh,
   logout,
-  getProfile
+  getProfile,
 };

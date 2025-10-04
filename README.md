@@ -181,54 +181,71 @@ docker-compose restart frontend
 
 ### Backend API
 
-#### GET `/`
-Informações básicas da API
+O backend fornece uma API RESTful completa com os seguintes recursos:
+
+#### Health & Status
+- `GET /` - Informações básicas da API
+- `GET /health` - Health check do sistema
+- `GET /api/status` - Status detalhado de todos os serviços
+
+#### Authentication
+- `POST /api/auth/register` - Registrar novo usuário
+- `POST /api/auth/login` - Login de usuário
+- `POST /api/auth/refresh` - Renovar access token
+- `POST /api/auth/logout` - Logout de usuário (protegido)
+- `GET /api/auth/profile` - Obter perfil do usuário (protegido)
+
+#### Data Management (Protegido)
+- `POST /api/data` - Criar nova entidade de dados
+- `GET /api/data` - Listar todos os dados (paginado)
+- `GET /api/data/:id` - Obter dados por ID (com cache)
+- `PUT /api/data/:id` - Atualizar dados por ID
+- `DELETE /api/data/:id` - Deletar dados por ID
+- `GET /api/data/search` - Buscar dados com filtros
+- `POST /api/data/bulk` - Operações em massa (criar/atualizar/deletar)
+- `GET /api/data/export` - Exportar dados (JSON/CSV)
+- `GET /api/data/analytics` - Obter analytics dos dados
+
+### Exemplo de Uso
 
 ```bash
-curl http://localhost:3000/
-```
-
-#### GET `/health`
-Health check do sistema
-
-```bash
+# Health check
 curl http://localhost:3000/health
-```
 
-Resposta:
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-10-03T...",
-  "services": {
-    "mongodb": "connected",
-    "redis": "connected"
-  }
-}
-```
+# Registrar usuário
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "user",
+    "email": "user@example.com",
+    "password": "Password123"
+  }'
 
-#### GET `/api/status`
-Status detalhado de todos os serviços
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "Password123"
+  }'
 
-```bash
-curl http://localhost:3000/api/status
-```
-
-#### POST `/api/data`
-Salvar dados no Redis cache
-
-```bash
+# Criar dados (requer token)
 curl -X POST http://localhost:3000/api/data \
   -H "Content-Type: application/json" \
-  -d '{"key": "test", "value": "Hello xRat!"}'
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "name": "My Data",
+    "content": {"key": "value"},
+    "type": "json",
+    "tags": ["important"]
+  }'
+
+# Listar dados (requer token)
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data?page=1&limit=10"
 ```
 
-#### GET `/api/data/:key`
-Recuperar dados do Redis cache
-
-```bash
-curl http://localhost:3000/api/data/test
-```
+Para documentação completa da API, consulte [docs/API.md](docs/API.md).
 
 ---
 

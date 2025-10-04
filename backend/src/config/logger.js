@@ -63,10 +63,7 @@ const combinedFileTransport = new DailyRotateFile({
 });
 
 // Create transports array
-const transports = [
-  errorFileTransport,
-  combinedFileTransport,
-];
+const transports = [errorFileTransport, combinedFileTransport];
 
 // Add console transport for non-production environments
 if (process.env.NODE_ENV !== 'production') {

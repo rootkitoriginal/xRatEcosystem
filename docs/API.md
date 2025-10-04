@@ -619,6 +619,607 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
 
 ---
 
+## 📦 Data Management
+
+The Data Management API provides comprehensive CRUD operations with advanced features including validation, caching, search, pagination, bulk operations, export, and analytics.
+
+### Create Data
+
+#### `POST /api/data`
+
+Create a new data entity.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/data \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "name": "My Data",
+    "description": "Data description",
+    "content": {"key": "value"},
+    "type": "json",
+    "tags": ["important", "project-a"],
+    "status": "active"
+  }'
+```
+
+**Request Body:**
+
+```json
+{
+  "name": "My Data",
+  "description": "Optional description",
+  "content": "Any JSON value",
+  "type": "json",
+  "tags": ["tag1", "tag2"],
+  "status": "active"
+}
+```
+
+**Request Fields:**
+
+- `name` (string, required): Name of the data entity (2-100 characters)
+- `description` (string, optional): Description (max 500 characters)
+- `content` (any, required): Flexible content field (string, number, object, array, boolean)
+- `type` (string, optional): Content type - `text`, `json`, `number`, `boolean`, `array`, `object` (auto-detected if not provided)
+- `tags` (array, optional): Array of string tags for categorization
+- `status` (string, optional): Status - `active`, `archived`, `deleted` (default: `active`)
+- `metadata` (object, optional): Additional metadata key-value pairs
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "message": "Data created successfully",
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "My Data",
+    "description": "Data description",
+    "content": {"key": "value"},
+    "type": "json",
+    "tags": ["important", "project-a"],
+    "status": "active",
+    "userId": "507f191e810c19729de860ea",
+    "createdAt": "2025-01-04T08:00:00.000Z",
+    "updatedAt": "2025-01-04T08:00:00.000Z"
+  },
+  "timestamp": "2025-01-04T08:00:00.000Z"
+}
+```
+
+**Status Codes:**
+
+- `201 Created` - Data created successfully
+- `400 Bad Request` - Validation error
+- `401 Unauthorized` - Missing or invalid token
+- `500 Internal Server Error` - System error
+
+---
+
+### List All Data
+
+#### `GET /api/data`
+
+List all data entities with pagination and filtering.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data?page=1&limit=10&sort=-createdAt&status=active&type=json"
+```
+
+**Query Parameters:**
+
+- `page` (number, optional): Page number (default: 1)
+- `limit` (number, optional): Items per page (1-100, default: 10)
+- `sort` (string, optional): Sort field (prefix with `-` for descending, default: `-createdAt`)
+- `status` (string, optional): Filter by status - `active`, `archived`, `deleted`
+- `type` (string, optional): Filter by type - `text`, `json`, `number`, `boolean`, `array`, `object`
+- `tags` (string|array, optional): Filter by tags
+- `search` (string, optional): Full-text search in name and description
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "name": "My Data",
+      "content": {"key": "value"},
+      "type": "json",
+      "status": "active",
+      "tags": ["important"],
+      "createdAt": "2025-01-04T08:00:00.000Z",
+      "updatedAt": "2025-01-04T08:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 42,
+    "pages": 5
+  },
+  "timestamp": "2025-01-04T08:00:00.000Z"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Success
+- `400 Bad Request` - Invalid query parameters
+- `401 Unauthorized` - Missing or invalid token
+- `500 Internal Server Error` - System error
+
+---
+
+### Get Data by ID
+
+#### `GET /api/data/:id`
+
+Retrieve a specific data entity by ID. Results are cached in Redis for improved performance.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:3000/api/data/507f1f77bcf86cd799439011
+```
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "My Data",
+    "description": "Data description",
+    "content": {"key": "value"},
+    "type": "json",
+    "tags": ["important"],
+    "status": "active",
+    "userId": "507f191e810c19729de860ea",
+    "createdAt": "2025-01-04T08:00:00.000Z",
+    "updatedAt": "2025-01-04T08:00:00.000Z"
+  },
+  "source": "cache",
+  "timestamp": "2025-01-04T08:00:00.000Z"
+}
+```
+
+**Response (Not Found):**
+
+```json
+{
+  "success": false,
+  "message": "Data not found"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Data found
+- `400 Bad Request` - Invalid ID format
+- `401 Unauthorized` - Missing or invalid token
+- `404 Not Found` - Data not found
+- `500 Internal Server Error` - System error
+
+---
+
+### Update Data
+
+#### `PUT /api/data/:id`
+
+Update an existing data entity. Cache is automatically invalidated.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -X PUT http://localhost:3000/api/data/507f1f77bcf86cd799439011 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "name": "Updated Name",
+    "description": "Updated description",
+    "tags": ["new-tag"]
+  }'
+```
+
+**Request Body:**
+
+At least one field must be provided. All fields are optional:
+
+```json
+{
+  "name": "Updated Name",
+  "description": "Updated description",
+  "content": "New content",
+  "type": "text",
+  "tags": ["tag1"],
+  "status": "archived",
+  "metadata": {"key": "value"}
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Data updated successfully",
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "Updated Name",
+    "description": "Updated description",
+    "content": {"key": "value"},
+    "type": "json",
+    "tags": ["new-tag"],
+    "status": "active",
+    "userId": "507f191e810c19729de860ea",
+    "createdAt": "2025-01-04T08:00:00.000Z",
+    "updatedAt": "2025-01-04T08:30:00.000Z"
+  },
+  "timestamp": "2025-01-04T08:30:00.000Z"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Updated successfully
+- `400 Bad Request` - Validation error or invalid ID
+- `401 Unauthorized` - Missing or invalid token
+- `404 Not Found` - Data not found
+- `500 Internal Server Error` - System error
+
+---
+
+### Delete Data
+
+#### `DELETE /api/data/:id`
+
+Delete a data entity. Cache is automatically invalidated.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/data/507f1f77bcf86cd799439011 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Data deleted successfully",
+  "data": {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "My Data",
+    "status": "active"
+  },
+  "timestamp": "2025-01-04T08:40:00.000Z"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Deleted successfully
+- `400 Bad Request` - Invalid ID format
+- `401 Unauthorized` - Missing or invalid token
+- `404 Not Found` - Data not found
+- `500 Internal Server Error` - System error
+
+---
+
+### Search Data
+
+#### `GET /api/data/search`
+
+Full-text search across data entities with filters and pagination.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data/search?search=important&page=1&limit=10&status=active"
+```
+
+**Query Parameters:**
+
+- `search` (string, required): Search query for name and description
+- `page` (number, optional): Page number (default: 1)
+- `limit` (number, optional): Items per page (default: 10)
+- `sort` (string, optional): Sort field (default: `-createdAt`)
+- `status` (string, optional): Filter by status
+- `type` (string, optional): Filter by type
+- `tags` (string|array, optional): Filter by tags
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "name": "Important Data",
+      "content": {"key": "value"},
+      "type": "json",
+      "status": "active"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 5,
+    "pages": 1
+  },
+  "query": "important",
+  "timestamp": "2025-01-04T08:50:00.000Z"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Search completed
+- `400 Bad Request` - Missing search query or invalid parameters
+- `401 Unauthorized` - Missing or invalid token
+- `500 Internal Server Error` - System error
+
+---
+
+### Bulk Operations
+
+#### `POST /api/data/bulk`
+
+Perform bulk create, update, or delete operations. Maximum 100 items per request.
+
+**🔒 Authentication Required**
+
+**Request (Bulk Create):**
+
+```bash
+curl -X POST http://localhost:3000/api/data/bulk \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "operation": "create",
+    "data": [
+      {
+        "name": "Data 1",
+        "content": "Content 1"
+      },
+      {
+        "name": "Data 2",
+        "content": "Content 2"
+      }
+    ]
+  }'
+```
+
+**Request (Bulk Update):**
+
+```bash
+curl -X POST http://localhost:3000/api/data/bulk \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "operation": "update",
+    "data": [
+      {
+        "id": "507f1f77bcf86cd799439011",
+        "updates": {
+          "name": "Updated Name"
+        }
+      }
+    ]
+  }'
+```
+
+**Request (Bulk Delete):**
+
+```bash
+curl -X POST http://localhost:3000/api/data/bulk \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "operation": "delete",
+    "data": [
+      {
+        "id": "507f1f77bcf86cd799439011"
+      },
+      {
+        "id": "507f1f77bcf86cd799439012"
+      }
+    ]
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Bulk create completed",
+  "results": {
+    "success": [
+      {
+        "id": "507f1f77bcf86cd799439011",
+        "data": {
+          "name": "Data 1",
+          "content": "Content 1"
+        }
+      },
+      {
+        "id": "507f1f77bcf86cd799439012",
+        "data": {
+          "name": "Data 2",
+          "content": "Content 2"
+        }
+      }
+    ],
+    "failed": []
+  },
+  "summary": {
+    "total": 2,
+    "succeeded": 2,
+    "failed": 0
+  },
+  "timestamp": "2025-01-04T09:00:00.000Z"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Bulk operation completed (check results for individual successes/failures)
+- `400 Bad Request` - Validation error (invalid operation or data)
+- `401 Unauthorized` - Missing or invalid token
+- `500 Internal Server Error` - System error
+
+---
+
+### Export Data
+
+#### `GET /api/data/export`
+
+Export data entities in JSON or CSV format with optional filters.
+
+**🔒 Authentication Required**
+
+**Request (JSON):**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data/export?format=json&status=active"
+```
+
+**Request (CSV):**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data/export?format=csv&type=json" \
+  -o data-export.csv
+```
+
+**Query Parameters:**
+
+- `format` (string, optional): Export format - `json` or `csv` (default: `json`)
+- `status` (string, optional): Filter by status
+- `type` (string, optional): Filter by type
+- `tags` (string|array, optional): Filter by tags
+- `startDate` (ISO date, optional): Filter by creation date (from)
+- `endDate` (ISO date, optional): Filter by creation date (to)
+
+**Response (JSON):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439011",
+      "name": "My Data",
+      "content": {"key": "value"},
+      "type": "json",
+      "status": "active",
+      "tags": ["important"],
+      "createdAt": "2025-01-04T08:00:00.000Z",
+      "updatedAt": "2025-01-04T08:00:00.000Z"
+    }
+  ],
+  "count": 1,
+  "exportedAt": "2025-01-04T09:10:00.000Z"
+}
+```
+
+**Response (CSV):**
+
+```csv
+ID,Name,Type,Status,Tags,Created At,Updated At
+507f1f77bcf86cd799439011,My Data,json,active,important,2025-01-04T08:00:00.000Z,2025-01-04T08:00:00.000Z
+```
+
+**Status Codes:**
+
+- `200 OK` - Export successful
+- `400 Bad Request` - Invalid parameters
+- `401 Unauthorized` - Missing or invalid token
+- `500 Internal Server Error` - System error
+
+---
+
+### Get Analytics
+
+#### `GET /api/data/analytics`
+
+Get data analytics including counts by type, status, and recent activity.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:3000/api/data/analytics
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "analytics": {
+    "total": 42,
+    "byType": {
+      "json": 20,
+      "text": 15,
+      "number": 5,
+      "boolean": 2
+    },
+    "byStatus": {
+      "active": 35,
+      "archived": 5,
+      "deleted": 2
+    },
+    "recentCount": 12
+  },
+  "timestamp": "2025-01-04T09:20:00.000Z"
+}
+```
+
+**Response Fields:**
+
+- `total` (number): Total data entities for the user
+- `byType` (object): Count of entities by type
+- `byStatus` (object): Count of entities by status
+- `recentCount` (number): Count of entities created in the last 7 days
+
+**Status Codes:**
+
+- `200 OK` - Analytics retrieved successfully
+- `401 Unauthorized` - Missing or invalid token
+- `500 Internal Server Error` - System error
+
+---
+
 ## 🚫 Error Handling
 
 ### 404 Not Found
@@ -802,13 +1403,29 @@ curl http://localhost:3000/health
 # Get status
 curl http://localhost:3000/api/status
 
-# Store data
+# Register user
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"user","email":"user@example.com","password":"Password123"}'
+
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"Password123"}'
+
+# Create data
 curl -X POST http://localhost:3000/api/data \
   -H "Content-Type: application/json" \
-  -d '{"key":"test","value":"hello"}'
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{"name":"My Data","content":{"key":"value"},"type":"json"}'
 
-# Retrieve data
-curl http://localhost:3000/api/data/test
+# List data
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data?page=1&limit=10"
+
+# Get data by ID
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:3000/api/data/507f1f77bcf86cd799439011
 ```
 
 ### Python / Requests
@@ -819,14 +1436,31 @@ import requests
 # Health check
 health = requests.get('http://localhost:3000/health').json()
 
-# Store data
-response = requests.post('http://localhost:3000/api/data', json={
-    'key': 'myKey',
-    'value': {'data': 'myValue'}
+# Login
+auth_response = requests.post('http://localhost:3000/api/auth/login', json={
+    'email': 'user@example.com',
+    'password': 'Password123'
 })
+token = auth_response.json()['data']['accessToken']
 
-# Retrieve data
-data = requests.get('http://localhost:3000/api/data/myKey').json()
+# Create data
+headers = {'Authorization': f'Bearer {token}'}
+response = requests.post('http://localhost:3000/api/data', 
+    json={
+        'name': 'My Data',
+        'content': {'key': 'value'},
+        'type': 'json'
+    },
+    headers=headers
+)
+
+# List data
+data_list = requests.get('http://localhost:3000/api/data?page=1&limit=10', 
+    headers=headers).json()
+
+# Get data by ID
+data = requests.get('http://localhost:3000/api/data/507f1f77bcf86cd799439011',
+    headers=headers).json()
 ```
 
 ---
@@ -868,24 +1502,18 @@ All API requests are logged with:
 
 ## 🚀 Future Endpoints
 
-### Authentication
-
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `POST /api/auth/refresh` - Refresh token
-
 ### User Management
 
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/:id` - Update user profile
 - `DELETE /api/users/:id` - Delete user
 
-### Data Management
+### Advanced Features
 
-- `PUT /api/data/:key` - Update data
-- `DELETE /api/data/:key` - Delete data
-- `GET /api/data` - List all keys (with pagination)
+- `GET /metrics` - Prometheus metrics
+- `GET /api/stats` - API usage statistics
+- `POST /api/data/backup` - Backup data
+- `POST /api/data/restore` - Restore data from backup
 
 ---
 

@@ -16,44 +16,48 @@ The xRat Ecosystem backend uses [Winston](https://github.com/winstonjs/winston) 
 ## Log Levels
 
 ### error
+
 Critical errors and exceptions that require immediate attention.
 
 ```javascript
 logger.error('Failed to connect to database', {
   service: 'mongodb',
   error: err.message,
-  stack: err.stack
+  stack: err.stack,
 });
 ```
 
 ### warn
+
 Warning messages for potentially harmful situations.
 
 ```javascript
 logger.warn('Route not found', {
   requestId: req.requestId,
   method: req.method,
-  url: req.url
+  url: req.url,
 });
 ```
 
 ### info
+
 Informational messages about application flow and operations.
 
 ```javascript
 logger.info('User logged in successfully', {
   userId: user._id,
-  email: user.email
+  email: user.email,
 });
 ```
 
 ### debug
+
 Detailed debug information (only in development).
 
 ```javascript
 logger.debug('Cache hit', {
   key: cacheKey,
-  ttl: 3600
+  ttl: 3600,
 });
 ```
 
@@ -73,7 +77,7 @@ try {
 } catch (error) {
   logger.error('Operation failed', {
     error: error.message,
-    stack: error.stack
+    stack: error.stack,
   });
 }
 ```
@@ -81,6 +85,7 @@ try {
 ### Request Logging
 
 Request logging is automatically handled by the `requestLogger` middleware. Every request gets:
+
 - Unique request ID
 - Method, URL, IP, User Agent
 - Response status code and time
@@ -114,16 +119,19 @@ Request logging is automatically handled by the `requestLogger` middleware. Ever
 ## Log Files
 
 ### Location
+
 All log files are stored in `backend/logs/`
 
 ### File Types
 
 #### Combined Logs
+
 - **Pattern**: `combined-YYYY-MM-DD.log`
 - **Content**: All log levels (info, warn, error, debug)
 - **Format**: JSON, one log entry per line
 
 #### Error Logs
+
 - **Pattern**: `error-YYYY-MM-DD.log`
 - **Content**: Only error level logs
 - **Format**: JSON, one log entry per line
@@ -150,11 +158,13 @@ NODE_ENV=production  # Console logging disabled in production
 ### Log Levels by Environment
 
 **Development:**
+
 - Console: Colorized, human-readable format
 - Files: JSON format
 - Level: debug (all logs)
 
 **Production:**
+
 - Console: Disabled (logs only to files)
 - Files: JSON format
 - Level: info (info, warn, error only)
@@ -207,7 +217,7 @@ Always include relevant metadata as a second parameter:
 logger.info('User registered', {
   userId: user._id,
   email: user.email,
-  role: user.role
+  role: user.role,
 });
 
 // Avoid
@@ -224,13 +234,13 @@ app.post('/api/users', async (req, res) => {
     // Your logic here
     logger.info('User created', {
       requestId: req.requestId,
-      userId: newUser._id
+      userId: newUser._id,
     });
   } catch (error) {
     logger.error('Failed to create user', {
       requestId: req.requestId,
       error: error.message,
-      stack: error.stack
+      stack: error.stack,
     });
   }
 });
@@ -252,13 +262,13 @@ Never log passwords, tokens, credit cards, or other sensitive information:
 // Bad
 logger.info('User login', {
   email: user.email,
-  password: password  // ❌ Never log passwords
+  password: password, // ❌ Never log passwords
 });
 
 // Good
 logger.info('User login attempt', {
   email: user.email,
-  success: true
+  success: true,
 });
 ```
 
