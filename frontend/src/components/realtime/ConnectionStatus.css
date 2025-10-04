@@ -1,0 +1,68 @@
+.connection-status {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  min-width: 300px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateX(-50%) translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+.connection-status.warning {
+  background: #fef5e7;
+  border: 1px solid #f39c12;
+  color: #7d6608;
+}
+
+.connection-status.error {
+  background: #fee;
+  border: 1px solid #f56565;
+  color: #9b2c2c;
+}
+
+.connection-status-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.status-text {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.reconnect-btn {
+  background: white;
+  border: 1px solid currentColor;
+  color: inherit;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.reconnect-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}

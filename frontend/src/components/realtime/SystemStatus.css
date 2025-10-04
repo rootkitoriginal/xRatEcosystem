@@ -1,0 +1,103 @@
+.system-status {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.system-status-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  color: #1a1a1a;
+}
+
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.connection-dot.connected {
+  background: #48bb78;
+  animation: pulse 2s infinite;
+}
+
+.connection-dot.disconnected {
+  background: #f56565;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.status-metric {
+  padding: 1rem;
+  border-radius: 6px;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.status-metric.good {
+  border-color: #48bb78;
+  background: #f0fff4;
+}
+
+.status-metric.warning {
+  border-color: #ed8936;
+  background: #fffaf0;
+}
+
+.status-metric.critical {
+  border-color: #f56565;
+  background: #fff5f5;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.metric-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.status-metric.good .metric-bar-fill {
+  background: #48bb78;
+}
+
+.status-metric.warning .metric-bar-fill {
+  background: #ed8936;
+}
+
+.status-metric.critical .metric-bar-fill {
+  background: #f56565;
+}
+
+.status-metric.unknown .metric-value {
+  color: #a0aec0;
+}

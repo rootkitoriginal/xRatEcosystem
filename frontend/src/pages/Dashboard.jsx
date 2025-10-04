@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserProfile from '../components/auth/UserProfile';
+import SystemStatus from '../components/realtime/SystemStatus';
+import { useWebSocket } from '../components/realtime/WebSocketProvider';
 import '../App.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -12,6 +14,7 @@ function Dashboard() {
   const [key, setKey] = useState('');
   const [value, setValue] = useState('');
   const [message, setMessage] = useState('');
+  const { addNotification } = useWebSocket();
 
   useEffect(() => {
     fetchStatus();
@@ -43,12 +46,26 @@ function Dashboard() {
         body: JSON.stringify({ key, value }),
       });
       const data = await response.json();
-      setMessage(data.success ? '✅ Data saved successfully!' : '❌ Failed to save data');
+      const success = data.success;
+      setMessage(success ? '✅ Data saved successfully!' : '❌ Failed to save data');
+      
+      // Show notification
+      addNotification({
+        type: success ? 'success' : 'error',
+        title: success ? 'Success' : 'Error',
+        message: success ? 'Data saved to Redis cache' : 'Failed to save data',
+      });
+      
       setKey('');
       setValue('');
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setMessage('❌ Error saving data');
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Network error while saving data',
+      });
       console.error(err);
     }
   };
@@ -133,6 +150,10 @@ function Dashboard() {
             </button>
           </form>
           {message && <div className="message">{message}</div>}
+        </section>
+
+        <section style={{ marginBottom: '2rem' }}>
+          <SystemStatus />
         </section>
 
         <section className="info-section">
