@@ -8,7 +8,7 @@
     "frontend"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "node -e \"try{require('husky')()}catch(e){}\"",
     "lint": "npm run lint --workspaces",
     "format": "npm run format --workspaces",
     "test": "npm run test --workspaces",
