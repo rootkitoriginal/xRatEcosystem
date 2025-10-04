@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '../components/auth/LoginForm';
 import RegisterForm from '../components/auth/RegisterForm';
 
 function AuthPage() {
-  const [showLogin, setShowLogin] = useState(true);
+  const location = useLocation();
+  const [showLogin, setShowLogin] = useState(() => location.pathname !== '/register');
   const navigate = useNavigate();
 
   const handleAuthSuccess = () => {
