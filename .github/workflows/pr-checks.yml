@@ -8,6 +8,8 @@ jobs:
   pr-title-check:
     name: Check PR Title Format
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Check PR title
@@ -30,6 +32,8 @@ jobs:
   branch-name-check:
     name: Check Branch Name
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Check branch name
@@ -45,6 +49,8 @@ jobs:
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -86,6 +92,8 @@ jobs:
   test-coverage:
     name: Test Coverage Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -126,6 +134,8 @@ jobs:
   size-check:
     name: Bundle Size Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code

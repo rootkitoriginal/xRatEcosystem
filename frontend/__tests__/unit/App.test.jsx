@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../../src/App';
 
@@ -12,21 +12,25 @@ describe('App Component', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders the app header', () => {
+  it('renders the app header', async () => {
     global.fetch.mockResolvedValueOnce({
       json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } })
     });
 
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
     expect(screen.getByText('🐀 xRat Ecosystem')).toBeDefined();
     expect(screen.getByText('Docker Isolated Environment')).toBeDefined();
   });
 
-  it('displays loading state initially', () => {
+  it('displays loading state initially', async () => {
     global.fetch.mockImplementation(() => new Promise(() => {}));
     
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
     expect(screen.getByText('Loading...')).toBeDefined();
   });
@@ -45,7 +49,9 @@ describe('App Component', () => {
       json: async () => mockStatus
     });
 
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('🗄️ MongoDB')).toBeDefined();
@@ -56,7 +62,9 @@ describe('App Component', () => {
   it('displays error message when fetch fails', async () => {
     global.fetch.mockRejectedValueOnce(new Error('Network error'));
 
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Failed to connect to backend')).toBeDefined();
@@ -72,14 +80,19 @@ describe('App Component', () => {
       json: async () => mockStatus
     });
 
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('🔄 Refresh Status')).toBeDefined();
     });
 
     const refreshButton = screen.getByText('🔄 Refresh Status');
-    fireEvent.click(refreshButton);
+    
+    await act(async () => {
+      fireEvent.click(refreshButton);
+    });
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
@@ -101,7 +114,10 @@ describe('App Component', () => {
       .mockResolvedValueOnce({ json: async () => mockSubmitResponse });
 
     const user = userEvent.setup();
-    render(<App />);
+    
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(screen.getByLabelText('Key:')).toBeDefined();
@@ -130,7 +146,10 @@ describe('App Component', () => {
       .mockRejectedValueOnce(new Error('Submit failed'));
 
     const user = userEvent.setup();
-    render(<App />);
+    
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(screen.getByLabelText('Key:')).toBeDefined();
@@ -149,12 +168,14 @@ describe('App Component', () => {
     });
   });
 
-  it('renders ecosystem info section', () => {
+  it('renders ecosystem info section', async () => {
     global.fetch.mockResolvedValueOnce({
       json: async () => ({ database: { mongodb: 'connected', redis: 'connected' } })
     });
 
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
     expect(screen.getByText('📋 Ecosystem Info')).toBeDefined();
     expect(screen.getByText(/Backend API exposed on port 3000/)).toBeDefined();
