@@ -10,10 +10,10 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:docker": "docker-compose -f docker-compose.test.yml run --rm backend npm test",
-    "lint": "eslint src __tests__",
-    "lint:fix": "eslint src __tests__ --fix",
-    "format": "prettier --write \"src/**/*.js\" \"__tests__/**/*.js\"",
-    "format:check": "prettier --check \"src/**/*.js\" \"__tests__/**/*.js\""
+    "lint": "eslint src __tests__ tests",
+    "lint:fix": "eslint src __tests__ tests --fix",
+    "format": "prettier --write \"src/**/*.js\" \"__tests__/**/*.js\" \"tests/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"__tests__/**/*.js\" \"tests/**/*.js\""
   },
   "keywords": [
     "xrat",

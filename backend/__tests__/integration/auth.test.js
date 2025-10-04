@@ -14,8 +14,8 @@ jest.mock('mongoose', () => {
     connect: jest.fn().mockResolvedValue(true),
     connection: {
       readyState: 1,
-      close: jest.fn()
-    }
+      close: jest.fn(),
+    },
   };
 });
 
@@ -53,39 +53,47 @@ describe('Auth API Endpoints', () => {
     User.findOne = jest.fn((query) => {
       if (query.$or) {
         return Promise.resolve(
-          mockUsers.find(u =>
-            u.email === query.$or[0].email ||
-            u.username === query.$or[1].username
+          mockUsers.find(
+            (u) => u.email === query.$or[0].email || u.username === query.$or[1].username
           )
         );
       }
       if (query.email) {
-        const user = mockUsers.find(u => u.email === query.email);
-        return Promise.resolve(user
-          ? {
-              ...user,
-              comparePassword: jest.fn((password) => Promise.resolve(password === 'Password123')),
-              save: jest.fn(),
-              toJSON: () => ({ _id: user._id, username: user.username, email: user.email, role: user.role })
-            }
-          : null);
+        // Handle both direct email queries and MongoDB $eq operator
+        const emailValue = typeof query.email === 'object' ? query.email.$eq : query.email;
+        const user = mockUsers.find((u) => u.email === emailValue);
+        if (!user) return Promise.resolve(null);
+
+        return Promise.resolve({
+          ...user,
+          comparePassword: jest.fn((password) => Promise.resolve(password === 'Password123')),
+          save: jest.fn().mockResolvedValue(user),
+          toJSON: () => ({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+          }),
+        });
       }
       return Promise.resolve(null);
     });
 
     User.findById = jest.fn((id) => {
-      const user = mockUsers.find(u => u._id === id);
+      const user = mockUsers.find((u) => u._id === id);
       if (!user) return Promise.resolve(null);
 
       return {
         ...user,
         save: jest.fn().mockResolvedValue(user),
-        select: jest.fn(() => Promise.resolve({
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-          role: user.role
-        }))
+        select: jest.fn(() =>
+          Promise.resolve({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+          })
+        ),
       };
     });
 
@@ -99,7 +107,7 @@ describe('Auth API Endpoints', () => {
         _id: this._id,
         username: this.username,
         email: this.email,
-        role: this.role
+        role: this.role,
       };
     });
   });
@@ -109,12 +117,10 @@ describe('Auth API Endpoints', () => {
       const userData = {
         username: 'testuser',
         email: 'test@example.com',
-        password: 'Password123'
+        password: 'Password123',
       };
 
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(userData);
+      const response = await request(app).post('/api/auth/register').send(userData);
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
@@ -127,9 +133,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject registration with missing fields', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({ username: 'testuser' });
+      const response = await request(app).post('/api/auth/register').send({ username: 'testuser' });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -137,13 +141,11 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject registration with weak password', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          username: 'testuser',
-          email: 'test@example.com',
-          password: 'weak'
-        });
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'weak',
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -151,17 +153,17 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject registration with password without complexity', async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          username: 'testuser',
-          email: 'test@example.com',
-          password: 'password'
-        });
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'password',
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Password must contain at least one letter and one number');
+      expect(response.body.message).toBe(
+        'Password must contain at least one letter and one number'
+      );
     });
 
     it('should reject registration with existing email', async () => {
@@ -169,16 +171,14 @@ describe('Auth API Endpoints', () => {
         _id: '123',
         username: 'existing',
         email: 'test@example.com',
-        role: 'user'
+        role: 'user',
       });
 
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          username: 'newuser',
-          email: 'test@example.com',
-          password: 'Password123'
-        });
+      const response = await request(app).post('/api/auth/register').send({
+        username: 'newuser',
+        email: 'test@example.com',
+        password: 'Password123',
+      });
 
       expect(response.status).toBe(409);
       expect(response.body.success).toBe(false);
@@ -194,17 +194,15 @@ describe('Auth API Endpoints', () => {
         email: 'test@example.com',
         password: 'hashedPassword123',
         role: 'user',
-        refreshToken: null
+        refreshToken: null,
       });
     });
 
     it('should login user successfully', async () => {
-      const response = await request(app)
-        .post('/api/auth/login')
-        .send({
-          email: 'test@example.com',
-          password: 'Password123'
-        });
+      const response = await request(app).post('/api/auth/login').send({
+        email: 'test@example.com',
+        password: 'Password123',
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -225,12 +223,10 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject login with invalid email', async () => {
-      const response = await request(app)
-        .post('/api/auth/login')
-        .send({
-          email: 'wrong@example.com',
-          password: 'Password123'
-        });
+      const response = await request(app).post('/api/auth/login').send({
+        email: 'wrong@example.com',
+        password: 'Password123',
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -238,18 +234,18 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject login with invalid password', async () => {
-      User.findOne = jest.fn(() => Promise.resolve({
-        email: 'test@example.com',
-        comparePassword: jest.fn(() => Promise.resolve(false)),
-        save: jest.fn()
-      }));
-
-      const response = await request(app)
-        .post('/api/auth/login')
-        .send({
+      User.findOne = jest.fn(() =>
+        Promise.resolve({
           email: 'test@example.com',
-          password: 'WrongPassword123'
-        });
+          comparePassword: jest.fn(() => Promise.resolve(false)),
+          save: jest.fn(),
+        })
+      );
+
+      const response = await request(app).post('/api/auth/login').send({
+        email: 'test@example.com',
+        password: 'WrongPassword123',
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -267,12 +263,10 @@ describe('Auth API Endpoints', () => {
         username: 'testuser',
         email: 'test@example.com',
         role: 'user',
-        refreshToken
+        refreshToken,
       });
 
-      const response = await request(app)
-        .post('/api/auth/refresh')
-        .send({ refreshToken });
+      const response = await request(app).post('/api/auth/refresh').send({ refreshToken });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -281,9 +275,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject refresh with missing token', async () => {
-      const response = await request(app)
-        .post('/api/auth/refresh')
-        .send({});
+      const response = await request(app).post('/api/auth/refresh').send({});
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -311,7 +303,7 @@ describe('Auth API Endpoints', () => {
         username: 'testuser',
         email: 'test@example.com',
         role: 'user',
-        refreshToken: 'some_token'
+        refreshToken: 'some_token',
       });
 
       const response = await request(app)
@@ -324,8 +316,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject logout without token', async () => {
-      const response = await request(app)
-        .post('/api/auth/logout');
+      const response = await request(app).post('/api/auth/logout');
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -342,7 +333,7 @@ describe('Auth API Endpoints', () => {
         _id: userId,
         username: 'testuser',
         email: 'test@example.com',
-        role: 'user'
+        role: 'user',
       });
 
       const response = await request(app)
@@ -356,8 +347,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject profile request without token', async () => {
-      const response = await request(app)
-        .get('/api/auth/profile');
+      const response = await request(app).get('/api/auth/profile');
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);

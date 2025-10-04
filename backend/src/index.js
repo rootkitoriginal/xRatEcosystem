@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const mongoose = require('mongoose');
 const { createClient } = require('redis');
+const { createHealthRouter } = require('./health');
 
 // Load environment variables
 require('dotenv').config();
@@ -19,19 +20,20 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(helmet());
 app.use(compression());
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
-let mongoConnected = false;
-mongoose.connect(process.env.MONGODB_URI)
+mongoose
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB connected successfully');
-    mongoConnected = true;
   })
   .catch((err) => {
     console.error('❌ MongoDB connection error:', err.message);
@@ -39,26 +41,23 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Redis Connection
 let redisClient;
-let redisConnected = false;
 
 (async () => {
   try {
     redisClient = createClient({
       socket: {
         host: process.env.REDIS_HOST || 'redis',
-        port: process.env.REDIS_PORT || 6379
+        port: process.env.REDIS_PORT || 6379,
       },
-      password: process.env.REDIS_PASSWORD
+      password: process.env.REDIS_PASSWORD,
     });
 
     redisClient.on('error', (err) => {
       console.error('❌ Redis Client Error:', err.message);
-      redisConnected = false;
     });
 
     redisClient.on('connect', () => {
       console.log('✅ Redis connected successfully');
-      redisConnected = true;
     });
 
     await redisClient.connect();
@@ -67,17 +66,8 @@ let redisConnected = false;
   }
 })();
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: {
-      mongodb: mongoConnected ? 'connected' : 'disconnected',
-      redis: redisConnected ? 'connected' : 'disconnected'
-    }
-  });
-});
+// Health check endpoints
+app.use('/health', createHealthRouter(mongoose.connection.getClient(), redisClient));
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -87,8 +77,8 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       api: '/api',
-      auth: '/api/auth'
-    }
+      auth: '/api/auth',
+    },
   });
 });
 
@@ -118,15 +108,15 @@ app.get('/api/status', async (req, res) => {
       ecosystem: 'xRat',
       database: {
         mongodb: dbStatus,
-        redis: redisStatus
+        redis: redisStatus,
       },
       cache_test: cacheTest,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -139,14 +129,14 @@ app.post('/api/data', authenticate, async (req, res) => {
     if (!key || !value) {
       return res.status(400).json({
         success: false,
-        message: 'Key and value are required'
+        message: 'Key and value are required',
       });
     }
 
     // Store in Redis cache
     if (redisClient && redisClient.isOpen) {
       await redisClient.set(`data:${key}`, JSON.stringify(value), {
-        EX: 3600 // Expire in 1 hour
+        EX: 3600, // Expire in 1 hour
       });
     }
 
@@ -154,12 +144,12 @@ app.post('/api/data', authenticate, async (req, res) => {
       success: true,
       message: 'Data stored successfully',
       key,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -176,19 +166,19 @@ app.get('/api/data/:key', authenticate, async (req, res) => {
         return res.json({
           success: true,
           data: JSON.parse(cachedData),
-          source: 'cache'
+          source: 'cache',
         });
       }
     }
 
     res.status(404).json({
       success: false,
-      message: 'Data not found'
+      message: 'Data not found',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -197,7 +187,7 @@ app.get('/api/data/:key', authenticate, async (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'Route not found',
   });
 });
 
@@ -207,7 +197,7 @@ app.use((err, req, res, _next) => {
   res.status(500).json({
     success: false,
     message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });
 });
 
