@@ -9,6 +9,7 @@ Node.js + Express API server for the xRat Ecosystem.
 - **Database:** MongoDB (via Mongoose)
 - **Cache:** Redis
 - **Security:** Helmet.js
+- **Logging:** Winston with daily log rotation
 - **Testing:** Jest + Supertest
 
 ## 📁 Project Structure
@@ -16,15 +17,26 @@ Node.js + Express API server for the xRat Ecosystem.
 ```
 backend/
 ├── src/
-│   └── index.js           # Main application entry point
+│   ├── config/          # Configuration files
+│   │   └── logger.js    # Winston logger configuration
+│   ├── middleware/      # Express middleware
+│   │   ├── auth.js      # JWT authentication
+│   │   ├── rateLimiter.js  # Rate limiting
+│   │   └── requestLogger.js  # HTTP request logging
+│   ├── models/          # Mongoose models
+│   ├── utils/           # Utility functions
+│   └── index.js         # Main application entry point
 ├── __tests__/
-│   ├── unit/             # Unit tests
-│   ├── integration/      # Integration tests (API endpoints)
-│   ├── e2e/             # End-to-end tests
-│   └── fixtures/        # Test data and mocks
-├── Dockerfile           # Container configuration
-├── package.json         # Dependencies and scripts
-└── jest.config.js       # Test configuration
+│   ├── unit/            # Unit tests
+│   ├── integration/     # Integration tests (API endpoints)
+│   ├── e2e/            # End-to-end tests
+│   └── fixtures/       # Test data and mocks
+├── logs/               # Log files (auto-generated)
+├── docs/               # Documentation
+│   └── LOGGING.md      # Logging guide
+├── Dockerfile          # Container configuration
+├── package.json        # Dependencies and scripts
+└── jest.config.js      # Test configuration
 ```
 
 ## 🔧 Environment Variables
@@ -48,6 +60,9 @@ REDIS_PASSWORD=
 JWT_SECRET=your_jwt_secret_key_minimum_32_characters
 JWT_REFRESH_SECRET=your_jwt_refresh_secret_key_minimum_32_characters
 JWT_EXPIRE=1h
+
+# Logging
+LOG_LEVEL=info  # Options: error, warn, info, debug
 JWT_REFRESH_EXPIRE=7d
 ```
 
@@ -95,6 +110,7 @@ npm start
 🎉 **Swagger UI is available at `/api-docs`**
 
 Access comprehensive interactive API documentation at:
+
 - Local: http://localhost:3000/api-docs
 - Try out endpoints directly from your browser
 - View request/response examples
@@ -116,8 +132,25 @@ Access comprehensive interactive API documentation at:
 
 ### Data Management
 
-- `POST /api/data` - Store key-value data in cache (protected)
-- `GET /api/data/:key` - Retrieve data by key (protected)
+- `POST /api/data` - Create new data entity (protected)
+- `GET /api/data` - List all data with pagination (protected)
+- `GET /api/data/:id` - Get data by ID (protected, cached)
+- `PUT /api/data/:id` - Update data by ID (protected)
+- `DELETE /api/data/:id` - Delete data by ID (protected)
+- `GET /api/data/search` - Search data with filters (protected)
+- `POST /api/data/bulk` - Bulk operations (protected)
+- `GET /api/data/export` - Export data (JSON/CSV) (protected)
+- `GET /api/data/analytics` - Get data analytics (protected)
+
+**Features:**
+
+- ✅ CRUD operations with validation
+- ✅ Redis caching for read operations
+- ✅ Full-text search capability
+- ✅ Pagination and filtering
+- ✅ Bulk operations (create/update/delete)
+- ✅ Data export (JSON/CSV)
+- ✅ Analytics and insights
 
 **Note:** Protected endpoints require a valid JWT token in the Authorization header.
 
@@ -207,6 +240,8 @@ See [Security Documentation](../docs/SECURITY.md) for more details.
 - `jsonwebtoken` - JWT token generation and verification
 - `bcryptjs` - Password hashing
 - `express-rate-limit` - Rate limiting middleware
+- `winston` - Structured logging
+- `winston-daily-rotate-file` - Automatic log rotation
 
 ### Development
 
@@ -226,9 +261,20 @@ npm run test:coverage # Run tests with coverage report
 
 ## 🐛 Debugging
 
-### Console Logging
+### Structured Logging
+
+The application uses Winston for structured logging. See [docs/LOGGING.md](./docs/LOGGING.md) for details.
 
 ```bash
+# View real-time logs (development)
+npm run dev
+
+# View log files (JSON format)
+tail -f logs/combined-2025-10-04.log | jq .
+
+# View error logs only
+tail -f logs/error-2025-10-04.log | jq .
+
 # View logs in Docker
 docker-compose logs -f backend
 

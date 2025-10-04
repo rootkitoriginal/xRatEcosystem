@@ -27,7 +27,7 @@ O **xRat Ecosystem** é um ambiente de desenvolvimento totalmente containerizado
 ✅ Rede isolada `xrat-network` para comunicação entre serviços  
 ✅ Health checks para todos os serviços  
 ✅ Persistência de dados com volumes Docker  
-✅ Hot-reload para desenvolvimento  
+✅ Hot-reload para desenvolvimento
 
 ---
 
@@ -185,6 +185,7 @@ docker-compose restart frontend
 **Access comprehensive API documentation at: http://localhost:3000/api-docs**
 
 The API documentation includes:
+
 - ✅ All endpoints with detailed descriptions
 - ✅ Request/response examples
 - ✅ Authentication requirements (JWT Bearer token)
@@ -194,40 +195,64 @@ The API documentation includes:
 
 ### Backend API
 
-#### GET `/`
-Informações básicas da API
+O backend fornece uma API RESTful completa com os seguintes recursos:
 
-```bash
-curl http://localhost:3000/
-```
+#### Health & Status
 
-#### GET `/health`
-Health check do sistema
+- `GET /` - Informações básicas da API
+- `GET /health` - Health check do sistema
+- `GET /api/status` - Status detalhado de todos os serviços
 
-```bash
+#### Authentication
+
+- `POST /api/auth/register` - Registrar novo usuário
+- `POST /api/auth/login` - Login de usuário
+- `POST /api/auth/refresh` - Renovar access token
+- `POST /api/auth/logout` - Logout de usuário (protegido)
+- `GET /api/auth/profile` - Obter perfil do usuário (protegido)
+
+#### Data Management (Protegido)
+
+- `POST /api/data` - Criar nova entidade de dados
+- `GET /api/data` - Listar todos os dados (paginado)
+- `GET /api/data/:id` - Obter dados por ID (com cache)
+- `PUT /api/data/:id` - Atualizar dados por ID
+- `DELETE /api/data/:id` - Deletar dados por ID
+- `GET /api/data/search` - Buscar dados com filtros
+- `POST /api/data/bulk` - Operações em massa (criar/atualizar/deletar)
+- `GET /api/data/export` - Exportar dados (JSON/CSV)
+- `GET /api/data/analytics` - Obter analytics dos dados
+
+### Exemplo de Uso
+
+````bash
+# Health check
 curl http://localhost:3000/health
-```
 
-Resposta:
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-10-03T...",
-  "services": {
-    "mongodb": "connected",
-    "redis": "connected"
-  }
-}
-```
+# Registrar usuário
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "user",
+    "email": "user@example.com",
+    "password": "Password123"
+  }'
 
-#### GET `/api/status`
-Status detalhado de todos os serviços
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "Password123"
+  }'
 
+<<<<<<< HEAD
 ```bash
 curl http://localhost:3000/api/status
-```
+````
 
 #### POST `/api/data`
+
 Salvar dados no Redis cache (requires authentication)
 
 ```bash
@@ -238,12 +263,35 @@ curl -X POST http://localhost:3000/api/data \
 ```
 
 #### GET `/api/data/:key`
+
 Recuperar dados do Redis cache (requires authentication)
 
 ```bash
 curl http://localhost:3000/api/data/test \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
+
+=======
+
+# Criar dados (requer token)
+
+```bash
+curl -X POST http://localhost:3000/api/data \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "name": "My Data",
+    "content": {"key": "value"},
+    "type": "json",
+    "tags": ["important"]
+  }'
+
+# Listar dados (requer token)
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  "http://localhost:3000/api/data?page=1&limit=10"
+```
+
+Para documentação completa da API, consulte [docs/API.md](docs/API.md) ou acesse a interface interativa:
 
 **For complete API documentation, visit http://localhost:3000/api-docs**
 
@@ -256,6 +304,7 @@ curl http://localhost:3000/api/data/test \
 ⚠️ **IMPORTANTE**: As senhas padrão são para desenvolvimento. **Altere-as em produção!**
 
 No arquivo `.env`:
+
 - `MONGO_ROOT_PASSWORD`: Senha do MongoDB
 - `REDIS_PASSWORD`: Senha do Redis
 
@@ -273,6 +322,7 @@ O projeto usa uma rede Docker isolada chamada `xrat-network`:
 - **5173**: Frontend (HTTP)
 
 Portas **NÃO** expostas (internas apenas):
+
 - **27017**: MongoDB
 - **6379**: Redis
 
@@ -354,11 +404,13 @@ docker-compose logs <service-name>
 ### MongoDB não conecta
 
 Verifique se o container está rodando:
+
 ```bash
 docker-compose ps mongodb
 ```
 
 Verifique os logs:
+
 ```bash
 docker-compose logs mongodb
 ```
@@ -366,6 +418,7 @@ docker-compose logs mongodb
 ### Redis não conecta
 
 Verifique a senha no `.env`:
+
 ```bash
 docker-compose logs redis
 ```
@@ -373,6 +426,7 @@ docker-compose logs redis
 ### Frontend não carrega
 
 Limpe o cache e reconstrua:
+
 ```bash
 docker-compose down
 docker-compose up -d --build
@@ -401,17 +455,17 @@ FRONTEND_PORT=5174
 
 ## 📝 Variáveis de Ambiente
 
-| Variável | Descrição | Padrão |
-|----------|-----------|--------|
-| `NODE_ENV` | Ambiente Node.js | `development` |
-| `BACKEND_PORT` | Porta do backend no host | `3000` |
-| `FRONTEND_PORT` | Porta do frontend no host | `5173` |
-| `MONGO_ROOT_USER` | Usuário admin MongoDB | `admin` |
-| `MONGO_ROOT_PASSWORD` | Senha MongoDB | `xrat_secret_2025` |
-| `MONGO_DATABASE` | Nome do database | `xrat_db` |
-| `REDIS_PASSWORD` | Senha Redis | `xrat_redis_2025` |
-| `VITE_API_URL` | URL da API para frontend | `http://localhost:3000` |
-| `FRONTEND_URL` | URL do frontend (CORS) | `http://localhost:5173` |
+| Variável              | Descrição                 | Padrão                  |
+| --------------------- | ------------------------- | ----------------------- |
+| `NODE_ENV`            | Ambiente Node.js          | `development`           |
+| `BACKEND_PORT`        | Porta do backend no host  | `3000`                  |
+| `FRONTEND_PORT`       | Porta do frontend no host | `5173`                  |
+| `MONGO_ROOT_USER`     | Usuário admin MongoDB     | `admin`                 |
+| `MONGO_ROOT_PASSWORD` | Senha MongoDB             | `xrat_secret_2025`      |
+| `MONGO_DATABASE`      | Nome do database          | `xrat_db`               |
+| `REDIS_PASSWORD`      | Senha Redis               | `xrat_redis_2025`       |
+| `VITE_API_URL`        | URL da API para frontend  | `http://localhost:3000` |
+| `FRONTEND_URL`        | URL do frontend (CORS)    | `http://localhost:5173` |
 
 ---
 
@@ -428,6 +482,7 @@ Contribuições são bem-vindas! Por favor, leia nosso [Guia de Contribuição](
 5. Abra um Pull Request
 
 Veja também:
+
 - [Guia de Testes](docs/TESTING.md)
 - [Documentação da API](docs/API.md)
 - [Arquitetura](docs/ARCHITECTURE.md)
@@ -482,7 +537,7 @@ Agradecimentos a todos que contribuíram para este projeto:
 
 ## 📞 Suporte
 
-Precisa de ajuda? 
+Precisa de ajuda?
 
 - 📖 Confira a [documentação](docs/)
 - 🐛 Abra uma [issue](https://github.com/xLabInternet/xRatEcosystem/issues)

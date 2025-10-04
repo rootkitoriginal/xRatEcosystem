@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import UserProfile from '../components/auth/UserProfile';
 import '../App.css';
 
@@ -57,6 +58,12 @@ function Dashboard() {
       <main className="main">
         <section style={{ marginBottom: '2rem' }}>
           <UserProfile />
+        </section>
+
+        <section style={{ marginBottom: '2rem' }}>
+          <Link to="/data" className="data-link">
+            <button className="submit-btn">📊 Go to Data Management</button>
+          </Link>
         </section>
 
         <section className="status-section">

@@ -13,10 +13,16 @@ const path = require('path');
 // Load environment variables
 require('dotenv').config();
 
+// Import logger
+const logger = require('./config/logger');
+
 // Import routes and middleware
 const authRoutes = require('./auth/authRoutes');
-const { authenticate } = require('./middleware/auth');
+const createDataRoutes = require('./routes/dataRoutes');
+const DataService = require('./services/dataService');
+const dataController = require('./controllers/dataController');
 const { apiLimiter } = require('./middleware/rateLimiter');
+const { requestLogger, errorLogger } = require('./middleware/requestLogger');
 
 // Load OpenAPI specification
 const openApiPath = path.join(__dirname, 'openapi.yaml');
@@ -37,14 +43,17 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware
+app.use(requestLogger);
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('✅ MongoDB connected successfully');
+    logger.info('MongoDB connected successfully', { service: 'mongodb' });
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
+    logger.error('MongoDB connection error', { service: 'mongodb', error: err.message });
   });
 
 // Redis Connection
@@ -61,16 +70,23 @@ let redisClient;
     });
 
     redisClient.on('error', (err) => {
-      console.error('❌ Redis Client Error:', err.message);
+      logger.error('Redis client error', { service: 'redis', error: err.message });
     });
 
     redisClient.on('connect', () => {
-      console.log('✅ Redis connected successfully');
+      logger.info('Redis connected successfully', { service: 'redis' });
     });
 
     await redisClient.connect();
+
+    // Initialize data service after Redis connection
+    const dataService = new DataService(redisClient);
+    const dataRoutes = createDataRoutes(dataService, dataController);
+
+    // Data Management Routes (protected)
+    app.use('/api/data', dataRoutes);
   } catch (err) {
-    console.error('❌ Redis connection error:', err.message);
+    logger.error('Redis connection error', { service: 'redis', error: err.message });
   }
 })();
 
@@ -97,6 +113,7 @@ app.get('/', (req, res) => {
       api: '/api',
       auth: '/api/auth',
       docs: '/api-docs',
+      data: '/api/data',
     },
   });
 });
@@ -140,79 +157,24 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
-// Sample API endpoint with MongoDB and Redis (protected)
-app.post('/api/data', authenticate, async (req, res) => {
-  try {
-    const { key, value } = req.body;
-
-    if (!key || !value) {
-      return res.status(400).json({
-        success: false,
-        message: 'Key and value are required',
-      });
-    }
-
-    // Store in Redis cache
-    if (redisClient && redisClient.isOpen) {
-      await redisClient.set(`data:${key}`, JSON.stringify(value), {
-        EX: 3600, // Expire in 1 hour
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Data stored successfully',
-      key,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
-app.get('/api/data/:key', authenticate, async (req, res) => {
-  try {
-    const { key } = req.params;
-
-    // Get from Redis cache
-    if (redisClient && redisClient.isOpen) {
-      const cachedData = await redisClient.get(`data:${key}`);
-
-      if (cachedData) {
-        return res.json({
-          success: true,
-          data: JSON.parse(cachedData),
-          source: 'cache',
-        });
-      }
-    }
-
-    res.status(404).json({
-      success: false,
-      message: 'Data not found',
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
-
 // 404 handler
 app.use((req, res) => {
+  logger.warn('Route not found', {
+    requestId: req.requestId,
+    method: req.method,
+    url: req.url,
+  });
   res.status(404).json({
     success: false,
     message: 'Route not found',
   });
 });
 
+// Error logging middleware
+app.use(errorLogger);
+
 // Error handler
 app.use((err, req, res, _next) => {
-  console.error('Error:', err);
   res.status(500).json({
     success: false,
     message: 'Internal server error',
@@ -222,20 +184,24 @@ app.use((err, req, res, _next) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 xRat Backend running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
+  logger.info('xRat Backend server started', {
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development',
+    healthCheckUrl: `http://localhost:${PORT}/health`,
+    apiDocsUrl: `http://localhost:${PORT}/api-docs`,
+  });
 });
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully...');
+  logger.info('SIGTERM received, shutting down gracefully...');
 
   if (redisClient) {
     await redisClient.quit();
+    logger.info('Redis connection closed');
   }
 
   await mongoose.connection.close();
+  logger.info('MongoDB connection closed');
   process.exit(0);
 });
