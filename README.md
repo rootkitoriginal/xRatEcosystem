@@ -47,28 +47,119 @@ O **xRat Ecosystem** é um ambiente de desenvolvimento totalmente containerizado
 
 ```
 xRatEcosystem/
-├── backend/
-│   ├── src/
-│   │   └── index.js          # API Backend
-│   ├── Dockerfile
-│   ├── package.json
-│   └── .dockerignore
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx           # Componente principal
-│   │   ├── App.css
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── Dockerfile
-│   ├── package.json
-│   └── .dockerignore
-├── docker-compose.yml        # Orquestração de containers
-├── .env                      # Variáveis de ambiente (não commitar)
-├── .env.example              # Template de variáveis
-├── .gitignore
-└── README.md
+├── 📁 backend/                    # Backend Node.js + Express
+│   ├── 📁 src/                   # Código fonte principal
+│   │   ├── index.js              # Entry point da API
+│   │   ├── openapi.yaml          # Documentação OpenAPI/Swagger
+│   │   ├── 📁 auth/              # Sistema de autenticação
+│   │   │   ├── authController.js # Controller de autenticação
+│   │   │   └── authRoutes.js     # Rotas de auth
+│   │   ├── 📁 config/            # Configurações
+│   │   │   └── logger.js         # Configuração Winston
+│   │   ├── 📁 controllers/       # Controllers da API
+│   │   │   └── dataController.js # Controller de dados
+│   │   ├── 📁 health/            # Health checks
+│   │   │   ├── healthRouter.js   # Rotas de health
+│   │   │   ├── healthService.js  # Serviço de health
+│   │   │   └── index.js          # Exportações
+│   │   ├── 📁 middleware/        # Middlewares Express
+│   │   │   ├── auth.js           # Middleware de autenticação
+│   │   │   ├── rateLimiter.js    # Rate limiting
+│   │   │   └── requestLogger.js  # Logging de requests
+│   │   ├── 📁 models/            # Modelos Mongoose
+│   │   │   ├── Data.js           # Model de dados
+│   │   │   └── User.js           # Model de usuário
+│   │   ├── 📁 routes/            # Definições de rotas
+│   │   │   └── dataRoutes.js     # Rotas de dados
+│   │   ├── 📁 services/          # Serviços de negócio
+│   │   │   └── dataService.js    # Serviço de dados
+│   │   └── 📁 utils/             # Utilitários
+│   │       ├── jwt.js            # Utilities JWT
+│   │       └── validation.js     # Validações
+│   ├── 📁 __tests__/             # Testes principais
+│   │   ├── 📁 integration/       # Testes de integração
+│   │   │   ├── api.test.js       # Testes gerais da API
+│   │   │   ├── auth.test.js      # Testes de autenticação
+│   │   │   ├── data.test.js      # Testes de dados
+│   │   │   ├── rateLimiter.test.js # Testes rate limiting
+│   │   │   └── swagger.test.js   # Testes documentação
+│   │   └── 📁 unit/              # Testes unitários
+│   │       ├── auth.test.js      # Middleware auth
+│   │       ├── logger.test.js    # Sistema de logging
+│   │       ├── rateLimiter.test.js # Rate limiter
+│   │       ├── requestLogger.test.js # Request logger
+│   │       └── 📁 models/        # Testes de modelos
+│   │           ├── Data.test.js  # Testes Data model
+│   │           └── User.test.js  # Testes User model
+│   ├── 📁 tests/                 # Testes específicos
+│   │   ├── 📁 integration/       # Testes de integração
+│   │   └── 📁 unit/              # Testes unitários
+│   ├── 📁 coverage/              # Relatórios de cobertura
+│   ├── 📁 logs/                  # Arquivos de log
+│   ├── 📁 docs/                  # Documentação específica
+│   ├── Dockerfile                # Container backend
+│   ├── package.json              # Dependências Node.js
+│   ├── jest.config.js            # Configuração Jest
+│   └── eslint.config.js          # Configuração ESLint
+├── 📁 frontend/                   # Frontend React + Vite
+│   ├── 📁 src/                   # Código fonte React
+│   │   ├── App.jsx               # Componente principal
+│   │   ├── App.css               # Estilos principais
+│   │   ├── main.jsx              # Entry point React
+│   │   ├── index.css             # Estilos globais
+│   │   ├── 📁 components/        # Componentes React
+│   │   │   ├── 📁 auth/          # Componentes autenticação
+│   │   │   └── 📁 data/          # Componentes dados
+│   │   ├── 📁 contexts/          # Contextos React
+│   │   │   └── AuthContext.jsx   # Context de autenticação
+│   │   ├── 📁 pages/             # Páginas/Views
+│   │   │   ├── AuthPage.jsx      # Página de autenticação
+│   │   │   ├── Dashboard.jsx     # Dashboard principal
+│   │   │   ├── DataManagement.jsx # Gerenciamento dados
+│   │   │   └── DataManagement.css # Estilos dados
+│   │   ├── 📁 services/          # Serviços API
+│   │   │   ├── mockAuth.js       # Mock autenticação
+│   │   │   └── mockDataService.js # Mock dados
+│   │   └── 📁 test/              # Utilitários de teste
+│   ├── 📁 __tests__/             # Testes frontend
+│   │   └── 📁 unit/              # Testes unitários React
+│   │       ├── App.test.jsx      # Testes App component
+│   │       ├── 📁 auth/          # Testes componentes auth
+│   │       └── 📁 data/          # Testes componentes data
+│   ├── 📁 coverage/              # Relatórios cobertura
+│   ├── index.html                # Template HTML
+│   ├── vite.config.js            # Configuração Vite
+│   ├── vitest.config.js          # Configuração Vitest
+│   ├── Dockerfile                # Container frontend
+│   └── package.json              # Dependências React
+├── 📁 docs/                       # Documentação completa
+│   ├── README.md                 # Índice documentação
+│   ├── ARCHITECTURE.md           # Arquitetura sistema
+│   ├── API.md                    # Documentação API
+│   ├── TESTING.md                # Guia de testes
+│   ├── CONTRIBUTING.md           # Guia contribuição
+│   ├── DEPLOYMENT.md             # Guia deployment
+│   ├── SECURITY.md               # Políticas segurança
+│   └── ACT_TESTING.md            # Testes locais
+├── 📁 .github/                    # GitHub workflows e templates
+│   ├── 📁 workflows/             # GitHub Actions
+│   └── 📁 ISSUE_TEMPLATE/        # Templates issues/PRs
+├── 📁 bin/                        # Scripts utilitários
+│   ├── gemini-helper.js          # Helper Gemini CLI
+│   ├── monitorDevOps.js          # Monitor DevOps
+│   └── README.md                 # Documentação scripts
+├── 📁 .husky/                     # Git hooks
+├── docker-compose.yml            # Orquestração containers
+├── package.json                  # Scripts raiz projeto
+├── .env.example                  # Template variáveis ambiente
+├── .gitignore                    # Arquivos ignorados Git
+├── .prettierrc                   # Configuração Prettier
+├── .editorconfig                 # Configuração editor
+├── CHANGELOG.md                  # Histórico mudanças
+├── LICENSE                       # Licença MIT
+├── QUICKSTART.md                 # Guia início rápido
+├── GEMINI.md                     # Context AI assistant
+└── README.md                     # Este arquivo
 ```
 
 ---
