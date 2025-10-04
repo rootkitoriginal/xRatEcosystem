@@ -415,9 +415,12 @@ describe('Data Model', () => {
 
       // Pre-save hook should not run if type is already set
       if (data.isNew && !data.type) {
-        const contentType = typeof data.content;
         if (Array.isArray(data.content)) {
           data.type = 'array';
+        } else if (typeof data.content === 'object' && data.content !== null) {
+          data.type = 'object';
+        } else {
+          data.type = typeof data.content;
         }
       }
 
