@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt');
+const logger = require('../config/logger');
 
 /**
  * Register a new user
@@ -75,7 +76,11 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    logger.error('Registration error', {
+      requestId: req.requestId,
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({
       success: false,
       message: 'Registration failed',
@@ -138,7 +143,11 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error', {
+      requestId: req.requestId,
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({
       success: false,
       message: 'Login failed',
@@ -193,7 +202,11 @@ const refresh = async (req, res) => {
       });
     }
 
-    console.error('Token refresh error:', error);
+    logger.error('Token refresh error', {
+      requestId: req.requestId,
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({
       success: false,
       message: 'Token refresh failed',
@@ -227,7 +240,11 @@ const logout = async (req, res) => {
       message: 'Logout successful'
     });
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error('Logout error', {
+      requestId: req.requestId,
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({
       success: false,
       message: 'Logout failed',
@@ -249,7 +266,11 @@ const getProfile = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error', {
+      requestId: req.requestId,
+      error: error.message,
+      stack: error.stack,
+    });
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve profile',
