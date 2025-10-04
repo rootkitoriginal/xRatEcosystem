@@ -72,6 +72,23 @@ describe('Request Logger Middleware', () => {
         })
       );
     });
+
+    it('should fallback to connection.remoteAddress when req.ip is undefined', () => {
+      req.ip = undefined;
+
+      requestLogger(req, res, next);
+
+      expect(logger.info).toHaveBeenCalledWith(
+        'Incoming request',
+        expect.objectContaining({
+          requestId: expect.any(String),
+          method: 'GET',
+          url: '/api/test',
+          ip: '127.0.0.1', // Should use connection.remoteAddress
+          userAgent: 'Test User Agent',
+        })
+      );
+    });
   });
 
   describe('errorLogger', () => {
