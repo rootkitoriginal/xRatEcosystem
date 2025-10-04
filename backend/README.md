@@ -43,6 +43,19 @@ MONGODB_URI=mongodb://mongo:27017/xrat
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_PASSWORD=
+
+# JWT Authentication
+JWT_SECRET=your_jwt_secret_key_minimum_32_characters
+JWT_REFRESH_SECRET=your_jwt_refresh_secret_key_minimum_32_characters
+JWT_EXPIRE=1h
+JWT_REFRESH_EXPIRE=7d
+```
+
+**Generate secure secrets:**
+
+```bash
+# Generate JWT secrets
+openssl rand -base64 64
 ```
 
 ## 🏃 Getting Started
@@ -83,10 +96,20 @@ npm start
 - `GET /health` - Health check
 - `GET /api/status` - Detailed system status
 
+### Authentication
+
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/logout` - Logout user (protected)
+- `GET /api/auth/profile` - Get user profile (protected)
+
 ### Data Management
 
-- `POST /api/data` - Store key-value data in cache
-- `GET /api/data/:key` - Retrieve data by key
+- `POST /api/data` - Store key-value data in cache (protected)
+- `GET /api/data/:key` - Retrieve data by key (protected)
+
+**Note:** Protected endpoints require a valid JWT token in the Authorization header.
 
 See [API Documentation](../docs/API.md) for detailed endpoint information.
 
@@ -117,11 +140,48 @@ See [Testing Documentation](../docs/TESTING.md) for more details.
 
 ## 🔐 Security Features
 
+- **JWT Authentication:** Token-based authentication with access and refresh tokens
+- **Password Hashing:** Bcrypt with 10 salt rounds
+- **Rate Limiting:** 5 auth attempts per 15 minutes, 100 API requests per 15 minutes
 - **Helmet.js:** Security headers
 - **CORS:** Cross-origin resource sharing configuration
 - **Compression:** Response compression
 - **Input Validation:** Request validation
 - **Error Handling:** Secure error responses
+
+### Authentication Flow
+
+1. **Register:** `POST /api/auth/register`
+
+   ```bash
+   curl -X POST http://localhost:3000/api/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"username":"user","email":"user@example.com","password":"Password123"}'
+   ```
+
+2. **Login:** `POST /api/auth/login`
+
+   ```bash
+   curl -X POST http://localhost:3000/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"user@example.com","password":"Password123"}'
+   ```
+
+3. **Use Token:** Include in Authorization header
+
+   ```bash
+   curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+     http://localhost:3000/api/auth/profile
+   ```
+
+4. **Refresh Token:** When access token expires
+   ```bash
+   curl -X POST http://localhost:3000/api/auth/refresh \
+     -H "Content-Type: application/json" \
+     -d '{"refreshToken":"YOUR_REFRESH_TOKEN"}'
+   ```
+
+See [Security Documentation](../docs/SECURITY.md) for more details.
 
 ## 📦 Dependencies
 
@@ -134,6 +194,9 @@ See [Testing Documentation](../docs/TESTING.md) for more details.
 - `helmet` - Security headers
 - `compression` - Response compression
 - `dotenv` - Environment variables
+- `jsonwebtoken` - JWT token generation and verification
+- `bcryptjs` - Password hashing
+- `express-rate-limit` - Rate limiting middleware
 
 ### Development
 
@@ -180,12 +243,14 @@ Connect with Chrome DevTools at `chrome://inspect`
 ### MongoDB
 
 ```javascript
-mongoose.connect(process.env.MONGODB_URI)
+mongoose
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
+  .catch((err) => console.error('MongoDB error:', err));
 ```
 
 **Connection Status:**
+
 - Check via `/health` endpoint
 - Check via `/api/status` endpoint
 
@@ -195,12 +260,13 @@ mongoose.connect(process.env.MONGODB_URI)
 const redisClient = createClient({
   socket: {
     host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-  }
+    port: process.env.REDIS_PORT,
+  },
 });
 ```
 
 **Cache Operations:**
+
 - Store: `POST /api/data`
 - Retrieve: `GET /api/data/:key`
 - TTL: 3600 seconds (1 hour)
@@ -225,6 +291,7 @@ docker-compose logs -f backend
 ## 📝 Adding New Endpoints
 
 1. **Define route:**
+
 ```javascript
 app.get('/api/new-endpoint', async (req, res) => {
   try {
@@ -237,6 +304,7 @@ app.get('/api/new-endpoint', async (req, res) => {
 ```
 
 2. **Add tests:**
+
 ```javascript
 describe('GET /api/new-endpoint', () => {
   it('should return success', async () => {
@@ -248,12 +316,14 @@ describe('GET /api/new-endpoint', () => {
 ```
 
 3. **Update documentation:**
+
 - Update [API.md](../docs/API.md)
 - Add JSDoc comments
 
 ## 🤝 Contributing
 
 See [Contributing Guidelines](../docs/CONTRIBUTING.md) for:
+
 - Code style guidelines
 - Commit message format
 - Pull request process

@@ -15,15 +15,9 @@ function AuthPage() {
   return (
     <div style={{ minHeight: '100vh', padding: '2rem' }}>
       {showLogin ? (
-        <LoginForm
-          onSuccess={handleAuthSuccess}
-          onSwitchToRegister={() => setShowLogin(false)}
-        />
+        <LoginForm onSuccess={handleAuthSuccess} onSwitchToRegister={() => setShowLogin(false)} />
       ) : (
-        <RegisterForm
-          onSuccess={handleAuthSuccess}
-          onSwitchToLogin={() => setShowLogin(true)}
-        />
+        <RegisterForm onSuccess={handleAuthSuccess} onSwitchToLogin={() => setShowLogin(true)} />
       )}
     </div>
   );

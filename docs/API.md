@@ -11,8 +11,30 @@ The xRat Ecosystem API provides RESTful endpoints for managing data, monitoring 
 
 ## 🔑 Authentication
 
-**Current:** No authentication required  
-**Future:** JWT-based authentication
+**Current:** JWT-based authentication  
+**Token Type:** Bearer token in Authorization header
+
+### Authentication Flow
+
+1. **Register:** Create a new account with `POST /api/auth/register`
+2. **Login:** Get access and refresh tokens with `POST /api/auth/login`
+3. **Access Protected Routes:** Include access token in Authorization header
+4. **Refresh Token:** Get new access token when expired with `POST /api/auth/refresh`
+5. **Logout:** Invalidate refresh token with `POST /api/auth/logout`
+
+### Token Configuration
+
+- **Access Token:** Expires in 1 hour
+- **Refresh Token:** Expires in 7 days
+- **Password Requirements:** Minimum 8 characters with at least one letter and one number
+
+### Using Authentication
+
+Include the access token in the `Authorization` header:
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" http://localhost:3000/api/protected-route
+```
 
 ## 📡 Endpoints
 
@@ -23,23 +45,27 @@ The xRat Ecosystem API provides RESTful endpoints for managing data, monitoring 
 Get API information and available endpoints.
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Welcome to xRat Ecosystem API",
   "version": "1.0.0",
   "endpoints": {
     "health": "/health",
-    "api": "/api"
+    "api": "/api",
+    "auth": "/api/auth"
   }
 }
 ```
 
 **Status Codes:**
+
 - `200 OK` - Success
 
 ---
@@ -51,11 +77,13 @@ curl http://localhost:3000/
 Check the health status of the backend and its dependencies.
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -68,6 +96,7 @@ curl http://localhost:3000/health
 ```
 
 **Response Fields:**
+
 - `status` (string): Overall health status (`healthy` or `unhealthy`)
 - `timestamp` (string): ISO 8601 timestamp
 - `services` (object): Status of each service
@@ -75,9 +104,11 @@ curl http://localhost:3000/health
   - `redis` (string): Redis connection status
 
 **Status Codes:**
+
 - `200 OK` - All services are healthy
 
 **Usage:**
+
 - Health monitoring systems
 - Load balancer health checks
 - Kubernetes liveness probes
@@ -91,11 +122,13 @@ curl http://localhost:3000/health
 Get detailed system status including database connections and cache test.
 
 **Request:**
+
 ```bash
 curl http://localhost:3000/api/status
 ```
 
 **Response (Success):**
+
 ```json
 {
   "success": true,
@@ -110,6 +143,7 @@ curl http://localhost:3000/api/status
 ```
 
 **Response (Error):**
+
 ```json
 {
   "success": false,
@@ -118,6 +152,7 @@ curl http://localhost:3000/api/status
 ```
 
 **Response Fields:**
+
 - `success` (boolean): Operation success status
 - `ecosystem` (string): Ecosystem identifier
 - `database` (object): Database connection statuses
@@ -126,6 +161,7 @@ curl http://localhost:3000/api/status
 - `error` (string): Error message (only on failure)
 
 **Status Codes:**
+
 - `200 OK` - Success
 - `500 Internal Server Error` - System error
 
@@ -137,10 +173,14 @@ curl http://localhost:3000/api/status
 
 Store key-value data in Redis cache with 1-hour TTL.
 
+**🔒 Authentication Required**
+
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/data \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -d '{
     "key": "user_123",
     "value": {
@@ -151,6 +191,7 @@ curl -X POST http://localhost:3000/api/data \
 ```
 
 **Request Body:**
+
 ```json
 {
   "key": "user_123",
@@ -159,10 +200,12 @@ curl -X POST http://localhost:3000/api/data \
 ```
 
 **Request Fields:**
+
 - `key` (string, required): Unique identifier for the data
 - `value` (any, required): Data to store (can be string, number, object, array)
 
 **Response (Success):**
+
 ```json
 {
   "success": true,
@@ -173,6 +216,7 @@ curl -X POST http://localhost:3000/api/data \
 ```
 
 **Response (Validation Error):**
+
 ```json
 {
   "success": false,
@@ -181,6 +225,7 @@ curl -X POST http://localhost:3000/api/data \
 ```
 
 **Response (System Error):**
+
 ```json
 {
   "success": false,
@@ -189,11 +234,14 @@ curl -X POST http://localhost:3000/api/data \
 ```
 
 **Status Codes:**
+
 - `200 OK` - Data stored successfully
 - `400 Bad Request` - Missing or invalid parameters
+- `401 Unauthorized` - Missing or invalid authentication token
 - `500 Internal Server Error` - System error
 
 **Cache Details:**
+
 - **Storage:** Redis
 - **TTL:** 3600 seconds (1 hour)
 - **Key Format:** `data:{key}`
@@ -207,15 +255,21 @@ curl -X POST http://localhost:3000/api/data \
 
 Retrieve data from Redis cache by key.
 
+**🔒 Authentication Required**
+
 **Request:**
+
 ```bash
-curl http://localhost:3000/api/data/user_123
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:3000/api/data/user_123
 ```
 
 **URL Parameters:**
+
 - `key` (string, required): The key to retrieve
 
 **Response (Found):**
+
 ```json
 {
   "success": true,
@@ -228,6 +282,7 @@ curl http://localhost:3000/api/data/user_123
 ```
 
 **Response (Not Found):**
+
 ```json
 {
   "success": false,
@@ -236,6 +291,7 @@ curl http://localhost:3000/api/data/user_123
 ```
 
 **Response (Error):**
+
 ```json
 {
   "success": false,
@@ -244,6 +300,7 @@ curl http://localhost:3000/api/data/user_123
 ```
 
 **Response Fields:**
+
 - `success` (boolean): Operation success status
 - `data` (any): Retrieved data (only on success)
 - `source` (string): Data source (always "cache")
@@ -251,8 +308,313 @@ curl http://localhost:3000/api/data/user_123
 - `error` (string): System error message (only on system error)
 
 **Status Codes:**
+
 - `200 OK` - Data found and returned
+- `401 Unauthorized` - Missing or invalid authentication token
 - `404 Not Found` - Data not found or expired
+- `500 Internal Server Error` - System error
+
+---
+
+## 🔐 Authentication Endpoints
+
+### Register User
+
+#### `POST /api/auth/register`
+
+Create a new user account.
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "email": "john@example.com",
+    "password": "SecurePass123"
+  }'
+```
+
+**Request Body:**
+
+```json
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Request Fields:**
+
+- `username` (string, required): Username (3-30 characters)
+- `email` (string, required): Valid email address
+- `password` (string, required): Password (min 8 chars, must contain letter and number)
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "_id": "user_id",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "role": "user",
+      "createdAt": "2025-01-03T12:00:00.000Z"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**Response (Validation Error):**
+
+```json
+{
+  "success": false,
+  "message": "Password must contain at least one letter and one number"
+}
+```
+
+**Response (Conflict):**
+
+```json
+{
+  "success": false,
+  "message": "Email already registered"
+}
+```
+
+**Status Codes:**
+
+- `201 Created` - User registered successfully
+- `400 Bad Request` - Invalid input or validation error
+- `409 Conflict` - Username or email already exists
+- `429 Too Many Requests` - Rate limit exceeded (5 attempts per 15 minutes)
+- `500 Internal Server Error` - System error
+
+---
+
+### Login User
+
+#### `POST /api/auth/login`
+
+Authenticate user and receive tokens.
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "SecurePass123"
+  }'
+```
+
+**Request Body:**
+
+```json
+{
+  "email": "john@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Request Fields:**
+
+- `email` (string, required): User email
+- `password` (string, required): User password
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "_id": "user_id",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "role": "user"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**Response (Error):**
+
+```json
+{
+  "success": false,
+  "message": "Invalid email or password"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Login successful
+- `400 Bad Request` - Missing required fields
+- `401 Unauthorized` - Invalid credentials
+- `429 Too Many Requests` - Rate limit exceeded (5 attempts per 15 minutes)
+- `500 Internal Server Error` - System error
+
+---
+
+### Refresh Token
+
+#### `POST /api/auth/refresh`
+
+Get a new access token using refresh token.
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }'
+```
+
+**Request Body:**
+
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Request Fields:**
+
+- `refreshToken` (string, required): Valid refresh token
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "message": "Token refreshed successfully",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**Response (Error):**
+
+```json
+{
+  "success": false,
+  "message": "Invalid or expired refresh token"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Token refreshed successfully
+- `400 Bad Request` - Missing refresh token
+- `401 Unauthorized` - Invalid or expired refresh token
+- `500 Internal Server Error` - System error
+
+---
+
+### Logout User
+
+#### `POST /api/auth/logout`
+
+Logout user and invalidate refresh token.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/logout \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "message": "Logout successful"
+}
+```
+
+**Response (Error):**
+
+```json
+{
+  "success": false,
+  "message": "Authentication required. Please provide a valid token."
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Logout successful
+- `401 Unauthorized` - Missing or invalid token
+- `404 Not Found` - User not found
+- `500 Internal Server Error` - System error
+
+---
+
+### Get User Profile
+
+#### `GET /api/auth/profile`
+
+Get authenticated user's profile information.
+
+**🔒 Authentication Required**
+
+**Request:**
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:3000/api/auth/profile
+```
+
+**Response (Success):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "_id": "user_id",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "role": "user",
+      "createdAt": "2025-01-03T12:00:00.000Z",
+      "updatedAt": "2025-01-03T12:00:00.000Z"
+    }
+  }
+}
+```
+
+**Response (Error):**
+
+```json
+{
+  "success": false,
+  "message": "Authentication required. Please provide a valid token."
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Profile retrieved successfully
+- `401 Unauthorized` - Missing or invalid token
 - `500 Internal Server Error` - System error
 
 ---
@@ -262,6 +624,7 @@ curl http://localhost:3000/api/data/user_123
 ### 404 Not Found
 
 **Response:**
+
 ```json
 {
   "success": false,
@@ -270,6 +633,7 @@ curl http://localhost:3000/api/data/user_123
 ```
 
 **Triggered by:**
+
 - Accessing undefined routes
 - Typos in endpoint URLs
 
@@ -278,6 +642,7 @@ curl http://localhost:3000/api/data/user_123
 ### 500 Internal Server Error
 
 **Response (Development):**
+
 ```json
 {
   "success": false,
@@ -287,6 +652,7 @@ curl http://localhost:3000/api/data/user_123
 ```
 
 **Response (Production):**
+
 ```json
 {
   "success": false,
@@ -301,7 +667,8 @@ curl http://localhost:3000/api/data/user_123
 ## 📊 Rate Limiting
 
 **Current:** No rate limiting  
-**Future:** 
+**Future:**
+
 - 100 requests per minute per IP
 - 1000 requests per hour per IP
 - Configurable per endpoint
@@ -311,10 +678,12 @@ curl http://localhost:3000/api/data/user_123
 ## 🔐 CORS Configuration
 
 **Allowed Origins:**
+
 - Development: `http://localhost:5173`
 - Production: Configured via `FRONTEND_URL` environment variable
 
 **Allowed Methods:**
+
 - GET
 - POST
 - PUT
@@ -330,6 +699,7 @@ curl http://localhost:3000/api/data/user_123
 All API responses follow a consistent format:
 
 **Success Response:**
+
 ```json
 {
   "success": true,
@@ -339,6 +709,7 @@ All API responses follow a consistent format:
 ```
 
 **Error Response:**
+
 ```json
 {
   "success": false,
@@ -354,6 +725,7 @@ All API responses follow a consistent format:
 ### Request Headers
 
 Always include `Content-Type` header for POST requests:
+
 ```bash
 Content-Type: application/json
 ```
@@ -361,11 +733,12 @@ Content-Type: application/json
 ### Error Handling
 
 Always check the `success` field in responses:
+
 ```javascript
 const response = await fetch('/api/data', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ key, value })
+  body: JSON.stringify({ key, value }),
 });
 
 const data = await response.json();
@@ -381,6 +754,7 @@ if (data.success) {
 ### Retry Logic
 
 Implement exponential backoff for failed requests:
+
 ```javascript
 async function fetchWithRetry(url, options, maxRetries = 3) {
   for (let i = 0; i < maxRetries; i++) {
@@ -389,7 +763,7 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
       if (response.ok) return response;
     } catch (error) {
       if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+      await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 1000));
     }
   }
 }
@@ -403,8 +777,7 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
 
 ```javascript
 // Get system status
-const status = await fetch('http://localhost:3000/api/status')
-  .then(res => res.json());
+const status = await fetch('http://localhost:3000/api/status').then((res) => res.json());
 
 // Store data
 const storeResult = await fetch('http://localhost:3000/api/data', {
@@ -412,13 +785,12 @@ const storeResult = await fetch('http://localhost:3000/api/data', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     key: 'myKey',
-    value: { data: 'myValue' }
-  })
-}).then(res => res.json());
+    value: { data: 'myValue' },
+  }),
+}).then((res) => res.json());
 
 // Retrieve data
-const data = await fetch('http://localhost:3000/api/data/myKey')
-  .then(res => res.json());
+const data = await fetch('http://localhost:3000/api/data/myKey').then((res) => res.json());
 ```
 
 ### cURL
@@ -465,6 +837,7 @@ data = requests.get('http://localhost:3000/api/data/myKey').json()
 **Strategy:** URL-based versioning (future)
 
 **Future Format:**
+
 ```
 /api/v1/data
 /api/v2/data
@@ -482,6 +855,7 @@ data = requests.get('http://localhost:3000/api/data/myKey').json()
 ### Logging
 
 All API requests are logged with:
+
 - Timestamp
 - HTTP method
 - URL path
@@ -495,17 +869,20 @@ All API requests are logged with:
 ## 🚀 Future Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `POST /api/auth/refresh` - Refresh token
 
 ### User Management
+
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/:id` - Update user profile
 - `DELETE /api/users/:id` - Delete user
 
 ### Data Management
+
 - `PUT /api/data/:key` - Update data
 - `DELETE /api/data/:key` - Delete data
 - `GET /api/data` - List all keys (with pagination)

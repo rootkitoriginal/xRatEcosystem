@@ -86,7 +86,6 @@ describe('API Endpoints', () => {
 
     app.get('/api/data/:key', (req, res) => {
       const { key } = req.params;
-
       res.json({
         success: true,
         data: { test: 'value' },
@@ -126,7 +125,7 @@ describe('API Endpoints', () => {
   });
 
   describe('GET /api/status', () => {
-    it('should return API status with database info', async () => {
+    it('should return ecosystem status', async () => {
       const response = await request(app).get('/api/status');
 
       expect(response.status).toBe(200);
@@ -138,10 +137,10 @@ describe('API Endpoints', () => {
   });
 
   describe('POST /api/data', () => {
-    it('should store data successfully', async () => {
+    it('should store data with valid key and value', async () => {
       const testData = {
-        key: 'test_key',
-        value: 'test_value',
+        key: 'test-key',
+        value: 'test-value',
       };
 
       const response = await request(app).post('/api/data').send(testData);
@@ -149,28 +148,33 @@ describe('API Endpoints', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Data stored successfully');
-      expect(response.body.key).toBe(testData.key);
+      expect(response.body.key).toBe('test-key');
     });
 
-    it('should return 400 when key is missing', async () => {
-      const response = await request(app).post('/api/data').send({ value: 'test_value' });
+    it('should return 400 if key is missing', async () => {
+      const response = await request(app).post('/api/data').send({
+        value: 'test-value',
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Key and value are required');
     });
 
-    it('should return 400 when value is missing', async () => {
-      const response = await request(app).post('/api/data').send({ key: 'test_key' });
+    it('should return 400 if value is missing', async () => {
+      const response = await request(app).post('/api/data').send({
+        key: 'test-key',
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe('Key and value are required');
     });
   });
 
   describe('GET /api/data/:key', () => {
     it('should retrieve data by key', async () => {
-      const response = await request(app).get('/api/data/test_key');
+      const response = await request(app).get('/api/data/test-key');
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -179,9 +183,9 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('404 handler', () => {
-    it('should return 404 for unknown routes', async () => {
-      const response = await request(app).get('/unknown-route');
+  describe('404 Handler', () => {
+    it('should return 404 for non-existent routes', async () => {
+      const response = await request(app).get('/nonexistent');
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);

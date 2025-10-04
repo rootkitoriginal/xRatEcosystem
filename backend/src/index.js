@@ -9,6 +9,11 @@ const { createHealthRouter } = require('./health');
 // Load environment variables
 require('dotenv').config();
 
+// Import routes and middleware
+const authRoutes = require('./auth/authRoutes');
+const { authenticate } = require('./middleware/auth');
+const { apiLimiter } = require('./middleware/rateLimiter');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -72,18 +77,26 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       api: '/api',
+      auth: '/api/auth',
     },
   });
 });
 
+// Auth Routes (public)
+app.use('/api/auth', authRoutes);
+
 // API Routes
+// Apply general rate limiting to API routes
+app.use('/api', apiLimiter);
 app.get('/api/status', async (req, res) => {
   try {
     // Test MongoDB
     const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+
     // Test Redis
     let redisStatus = 'disconnected';
     let cacheTest = null;
+
     if (redisClient && redisClient.isOpen) {
       await redisClient.set('test_key', 'xRat Ecosystem is running!');
       cacheTest = await redisClient.get('test_key');
@@ -108,10 +121,11 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
-// Sample API endpoint with MongoDB and Redis
-app.post('/api/data', async (req, res) => {
+// Sample API endpoint with MongoDB and Redis (protected)
+app.post('/api/data', authenticate, async (req, res) => {
   try {
     const { key, value } = req.body;
+
     if (!key || !value) {
       return res.status(400).json({
         success: false,
@@ -140,13 +154,14 @@ app.post('/api/data', async (req, res) => {
   }
 });
 
-app.get('/api/data/:key', async (req, res) => {
+app.get('/api/data/:key', authenticate, async (req, res) => {
   try {
     const { key } = req.params;
 
     // Get from Redis cache
     if (redisClient && redisClient.isOpen) {
       const cachedData = await redisClient.get(`data:${key}`);
+
       if (cachedData) {
         return res.json({
           success: true,
@@ -196,9 +211,11 @@ app.listen(PORT, '0.0.0.0', () => {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');
+
   if (redisClient) {
     await redisClient.quit();
   }
+
   await mongoose.connection.close();
   process.exit(0);
 });

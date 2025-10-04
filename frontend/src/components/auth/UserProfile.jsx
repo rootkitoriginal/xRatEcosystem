@@ -10,9 +10,7 @@ function UserProfile() {
 
   return (
     <div className="user-profile">
-      <div className="profile-avatar">
-        {user.name ? user.name.charAt(0).toUpperCase() : '?'}
-      </div>
+      <div className="profile-avatar">{user.name ? user.name.charAt(0).toUpperCase() : '?'}</div>
       <div className="profile-info">
         <div className="profile-name">{user.name || 'User'}</div>
         <div className="profile-email">{user.email}</div>

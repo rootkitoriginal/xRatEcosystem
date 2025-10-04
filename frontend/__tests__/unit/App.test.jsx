@@ -32,7 +32,7 @@ describe('App Component', () => {
 
     const loginButtons = screen.getAllByRole('button', { name: /login/i });
     expect(loginButtons.length).toBeGreaterThan(0);
-    
+
     const registerButtons = screen.getAllByRole('button', { name: /register/i });
     expect(registerButtons.length).toBeGreaterThan(0);
   });
