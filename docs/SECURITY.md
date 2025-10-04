@@ -38,6 +38,7 @@ If you discover a security vulnerability, please follow these steps:
 2. **DO NOT** disclose the vulnerability publicly until it has been addressed
 
 **Report via:**
+
 - **Email:** security@xrat-ecosystem.com (future)
 - **GitHub Security Advisory:** Use the "Security" tab on GitHub
 - **Private message:** Contact maintainers directly
@@ -80,18 +81,21 @@ We follow **responsible disclosure**:
 ### Environment Variables
 
 **DO:**
+
 - Store secrets in `.env` file (never commit!)
 - Use strong, randomly generated passwords
 - Rotate credentials regularly
 - Use different credentials for each environment
 
 **DON'T:**
+
 - Commit `.env` files to Git
 - Hardcode secrets in source code
 - Share credentials via insecure channels
 - Use default or weak passwords
 
 **Example:**
+
 ```bash
 # Good
 MONGODB_PASSWORD=$(openssl rand -base64 32)
@@ -107,6 +111,7 @@ JWT_SECRET=mysecret
 ### Database Security
 
 **MongoDB:**
+
 - Enable authentication (required in production)
 - Use strong passwords
 - Limit network access (internal only)
@@ -120,6 +125,7 @@ MONGODB_URI=mongodb://admin:strong_password@mongo:27017/xrat?authSource=admin
 ```
 
 **Redis:**
+
 - Require password authentication
 - Bind to localhost/internal network only
 - Disable dangerous commands in production
@@ -137,11 +143,13 @@ rename-command FLUSHALL ""
 ### Network Security
 
 **Docker Network Isolation:**
+
 - MongoDB and Redis are NOT exposed to host
 - Only Backend (3000) and Frontend (5173) ports are exposed
 - All internal communication via Docker network
 
 **Production Recommendations:**
+
 - Use HTTPS/TLS for all external connections
 - Implement reverse proxy (Nginx/Apache)
 - Configure firewall rules
@@ -151,6 +159,7 @@ rename-command FLUSHALL ""
 ### Application Security
 
 **Backend:**
+
 - Input validation on all endpoints
 - Parameterized queries (prevent SQL/NoSQL injection)
 - Rate limiting (future)
@@ -160,6 +169,7 @@ rename-command FLUSHALL ""
 - JWT for authentication (future)
 
 **Frontend:**
+
 - Sanitize user input
 - Implement CSP (Content Security Policy)
 - Avoid inline scripts
@@ -169,11 +179,13 @@ rename-command FLUSHALL ""
 ### Container Security
 
 **Current:**
+
 - Use official Docker images
 - Regular security updates
 - Volume-mounted data for persistence
 
 **Future Improvements:**
+
 - Run containers as non-root user
 - Read-only root filesystem
 - Drop unnecessary capabilities
@@ -215,6 +227,7 @@ app.use(helmet());
 ```
 
 **Headers set:**
+
 - `X-DNS-Prefetch-Control`
 - `X-Frame-Options`
 - `Strict-Transport-Security`
@@ -225,10 +238,12 @@ app.use(helmet());
 #### CORS Configuration
 
 ```javascript
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+  })
+);
 ```
 
 #### Request Compression
@@ -247,21 +262,98 @@ All API endpoints validate required fields:
 if (!key || !value) {
   return res.status(400).json({
     success: false,
-    message: 'Key and value are required'
+    message: 'Key and value are required',
   });
+}
+```
+
+#### JWT Authentication
+
+**Implemented Features:**
+
+- JWT-based authentication with access and refresh tokens
+- Password hashing using bcryptjs (10 salt rounds)
+- Token-based route protection
+- Secure password validation (min 8 chars, letter + number)
+
+**Configuration:**
+
+```javascript
+// Access token expires in 1 hour
+// Refresh token expires in 7 days
+const JWT_EXPIRE = process.env.JWT_EXPIRE || '1h';
+const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '7d';
+```
+
+**Protected Endpoints:**
+
+- `POST /api/data` - Store data (requires valid access token)
+- `GET /api/data/:key` - Retrieve data (requires valid access token)
+- `POST /api/auth/logout` - Logout user (requires valid access token)
+- `GET /api/auth/profile` - Get user profile (requires valid access token)
+
+**Authentication Flow:**
+
+1. User registers with `POST /api/auth/register`
+2. User logs in with `POST /api/auth/login` to receive tokens
+3. Access token is included in `Authorization: Bearer <token>` header
+4. When access token expires, use refresh token to get new access token
+5. User can logout to invalidate refresh token
+
+**Security Features:**
+
+- Passwords hashed with bcrypt before storage
+- JWT tokens signed with secret keys
+- Refresh tokens stored in database for validation
+- Passwords never returned in API responses
+- Token expiration enforced
+
+#### Rate Limiting
+
+**Implementation:**
+
+**Authentication Endpoints:**
+
+- 5 requests per 15 minutes per IP
+- Applies to login and registration endpoints
+- Prevents brute force attacks
+
+```javascript
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 requests per window
+});
+```
+
+**General API Endpoints:**
+
+- 100 requests per 15 minutes per IP
+- Applies to all `/api/*` routes
+- Prevents API abuse
+
+```javascript
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per window
+});
+```
+
+**Response on Rate Limit Exceeded:**
+
+```json
+{
+  "success": false,
+  "message": "Too many authentication attempts. Please try again later."
 }
 ```
 
 ### Future Security Features
 
-- [ ] JWT Authentication
 - [ ] Role-Based Access Control (RBAC)
-- [ ] Rate Limiting
-- [ ] Request Throttling
 - [ ] API Key Management
 - [ ] OAuth Integration
 - [ ] Two-Factor Authentication (2FA)
-- [ ] Session Management
+- [ ] Enhanced Session Management
 - [ ] Audit Logging
 - [ ] Encryption at Rest
 - [ ] TLS/SSL for Internal Communication
@@ -273,26 +365,28 @@ if (!key || !value) {
 ### Development vs Production
 
 **Development Mode:**
+
 - Detailed error messages exposed
 - Debug logging enabled
-- No authentication required
+- Authentication required for protected endpoints
 - CORS accepts localhost
 
 **Production Mode:**
+
 - Generic error messages
 - Minimal logging
-- Authentication required (future)
+- Authentication required for protected endpoints
 - CORS restricted to specific domains
 
 ### Current Limitations
 
-1. **No Authentication:** API endpoints are currently public
-   - **Mitigation:** Implement JWT authentication
-   - **Timeline:** Phase 3
+1. **✅ Authentication:** JWT authentication implemented
+   - **Status:** Complete
+   - **Features:** Access tokens, refresh tokens, password hashing, rate limiting
 
-2. **No Rate Limiting:** Susceptible to brute force and DoS
-   - **Mitigation:** Implement rate limiting middleware
-   - **Timeline:** Phase 3
+2. **✅ Rate Limiting:** Rate limiting implemented
+   - **Status:** Complete
+   - **Features:** 5 auth attempts per 15min, 100 API requests per 15min
 
 3. **MongoDB & Redis Access:** Exposed on Docker network
    - **Mitigation:** Already isolated from host
@@ -336,8 +430,8 @@ if (!key || !value) {
 - [ ] Environment set to production
 - [ ] Debug mode disabled
 - [ ] Detailed errors hidden
-- [ ] Rate limiting enabled (future)
-- [ ] Authentication implemented (future)
+- [x] Rate limiting enabled
+- [x] Authentication implemented
 - [ ] Audit logging enabled (future)
 - [ ] Regular security audits scheduled
 - [ ] Incident response plan documented
@@ -397,11 +491,11 @@ Regular security reviews include:
 
 ### Phase 3 (Authentication & Authorization)
 
-- [ ] Implement JWT authentication
-- [ ] Add user registration and login
-- [ ] Implement role-based access control
-- [ ] Add API rate limiting
-- [ ] Implement session management
+- [x] Implement JWT authentication
+- [x] Add user registration and login
+- [ ] Implement role-based access control (RBAC)
+- [x] Add API rate limiting
+- [x] Implement basic session management (JWT tokens)
 - [ ] Add audit logging
 
 ### Phase 4 (Advanced Security)
