@@ -135,10 +135,12 @@ describe('Rate Limiter Middleware', () => {
     });
 
     it('should block requests after exceeding the limit', async () => {
-      // Make 100 requests (the limit)
+      // Make 100 requests (the limit) in parallel
+      const requests = [];
       for (let i = 0; i < 100; i++) {
-        await request(app).get('/test-api');
+        requests.push(request(app).get('/test-api'));
       }
+      await Promise.all(requests);
 
       // 101st request should be blocked
       const response = await request(app).get('/test-api');
