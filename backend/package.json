@@ -32,7 +32,9 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
-    "redis": "^4.6.12"
+    "redis": "^4.6.12",
+    "winston": "^3.18.3",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
