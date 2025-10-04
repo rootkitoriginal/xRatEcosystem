@@ -175,9 +175,9 @@ class HealthService {
         cpu: {
           user: cpuUsage.user,
           system: cpuUsage.system
-        }
-      }
-    };
+    const memoryUtilization = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
+    
+    const isMemoryHealthy = memoryUtilization < 98;
   }
 
   /**
