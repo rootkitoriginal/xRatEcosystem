@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const request = require('supertest');
 const express = require('express');
 
@@ -6,8 +7,8 @@ jest.mock('mongoose', () => ({
   connect: jest.fn().mockResolvedValue(true),
   connection: {
     readyState: 1,
-    close: jest.fn()
-  }
+    close: jest.fn(),
+  },
 }));
 
 jest.mock('redis', () => ({
@@ -17,8 +18,8 @@ jest.mock('redis', () => ({
     set: jest.fn(),
     get: jest.fn(),
     quit: jest.fn(),
-    on: jest.fn()
-  }))
+    on: jest.fn(),
+  })),
 }));
 
 describe('API Endpoints', () => {
@@ -36,8 +37,8 @@ describe('API Endpoints', () => {
         timestamp: new Date().toISOString(),
         services: {
           mongodb: 'connected',
-          redis: 'connected'
-        }
+          redis: 'connected',
+        },
       });
     });
 
@@ -47,8 +48,8 @@ describe('API Endpoints', () => {
         version: '1.0.0',
         endpoints: {
           health: '/health',
-          api: '/api'
-        }
+          api: '/api',
+        },
       });
     });
 
@@ -58,20 +59,20 @@ describe('API Endpoints', () => {
         ecosystem: 'xRat',
         database: {
           mongodb: 'connected',
-          redis: 'connected'
+          redis: 'connected',
         },
         cache_test: 'test_value',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
     app.post('/api/data', (req, res) => {
       const { key, value } = req.body;
-      
+
       if (!key || !value) {
         return res.status(400).json({
           success: false,
-          message: 'Key and value are required'
+          message: 'Key and value are required',
         });
       }
 
@@ -79,24 +80,24 @@ describe('API Endpoints', () => {
         success: true,
         message: 'Data stored successfully',
         key,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
     app.get('/api/data/:key', (req, res) => {
       const { key } = req.params;
-      
+
       res.json({
         success: true,
         data: { test: 'value' },
-        source: 'cache'
+        source: 'cache',
       });
     });
 
     app.use((req, res) => {
       res.status(404).json({
         success: false,
-        message: 'Route not found'
+        message: 'Route not found',
       });
     });
   });
@@ -104,7 +105,7 @@ describe('API Endpoints', () => {
   describe('GET /', () => {
     it('should return welcome message', async () => {
       const response = await request(app).get('/');
-      
+
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message');
       expect(response.body.message).toBe('Welcome to xRat Ecosystem API');
@@ -115,7 +116,7 @@ describe('API Endpoints', () => {
   describe('GET /health', () => {
     it('should return health status', async () => {
       const response = await request(app).get('/health');
-      
+
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('healthy');
       expect(response.body).toHaveProperty('timestamp');
@@ -127,7 +128,7 @@ describe('API Endpoints', () => {
   describe('GET /api/status', () => {
     it('should return API status with database info', async () => {
       const response = await request(app).get('/api/status');
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.ecosystem).toBe('xRat');
@@ -140,13 +141,11 @@ describe('API Endpoints', () => {
     it('should store data successfully', async () => {
       const testData = {
         key: 'test_key',
-        value: 'test_value'
+        value: 'test_value',
       };
 
-      const response = await request(app)
-        .post('/api/data')
-        .send(testData);
-      
+      const response = await request(app).post('/api/data').send(testData);
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Data stored successfully');
@@ -154,20 +153,16 @@ describe('API Endpoints', () => {
     });
 
     it('should return 400 when key is missing', async () => {
-      const response = await request(app)
-        .post('/api/data')
-        .send({ value: 'test_value' });
-      
+      const response = await request(app).post('/api/data').send({ value: 'test_value' });
+
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Key and value are required');
     });
 
     it('should return 400 when value is missing', async () => {
-      const response = await request(app)
-        .post('/api/data')
-        .send({ key: 'test_key' });
-      
+      const response = await request(app).post('/api/data').send({ key: 'test_key' });
+
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
     });
@@ -176,7 +171,7 @@ describe('API Endpoints', () => {
   describe('GET /api/data/:key', () => {
     it('should retrieve data by key', async () => {
       const response = await request(app).get('/api/data/test_key');
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body).toHaveProperty('data');
@@ -187,7 +182,7 @@ describe('API Endpoints', () => {
   describe('404 handler', () => {
     it('should return 404 for unknown routes', async () => {
       const response = await request(app).get('/unknown-route');
-      
+
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Route not found');
