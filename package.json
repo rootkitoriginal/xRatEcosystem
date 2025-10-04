@@ -16,7 +16,9 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "docker:clean": "docker compose down -v --remove-orphans"
+    "docker:clean": "docker compose down -v --remove-orphans",
+    "monitor": "node bin/monitorDevOps.js",
+    "monitor:prs": "node bin/monitorDevOps.js"
   },
   "devDependencies": {
     "husky": "^9.0.11",
