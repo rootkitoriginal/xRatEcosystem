@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 env:
   REGISTRY: ghcr.io
@@ -120,13 +120,13 @@ jobs:
 
       - name: Start services with docker-compose
         run: |
-          docker-compose up -d
+          docker compose up -d
           sleep 15
 
       - name: Check services are running
         run: |
-          docker-compose ps
-          docker-compose logs
+          docker compose ps
+          docker compose logs
 
       - name: Test backend health
         run: |
@@ -139,4 +139,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v

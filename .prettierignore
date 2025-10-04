@@ -1,9 +1,45 @@
-node_modules
-dist
-build
-coverage
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+
+# Coverage reports
+coverage/
+**/coverage/
+
+# Logs
 *.log
+**/*.log
+
+# Environment files
 .env
-.DS_Store
+.env.*
+**/.env
+**/.env.*
+
+# Lock files
 package-lock.json
-*.md
+**/package-lock.json
+yarn.lock
+**/yarn.lock
+
+# OS files
+.DS_Store
+**/.DS_Store
+
+# Git and Husky
+.git/
+.husky/_/
+
+# Generated files
+CHANGELOG.md
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml

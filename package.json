@@ -1,0 +1,54 @@
+{
+  "name": "xrat-ecosystem",
+  "version": "1.0.0",
+  "description": "xRat Ecosystem - Docker-based isolated environment with Node.js backend, React frontend, MongoDB, and Redis",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces",
+    "test": "npm run test --workspaces",
+    "test:coverage": "npm run test:coverage --workspaces",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:clean": "docker compose down -v --remove-orphans"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.3.3"
+  },
+  "lint-staged": {
+    "backend/**/*.{js,json}": [
+      "cd backend && npm run lint:fix",
+      "cd backend && npm run format"
+    ],
+    "frontend/**/*.{js,jsx,json}": [
+      "cd frontend && npm run lint:fix", 
+      "cd frontend && npm run format"
+    ],
+    "*.{md,yml,yaml}": [
+      "npx prettier --write"
+    ]
+  },
+  "keywords": [
+    "xrat",
+    "ecosystem",
+    "docker",
+    "node",
+    "react",
+    "mongodb",
+    "redis"
+  ],
+  "author": "xRat Ecosystem Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
