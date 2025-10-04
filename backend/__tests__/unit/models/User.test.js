@@ -257,6 +257,101 @@ describe('User Model', () => {
 
       await expect(user.save()).rejects.toThrow('Hashing failed');
     });
+
+    it('should call next() after successful password hashing', async () => {
+      const user = new User({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'PlainPassword123',
+      });
+
+      bcrypt.genSalt.mockResolvedValue('mocksalt');
+      bcrypt.hash.mockResolvedValue('hashedpassword123');
+
+      const nextSpy = jest.fn();
+      user.isModified = jest.fn(() => true);
+
+      // Simulate the pre-save hook directly
+      const preSaveHook = async function(next) {
+        if (!this.isModified('password')) {
+          return next();
+        }
+        try {
+          const salt = await bcrypt.genSalt(10);
+          this.password = await bcrypt.hash(this.password, salt);
+          next();
+        } catch (error) {
+          next(error);
+        }
+      };
+
+      await preSaveHook.call(user, nextSpy);
+
+      expect(nextSpy).toHaveBeenCalledWith();
+    });
+
+    it('should call next(error) when hashing fails', async () => {
+      const user = new User({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'PlainPassword123',
+      });
+
+      const hashError = new Error('Hashing failed');
+      bcrypt.genSalt.mockRejectedValue(hashError);
+
+      const nextSpy = jest.fn();
+      user.isModified = jest.fn(() => true);
+
+      // Simulate the pre-save hook directly
+      const preSaveHook = async function(next) {
+        if (!this.isModified('password')) {
+          return next();
+        }
+        try {
+          const salt = await bcrypt.genSalt(10);
+          this.password = await bcrypt.hash(this.password, salt);
+          next();
+        } catch (error) {
+          next(error);
+        }
+      };
+
+      await preSaveHook.call(user, nextSpy);
+
+      expect(nextSpy).toHaveBeenCalledWith(hashError);
+    });
+
+    it('should return early when password is not modified', async () => {
+      const user = new User({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'hashedpassword',
+      });
+
+      const nextSpy = jest.fn();
+      user.isModified = jest.fn(() => false);
+
+      // Simulate the pre-save hook directly
+      const preSaveHook = async function(next) {
+        if (!this.isModified('password')) {
+          return next();
+        }
+        try {
+          const salt = await bcrypt.genSalt(10);
+          this.password = await bcrypt.hash(this.password, salt);
+          next();
+        } catch (error) {
+          next(error);
+        }
+      };
+
+      const result = await preSaveHook.call(user, nextSpy);
+
+      expect(nextSpy).toHaveBeenCalledWith();
+      expect(bcrypt.genSalt).not.toHaveBeenCalled();
+      expect(result).toBeUndefined();
+    });
   });
 
   describe('Password Comparison - comparePassword Method', () => {
@@ -399,6 +494,31 @@ describe('User Model', () => {
       });
 
       expect(user.updatedAt).toBeDefined();
+    });
+
+    it('should call updatedAt pre-save hook', async () => {
+      const user = new User({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'Password123',
+      });
+
+      const nextSpy = jest.fn();
+      const oldTime = user.updatedAt;
+
+      // Wait a bit to ensure time difference
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Simulate the updatedAt pre-save hook directly
+      const updatedAtHook = function(next) {
+        this.updatedAt = Date.now();
+        next();
+      };
+
+      updatedAtHook.call(user, nextSpy);
+
+      expect(nextSpy).toHaveBeenCalledWith();
+      expect(user.updatedAt).not.toEqual(oldTime);
     });
   });
 

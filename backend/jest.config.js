@@ -12,10 +12,10 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.js', '**/*.test.js'],
   coverageThreshold: {
     global: {
-      branches: 53,
+      branches: 80,
       functions: 80,
-      lines: 75,
-      statements: 75,
+      lines: 80,
+      statements: 80,
     },
     // Specific thresholds for middleware (the focus of this PR)
     'src/middleware/**/*.js': {

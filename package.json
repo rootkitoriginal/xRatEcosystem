@@ -13,6 +13,7 @@
     "format": "npm run format --workspaces",
     "test": "npm run test --workspaces",
     "test:coverage": "npm run test:coverage --workspaces",
+    "test:smoke": "jest --config jest.config.js",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
@@ -22,7 +23,9 @@
   },
   "devDependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@types/jest": "^30.0.0",
     "husky": "^9.0.11",
+    "jest": "^30.2.0",
     "jsdom": "^27.0.0",
     "lint-staged": "^15.2.2",
     "prettier": "^3.3.3"

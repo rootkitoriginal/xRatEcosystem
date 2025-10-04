@@ -99,6 +99,28 @@ npm test -- App.test.jsx
 npm test
 ```
 
+### Smoke Tests
+
+Smoke tests verify critical scripts and tools work correctly without testing every detail.
+
+```bash
+# Run smoke tests (from project root)
+npm run test:smoke
+
+# Run with verbose output
+npm run test:smoke -- --verbose
+
+# Run with coverage
+npm run test:smoke -- --coverage
+```
+
+**What's included:**
+- Monitor script (`bin/monitorDevOps.js`) functionality
+- Basic execution and error handling
+- Mocked API calls (no real GitHub requests)
+
+See [`__tests__/smoke/README.md`](../__tests__/smoke/README.md) for details.
+
 ### Run All Tests
 
 ```bash
@@ -106,12 +128,22 @@ npm test
 ./xrat.sh test  # (future script)
 
 # Or manually
-cd backend && npm test && cd ../frontend && npm test
+cd backend && npm test && cd ../frontend && npm test && cd .. && npm run test:smoke
 ```
 
 ---
 
 ## 📁 Test Structure
+
+### Project Root
+
+```
+__tests__/
+└── smoke/               # Smoke tests for critical scripts
+    ├── monitor.test.js  # DevOps monitor smoke test
+    └── README.md        # Smoke test documentation
+jest.config.js           # Root-level Jest configuration
+```
 
 ### Backend
 
