@@ -104,12 +104,34 @@ function fetchGitHub(path) {
 }
 
 /**
- * Busca todos os PRs abertos
+ * Busca detalhes de um PR específico
+ */
+async function fetchPRDetails(prNumber) {
+  try {
+    const pr = await fetchGitHub(`/repos/${OWNER}/${REPO}/pulls/${prNumber}`);
+    return pr;
+  } catch (error) {
+    console.error(`${emoji.error} Erro ao buscar detalhes do PR #${prNumber}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Busca todos os PRs abertos com detalhes completos
  */
 async function fetchOpenPRs() {
   try {
     const prs = await fetchGitHub(`/repos/${OWNER}/${REPO}/pulls?state=open`);
-    return prs;
+    
+    // Buscar detalhes completos de cada PR (com commits, additions, deletions)
+    const prsWithDetails = await Promise.all(
+      prs.map(async (pr) => {
+        const details = await fetchPRDetails(pr.number);
+        return details || pr;
+      })
+    );
+    
+    return prsWithDetails;
   } catch (error) {
     console.error(`${emoji.error} Erro ao buscar PRs:`, error.message);
     return [];
