@@ -1,0 +1,832 @@
+openapi: 3.0.0
+info:
+  title: xRat Ecosystem API
+  description: RESTful API for the xRat Ecosystem - A comprehensive backend service with MongoDB and Redis integration
+  version: 1.0.0
+  contact:
+    name: xRat Ecosystem Team
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: http://localhost:3000
+    description: Local development
+
+tags:
+  - name: Root
+    description: Root API endpoint
+  - name: Health
+    description: Health check and monitoring endpoints
+  - name: Authentication
+    description: User authentication and authorization endpoints
+  - name: Data Management
+    description: Data storage and retrieval endpoints
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoint
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: An error occurred
+        error:
+          type: string
+          description: Error details (only in development mode)
+          example: Detailed error message
+
+    HealthStatus:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [ok, healthy, unhealthy, error]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+          example: 2025-01-04T12:00:00.000Z
+        services:
+          type: object
+          properties:
+            mongodb:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [connected, disconnected]
+                  example: connected
+                latency:
+                  type: string
+                  example: 12ms
+            redis:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [connected, disconnected]
+                  example: connected
+                latency:
+                  type: string
+                  example: 8ms
+
+    ReadinessCheck:
+      type: object
+      required:
+        - status
+        - ready
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready]
+          example: ready
+        ready:
+          type: boolean
+          example: true
+        timestamp:
+          type: string
+          format: date-time
+        services:
+          type: object
+
+    LivenessCheck:
+      type: object
+      required:
+        - status
+        - alive
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [alive, unhealthy]
+          example: alive
+        alive:
+          type: boolean
+          example: true
+        timestamp:
+          type: string
+          format: date-time
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: johndoe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          minLength: 6
+          example: SecurePassword123!
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          example: SecurePassword123!
+
+    AuthResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Login successful
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            refreshToken:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            user:
+              $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: john@example.com
+        createdAt:
+          type: string
+          format: date-time
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    DataStoreRequest:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          example: myKey
+        value:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+          example: { data: "myValue" }
+
+    DataStoreResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Data stored successfully
+        key:
+          type: string
+          example: myKey
+        timestamp:
+          type: string
+          format: date-time
+
+    DataRetrieveResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+        source:
+          type: string
+          enum: [cache]
+          example: cache
+
+paths:
+  /:
+    get:
+      tags:
+        - Root
+      summary: Get API information
+      description: Returns basic API information and available endpoints
+      responses:
+        '200':
+          description: API information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Welcome to xRat Ecosystem API
+                  version:
+                    type: string
+                    example: 1.0.0
+                  endpoints:
+                    type: object
+                    properties:
+                      health:
+                        type: string
+                        example: /health
+                      api:
+                        type: string
+                        example: /api
+                      auth:
+                        type: string
+                        example: /api/auth
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Basic health check
+      description: Check the health status of the backend and its dependencies
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+              examples:
+                healthy:
+                  value:
+                    status: healthy
+                    timestamp: 2025-01-04T12:00:00.000Z
+                    services:
+                      mongodb:
+                        status: connected
+                        latency: 12ms
+                      redis:
+                        status: connected
+                        latency: 8ms
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /health/ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness probe
+      description: Check if the service is ready to receive traffic (for Kubernetes readiness probes)
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessCheck'
+        '503':
+          description: Service is not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessCheck'
+
+  /health/live:
+    get:
+      tags:
+        - Health
+      summary: Liveness probe
+      description: Check if the application is alive (for Kubernetes liveness probes)
+      responses:
+        '200':
+          description: Application is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessCheck'
+        '503':
+          description: Application is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessCheck'
+
+  /health/complete:
+    get:
+      tags:
+        - Health
+      summary: Complete health check
+      description: Comprehensive health check with all services status
+      responses:
+        '200':
+          description: Complete health status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/status:
+    get:
+      tags:
+        - Health
+      summary: Get system status
+      description: Get detailed system status including database connections
+      responses:
+        '200':
+          description: System status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  ecosystem:
+                    type: string
+                    example: xRat
+                  database:
+                    type: object
+                    properties:
+                      mongodb:
+                        type: string
+                        example: connected
+                      redis:
+                        type: string
+                        example: connected
+                  cache_test:
+                    type: string
+                    example: xRat Ecosystem is running!
+                  timestamp:
+                    type: string
+                    format: date-time
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              newUser:
+                value:
+                  username: johndoe
+                  email: john@example.com
+                  password: SecurePassword123!
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                validationError:
+                  value:
+                    success: false
+                    message: Username, email and password are required
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                userExists:
+                  value:
+                    success: false
+                    message: User already exists with this email
+        '429':
+          description: Too many requests (rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticate user and get access tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              login:
+                value:
+                  email: john@example.com
+                  password: SecurePassword123!
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidCredentials:
+                  value:
+                    success: false
+                    message: Invalid email or password
+        '429':
+          description: Too many requests (rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get a new access token using refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+            examples:
+              refresh:
+                value:
+                  refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token refreshed successfully
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                      refreshToken:
+                        type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Invalidate user session and refresh token
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Logout successful
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                noToken:
+                  value:
+                    success: false
+                    message: Authentication required. Please provide a valid token.
+                invalidToken:
+                  value:
+                    success: false
+                    message: Invalid token
+                expiredToken:
+                  value:
+                    success: false
+                    message: Token expired. Please login again.
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests (rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Get user profile
+      description: Retrieve the authenticated user's profile information
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests (rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/data:
+    post:
+      tags:
+        - Data Management
+      summary: Store data
+      description: Store key-value data in Redis cache (expires in 1 hour)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataStoreRequest'
+            examples:
+              simpleData:
+                value:
+                  key: myKey
+                  value: myValue
+              objectData:
+                value:
+                  key: userSettings
+                  value:
+                    theme: dark
+                    language: en
+      responses:
+        '200':
+          description: Data stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataStoreResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingFields:
+                  value:
+                    success: false
+                    message: Key and value are required
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests (rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/data/{key}:
+    get:
+      tags:
+        - Data Management
+      summary: Retrieve data
+      description: Get data by key from Redis cache
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: key
+          required: true
+          schema:
+            type: string
+          description: The key to retrieve data for
+          example: myKey
+      responses:
+        '200':
+          description: Data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataRetrieveResponse'
+              examples:
+                stringData:
+                  value:
+                    success: true
+                    data: myValue
+                    source: cache
+                objectData:
+                  value:
+                    success: true
+                    data:
+                      theme: dark
+                      language: en
+                    source: cache
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Data not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                notFound:
+                  value:
+                    success: false
+                    message: Data not found
+        '429':
+          description: Too many requests (rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
