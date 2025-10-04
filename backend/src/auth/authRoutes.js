@@ -30,7 +30,7 @@ router.post('/refresh', authController.refresh);
  * @desc    Logout user
  * @access  Protected
  */
-router.post('/logout', authenticate, authController.logout);
+router.post('/logout', authenticate, authLimiter, authController.logout);
 
 /**
  * @route   GET /api/auth/profile
