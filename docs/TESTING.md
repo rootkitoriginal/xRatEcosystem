@@ -39,6 +39,7 @@ The xRat Ecosystem follows the **testing pyramid** approach:
 
 **Framework:** Jest  
 **Additional Tools:**
+
 - Supertest - HTTP assertions
 - @types/jest - TypeScript support
 
@@ -48,6 +49,7 @@ The xRat Ecosystem follows the **testing pyramid** approach:
 
 **Framework:** Vitest  
 **Additional Tools:**
+
 - @testing-library/react - Component testing
 - @testing-library/jest-dom - DOM matchers
 - @testing-library/user-event - User interaction simulation
@@ -99,6 +101,29 @@ npm test -- App.test.jsx
 npm test
 ```
 
+### Smoke Tests
+
+Smoke tests verify critical scripts and tools work correctly without testing every detail.
+
+```bash
+# Run smoke tests (from project root)
+npm run test:smoke
+
+# Run with verbose output
+npm run test:smoke -- --verbose
+
+# Run with coverage
+npm run test:smoke -- --coverage
+```
+
+**What's included:**
+
+- Monitor script (`bin/monitorDevOps.js`) functionality
+- Basic execution and error handling
+- Mocked API calls (no real GitHub requests)
+
+See [`__tests__/smoke/README.md`](../__tests__/smoke/README.md) for details.
+
 ### Run All Tests
 
 ```bash
@@ -106,12 +131,22 @@ npm test
 ./xrat.sh test  # (future script)
 
 # Or manually
-cd backend && npm test && cd ../frontend && npm test
+cd backend && npm test && cd ../frontend && npm test && cd .. && npm run test:smoke
 ```
 
 ---
 
 ## 📁 Test Structure
+
+### Project Root
+
+```
+__tests__/
+└── smoke/               # Smoke tests for critical scripts
+    ├── monitor.test.js  # DevOps monitor smoke test
+    └── README.md        # Smoke test documentation
+jest.config.js           # Root-level Jest configuration
+```
 
 ### Backend
 
@@ -158,6 +193,7 @@ frontend/
 **File naming:** `*.test.js`
 
 **Example:**
+
 ```javascript
 // __tests__/unit/utils.test.js
 describe('Utils', () => {
@@ -180,6 +216,7 @@ describe('Utils', () => {
 **File naming:** `*.test.js`
 
 **Example:**
+
 ```javascript
 // __tests__/integration/api.test.js
 const request = require('supertest');
@@ -188,19 +225,15 @@ const app = require('../../src/app');
 describe('API Endpoints', () => {
   describe('POST /api/data', () => {
     it('should store data successfully', async () => {
-      const response = await request(app)
-        .post('/api/data')
-        .send({ key: 'test', value: 'data' });
-      
+      const response = await request(app).post('/api/data').send({ key: 'test', value: 'data' });
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
     });
 
     it('should validate required fields', async () => {
-      const response = await request(app)
-        .post('/api/data')
-        .send({});
-      
+      const response = await request(app).post('/api/data').send({});
+
       expect(response.status).toBe(400);
     });
   });
@@ -212,6 +245,7 @@ describe('API Endpoints', () => {
 **File naming:** `*.test.jsx`
 
 **Example:**
+
 ```javascript
 // __tests__/unit/Button.test.jsx
 import { render, screen } from '@testing-library/react';
@@ -227,10 +261,10 @@ describe('Button', () => {
   it('handles click events', async () => {
     const handleClick = vi.fn();
     const user = userEvent.setup();
-    
+
     render(<Button onClick={handleClick}>Click me</Button>);
     await user.click(screen.getByText('Click me'));
-    
+
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
@@ -244,6 +278,7 @@ describe('Button', () => {
 ### Frontend Integration Tests
 
 **Example:**
+
 ```javascript
 // __tests__/integration/UserFlow.test.jsx
 import { render, screen, waitFor } from '@testing-library/react';
@@ -252,12 +287,13 @@ import App from '../../src/App';
 
 describe('User Flow', () => {
   it('completes full data submission flow', async () => {
-    global.fetch = vi.fn()
+    global.fetch = vi
+      .fn()
       .mockResolvedValueOnce({
-        json: async () => ({ database: { mongodb: 'connected' } })
+        json: async () => ({ database: { mongodb: 'connected' } }),
       })
       .mockResolvedValueOnce({
-        json: async () => ({ success: true })
+        json: async () => ({ success: true }),
       });
 
     const user = userEvent.setup();
@@ -266,7 +302,7 @@ describe('User Flow', () => {
     // Fill form
     await user.type(screen.getByLabelText('Key:'), 'test-key');
     await user.type(screen.getByLabelText('Value:'), 'test-value');
-    
+
     // Submit
     await user.click(screen.getByText('💾 Save to Cache'));
 
@@ -288,15 +324,15 @@ describe('User Flow', () => {
 // Mock external dependencies
 jest.mock('mongoose', () => ({
   connect: jest.fn().mockResolvedValue(true),
-  connection: { readyState: 1 }
+  connection: { readyState: 1 },
 }));
 
 jest.mock('redis', () => ({
   createClient: jest.fn(() => ({
     connect: jest.fn(),
     set: jest.fn(),
-    get: jest.fn()
-  }))
+    get: jest.fn(),
+  })),
 }));
 ```
 
@@ -310,7 +346,7 @@ beforeEach(() => {
 
 // Mock specific response
 global.fetch.mockResolvedValueOnce({
-  json: async () => ({ success: true })
+  json: async () => ({ success: true }),
 });
 
 // Mock error
@@ -325,10 +361,7 @@ import { rest } from 'msw';
 
 export const handlers = [
   rest.get('/api/status', (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({ database: { mongodb: 'connected' } })
-    );
+    return res(ctx.status(200), ctx.json({ database: { mongodb: 'connected' } }));
   }),
 ];
 ```
@@ -369,23 +402,16 @@ coverageThreshold: {
 ### Excluding Files from Coverage
 
 **Backend** (`jest.config.js`):
+
 ```javascript
-collectCoverageFrom: [
-  'src/**/*.js',
-  '!src/**/*.test.js',
-  '!**/node_modules/**'
-]
+collectCoverageFrom: ['src/**/*.js', '!src/**/*.test.js', '!**/node_modules/**'];
 ```
 
 **Frontend** (`vitest.config.js`):
+
 ```javascript
 coverage: {
-  exclude: [
-    'node_modules/',
-    'src/test/',
-    '**/*.test.{js,jsx}',
-    '**/*.config.js'
-  ]
+  exclude: ['node_modules/', 'src/test/', '**/*.test.{js,jsx}', '**/*.config.js'];
 }
 ```
 
@@ -428,6 +454,7 @@ npm test -- --reporter=verbose
 ### Common Debugging Tips
 
 1. **Isolate the test**: Use `.only` to run a single test
+
    ```javascript
    it.only('should test this', () => {
      // This is the only test that will run
@@ -435,6 +462,7 @@ npm test -- --reporter=verbose
    ```
 
 2. **Skip flaky tests temporarily**: Use `.skip`
+
    ```javascript
    it.skip('flaky test', () => {
      // This test will be skipped
@@ -442,6 +470,7 @@ npm test -- --reporter=verbose
    ```
 
 3. **Add verbose logging**
+
    ```javascript
    it('should debug', () => {
      console.log('State:', state);
@@ -464,17 +493,19 @@ npm test -- --reporter=verbose
 ### 1. Test Naming
 
 **Good:**
+
 ```javascript
-it('should return 400 when key is missing')
-it('should store data successfully')
-it('should display error message on API failure')
+it('should return 400 when key is missing');
+it('should store data successfully');
+it('should display error message on API failure');
 ```
 
 **Bad:**
+
 ```javascript
-it('test 1')
-it('works')
-it('should work correctly')
+it('test 1');
+it('works');
+it('should work correctly');
 ```
 
 ### 2. Arrange-Act-Assert Pattern
@@ -483,10 +514,10 @@ it('should work correctly')
 it('should calculate total', () => {
   // Arrange
   const items = [{ price: 10 }, { price: 20 }];
-  
+
   // Act
   const total = calculateTotal(items);
-  
+
   // Assert
   expect(total).toBe(30);
 });
@@ -535,7 +566,7 @@ afterAll(async () => {
 export const mockUser = {
   id: '123',
   name: 'Test User',
-  email: 'test@example.com'
+  email: 'test@example.com',
 };
 
 // In tests
@@ -552,6 +583,7 @@ it('should create user', () => {
 ## 🔄 Continuous Integration
 
 Tests are automatically run on:
+
 - Pull requests
 - Push to main/develop branches
 - Scheduled runs (nightly)

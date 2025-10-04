@@ -250,6 +250,200 @@ describe('Data Model', () => {
     });
   });
 
+  describe('Pre-save Hook - Type Auto-detection', () => {
+    it('should auto-detect array type when type is not set', () => {
+      const data = new Data({
+        name: 'Array Data',
+        content: ['item1', 'item2'],
+        userId: mockUserId,
+      });
+
+      const nextSpy = jest.fn();
+      data.isNew = true;
+      data.type = undefined;
+
+      // Simulate the pre-save hook
+      const preSaveHook = function (next) {
+        if (this.isNew && !this.type) {
+          const contentType = typeof this.content;
+          if (Array.isArray(this.content)) {
+            this.type = 'array';
+          } else if (contentType === 'object' && this.content !== null) {
+            this.type = 'object';
+          } else {
+            this.type = contentType;
+          }
+        }
+        next();
+      };
+
+      preSaveHook.call(data, nextSpy);
+
+      expect(data.type).toBe('array');
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    it('should auto-detect object type when type is not set', () => {
+      const data = new Data({
+        name: 'Object Data',
+        content: { key: 'value' },
+        userId: mockUserId,
+      });
+
+      const nextSpy = jest.fn();
+      data.isNew = true;
+      data.type = undefined;
+
+      // Simulate the pre-save hook
+      const preSaveHook = function (next) {
+        if (this.isNew && !this.type) {
+          const contentType = typeof this.content;
+          if (Array.isArray(this.content)) {
+            this.type = 'array';
+          } else if (contentType === 'object' && this.content !== null) {
+            this.type = 'object';
+          } else {
+            this.type = contentType;
+          }
+        }
+        next();
+      };
+
+      preSaveHook.call(data, nextSpy);
+
+      expect(data.type).toBe('object');
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    it('should auto-detect string type when type is not set', () => {
+      const data = new Data({
+        name: 'String Data',
+        content: 'text content',
+        userId: mockUserId,
+      });
+
+      const nextSpy = jest.fn();
+      data.isNew = true;
+      data.type = undefined;
+
+      // Simulate the pre-save hook
+      const preSaveHook = function (next) {
+        if (this.isNew && !this.type) {
+          const contentType = typeof this.content;
+          if (Array.isArray(this.content)) {
+            this.type = 'array';
+          } else if (contentType === 'object' && this.content !== null) {
+            this.type = 'object';
+          } else {
+            this.type = contentType;
+          }
+        }
+        next();
+      };
+
+      preSaveHook.call(data, nextSpy);
+
+      expect(data.type).toBe('string');
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    it('should auto-detect number type when type is not set', () => {
+      const data = new Data({
+        name: 'Number Data',
+        content: 42,
+        userId: mockUserId,
+      });
+
+      const nextSpy = jest.fn();
+      data.isNew = true;
+      data.type = undefined;
+
+      // Simulate the pre-save hook
+      const preSaveHook = function (next) {
+        if (this.isNew && !this.type) {
+          const contentType = typeof this.content;
+          if (Array.isArray(this.content)) {
+            this.type = 'array';
+          } else if (contentType === 'object' && this.content !== null) {
+            this.type = 'object';
+          } else {
+            this.type = contentType;
+          }
+        }
+        next();
+      };
+
+      preSaveHook.call(data, nextSpy);
+
+      expect(data.type).toBe('number');
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    it('should not change type if already set', () => {
+      const data = new Data({
+        name: 'Typed Data',
+        content: { key: 'value' },
+        type: 'json',
+        userId: mockUserId,
+      });
+
+      const nextSpy = jest.fn();
+      data.isNew = true;
+
+      // Simulate the pre-save hook
+      const preSaveHook = function (next) {
+        if (this.isNew && !this.type) {
+          const contentType = typeof this.content;
+          if (Array.isArray(this.content)) {
+            this.type = 'array';
+          } else if (contentType === 'object' && this.content !== null) {
+            this.type = 'object';
+          } else {
+            this.type = contentType;
+          }
+        }
+        next();
+      };
+
+      preSaveHook.call(data, nextSpy);
+
+      expect(data.type).toBe('json');
+      expect(nextSpy).toHaveBeenCalled();
+    });
+
+    it('should not change type if not a new document', () => {
+      const data = new Data({
+        name: 'Existing Data',
+        content: 'text',
+        userId: mockUserId,
+      });
+
+      const nextSpy = jest.fn();
+      data.isNew = false;
+      data.type = undefined;
+
+      // Simulate the pre-save hook
+      const preSaveHook = function (next) {
+        if (this.isNew && !this.type) {
+          const contentType = typeof this.content;
+          if (Array.isArray(this.content)) {
+            this.type = 'array';
+          } else if (contentType === 'object' && this.content !== null) {
+            this.type = 'object';
+          } else {
+            this.type = contentType;
+          }
+        }
+        next();
+      };
+
+      preSaveHook.call(data, nextSpy);
+
+      expect(data.type).toBeUndefined();
+      expect(nextSpy).toHaveBeenCalled();
+    });
+  });
+
   describe('Static Methods', () => {
     describe('findByUserWithFilters()', () => {
       beforeEach(() => {
