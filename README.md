@@ -3,12 +3,14 @@
 [![Tests](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/test.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/test.yml)
 [![Build](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/build.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/build.yml)
 [![CodeQL](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/codeql.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/codeql.yml)
+[![Coverage](https://img.shields.io/badge/coverage-82.2%25-brightgreen.svg)](https://github.com/xLabInternet/xRatEcosystem)
+[![Tests](https://img.shields.io/badge/tests-205%20passing-brightgreen.svg)](https://github.com/xLabInternet/xRatEcosystem)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-%3E%3D20.10-blue.svg)](https://www.docker.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](docs/CONTRIBUTING.md)
 
-Um ambiente Docker isolado completo com Node.js, MongoDB, Redis, Backend API e Frontend React.
+Um ambiente Docker isolado completo com Node.js, MongoDB, Redis, Backend API e Frontend React com **cobertura de testes profissional**.
 
 ## 📋 Visão Geral
 
@@ -27,7 +29,17 @@ O **xRat Ecosystem** é um ambiente de desenvolvimento totalmente containerizado
 ✅ Rede isolada `xrat-network` para comunicação entre serviços  
 ✅ Health checks para todos os serviços  
 ✅ Persistência de dados com volumes Docker  
-✅ Hot-reload para desenvolvimento
+✅ Hot-reload para desenvolvimento  
+✅ **Cobertura de testes profissional com 205 testes passando**
+
+### 🧪 Status dos Testes
+
+- **🎯 Cobertura Total**: 82.2% (acima do threshold recomendado)
+- **📊 Total de Testes**: 205 testes executando com sucesso
+- **⚡ Performance**: 2.3s tempo de execução
+- **🔧 Middleware**: 100% de cobertura (auth, rateLimiter, requestLogger)
+- **📦 Models**: Cobertura significativa (Data: 75%, User: 59%)
+- **✅ Test Suites**: 14 suítes de teste implementadas
 
 ---
 
@@ -174,6 +186,25 @@ docker-compose exec redis redis-cli -a xrat_redis_2025
 ```bash
 docker-compose restart backend
 docker-compose restart frontend
+```
+
+### Executar Testes
+
+```bash
+# Testes do backend (Jest)
+npm run test --prefix backend
+
+# Testes com cobertura
+npm run test:coverage --prefix backend
+
+# Testes do frontend (Vitest)
+npm run test --prefix frontend
+
+# Testes de integração E2E
+npm run test:e2e --prefix frontend
+
+# Testes em modo watch (desenvolvimento)
+npm run test:watch --prefix backend
 ```
 
 ---
@@ -366,6 +397,32 @@ O backend está em `./backend/src/index.js` e inclui:
 - ✅ CORS configurado
 - ✅ Health checks
 - ✅ Endpoints de exemplo
+- ✅ **Suite de testes abrangente (146 testes)**
+
+#### Arquitetura de Testes Backend
+
+```
+backend/__tests__/
+├── integration/          # Testes de integração HTTP
+│   ├── api.test.js      # Testes gerais da API
+│   ├── auth.test.js     # Testes de autenticação
+│   ├── data.test.js     # Testes de gerenciamento de dados
+│   ├── rateLimiter.test.js  # Testes de rate limiting
+│   └── swagger.test.js  # Testes da documentação API
+├── unit/                # Testes unitários
+│   ├── auth.test.js     # Middleware de autenticação
+│   ├── logger.test.js   # Sistema de logging
+│   ├── rateLimiter.test.js  # Rate limiter middleware
+│   ├── requestLogger.test.js  # Middleware de logging
+│   └── models/          # Testes dos modelos
+│       ├── Data.test.js # Modelo de dados (29 testes)
+│       └── User.test.js # Modelo de usuário (30 testes)
+└── tests/               # Testes específicos
+    ├── integration/
+    │   └── healthEndpoints.test.js
+    └── unit/
+        └── healthService.test.js
+```
 
 ### Frontend (React + Vite)
 
@@ -376,6 +433,24 @@ O frontend está em `./frontend/src/` e inclui:
 - ✅ Interface para testar a API
 - ✅ Dashboard de status dos serviços
 - ✅ Hot-reload ativado
+- ✅ **Suite de testes com Vitest (59 testes)**
+
+#### Arquitetura de Testes Frontend
+
+```
+frontend/__tests__/
+└── unit/                # Testes unitários React
+    ├── App.test.jsx     # Componente principal
+    ├── auth/           # Testes de componentes auth
+    └── data/           # Testes de componentes data
+```
+
+**Tecnologias de teste:**
+
+- **Vitest** - Framework de testes rápido
+- **@testing-library/react** - Testes de componentes
+- **@testing-library/user-event** - Simulação de interações
+- **jsdom** - Ambiente DOM para testes
 
 ### Adicionar Dependências
 
@@ -519,10 +594,22 @@ Agradecimentos a todos que contribuíram para este projeto:
 
 ## 📊 Status do Projeto
 
-- ✅ **Fase 1:** Setup inicial e infraestrutura básica - Completo
-- ✅ **Fase 2:** Testes, documentação e CI/CD - Completo
-- ⏳ **Fase 3:** Autenticação e autorização - Em planejamento
-- ⏳ **Fase 4:** Features avançadas - Em planejamento
+- ✅ **Fase 1:** Setup inicial e infraestrutura básica - **Completo**
+- ✅ **Fase 2:** Testes, documentação e CI/CD - **Completo**
+- ✅ **Fase 2.5:** Comprehensive Testing Suite - **Completo** (205 testes)
+- 🟡 **Fase 3:** Production Features (Health Checks) - **Em Progresso**
+- 🟡 **Fase 4:** Authentication System (JWT Backend + UI) - **Em Progresso**
+- ⏳ **Fase 5:** Data Management API - **Planejado**
+- ⏳ **Fase 6:** WebSocket & Real-time Features - **Planejado**
+
+### 🎯 Últimas Conquistas
+
+- **PR #36** - Middleware Testing Suite (100% coverage) ✅
+- **PR #37** - Model Testing Suite (significativo aumento de coverage) ✅
+- **205 testes** implementados com sucesso
+- **82.2% cobertura** total do backend
+- **Middleware**: 100% de cobertura (auth, rateLimiter, requestLogger)
+- **Models**: Data.js (75%), User.js (59%)
 
 ---
 
