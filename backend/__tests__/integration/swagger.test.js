@@ -87,26 +87,26 @@ describe('Swagger API Documentation', () => {
       const openApiSpec = YAML.load(fs.readFileSync(openApiPath, 'utf8'));
 
       expect(openApiSpec.paths).toBeDefined();
-      
+
       // Root endpoint
       expect(openApiSpec.paths['/']).toBeDefined();
-      
+
       // Health endpoints
       expect(openApiSpec.paths['/health']).toBeDefined();
       expect(openApiSpec.paths['/health/ready']).toBeDefined();
       expect(openApiSpec.paths['/health/live']).toBeDefined();
       expect(openApiSpec.paths['/health/complete']).toBeDefined();
-      
+
       // Status endpoint
       expect(openApiSpec.paths['/api/status']).toBeDefined();
-      
+
       // Auth endpoints
       expect(openApiSpec.paths['/api/auth/register']).toBeDefined();
       expect(openApiSpec.paths['/api/auth/login']).toBeDefined();
       expect(openApiSpec.paths['/api/auth/refresh']).toBeDefined();
       expect(openApiSpec.paths['/api/auth/logout']).toBeDefined();
       expect(openApiSpec.paths['/api/auth/profile']).toBeDefined();
-      
+
       // Data endpoints
       expect(openApiSpec.paths['/api/data']).toBeDefined();
       expect(openApiSpec.paths['/api/data/{key}']).toBeDefined();
@@ -129,23 +129,23 @@ describe('Swagger API Documentation', () => {
       const openApiSpec = YAML.load(fs.readFileSync(openApiPath, 'utf8'));
 
       expect(openApiSpec.components.schemas).toBeDefined();
-      
+
       // Authentication schemas
       expect(openApiSpec.components.schemas.RegisterRequest).toBeDefined();
       expect(openApiSpec.components.schemas.LoginRequest).toBeDefined();
       expect(openApiSpec.components.schemas.AuthResponse).toBeDefined();
       expect(openApiSpec.components.schemas.User).toBeDefined();
-      
+
       // Health schemas
       expect(openApiSpec.components.schemas.HealthStatus).toBeDefined();
       expect(openApiSpec.components.schemas.ReadinessCheck).toBeDefined();
       expect(openApiSpec.components.schemas.LivenessCheck).toBeDefined();
-      
+
       // Data management schemas
       expect(openApiSpec.components.schemas.DataStoreRequest).toBeDefined();
       expect(openApiSpec.components.schemas.DataStoreResponse).toBeDefined();
       expect(openApiSpec.components.schemas.DataRetrieveResponse).toBeDefined();
-      
+
       // Error schema
       expect(openApiSpec.components.schemas.Error).toBeDefined();
     });
@@ -191,8 +191,8 @@ describe('Swagger API Documentation', () => {
 
       expect(openApiSpec.tags).toBeDefined();
       expect(Array.isArray(openApiSpec.tags)).toBe(true);
-      
-      const tagNames = openApiSpec.tags.map(tag => tag.name);
+
+      const tagNames = openApiSpec.tags.map((tag) => tag.name);
       expect(tagNames).toContain('Root');
       expect(tagNames).toContain('Health');
       expect(tagNames).toContain('Authentication');

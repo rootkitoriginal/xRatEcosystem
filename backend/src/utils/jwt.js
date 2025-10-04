@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key-change-in-production';
+const JWT_REFRESH_SECRET =
+  process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key-change-in-production';
 const JWT_EXPIRE = process.env.JWT_EXPIRE || '1h';
 const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '7d';
 
@@ -12,7 +13,7 @@ const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '7d';
  */
 const generateAccessToken = (payload) => {
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRE
+    expiresIn: JWT_EXPIRE,
   });
 };
 
@@ -23,7 +24,7 @@ const generateAccessToken = (payload) => {
  */
 const generateRefreshToken = (payload) => {
   return jwt.sign(payload, JWT_REFRESH_SECRET, {
-    expiresIn: JWT_REFRESH_EXPIRE
+    expiresIn: JWT_REFRESH_EXPIRE,
   });
 };
 
@@ -49,5 +50,5 @@ module.exports = {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
-  verifyRefreshToken
+  verifyRefreshToken,
 };
