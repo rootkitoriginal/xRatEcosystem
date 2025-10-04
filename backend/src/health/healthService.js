@@ -29,7 +29,6 @@ class HealthService {
    */
   async checkMongoDB() {
     const startTime = Date.now();
-    
     try {
       if (!this.mongoClient) {
         return {
@@ -52,9 +51,7 @@ class HealthService {
       // Perform a lightweight ping operation
       const admin = this.mongoClient.db().admin();
       await admin.ping();
-      
       const latency = Date.now() - startTime;
-      
       return {
         status: 'connected',
         latency: `${latency}ms`,
@@ -75,7 +72,6 @@ class HealthService {
    */
   async checkRedis() {
     const startTime = Date.now();
-    
     try {
       if (!this.redisClient) {
         return {
@@ -96,9 +92,7 @@ class HealthService {
 
       // Perform a lightweight ping operation
       await this.redisClient.ping();
-      
       const latency = Date.now() - startTime;
-      
       return {
         status: 'connected',
         latency: `${latency}ms`
@@ -149,19 +143,15 @@ class HealthService {
    */
   async getLivenessCheck() {
     const basicHealth = await this.getBasicHealth();
-    
     // Check critical application state
     const memoryUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
-    
     // Memory threshold check (alert if over 98% of max heap)
     const memoryThreshold = 0.98;
     const maxHeapSize = memoryUsage.heapTotal;
     const currentHeapUsed = memoryUsage.heapUsed;
     const memoryUtilization = currentHeapUsed / maxHeapSize;
-    
     const isMemoryHealthy = memoryUtilization < memoryThreshold;
-    
     return {
       ...basicHealth,
       status: isMemoryHealthy ? 'alive' : 'unhealthy',
@@ -175,9 +165,9 @@ class HealthService {
         cpu: {
           user: cpuUsage.user,
           system: cpuUsage.system
-    const memoryUtilization = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
-    
-    const isMemoryHealthy = memoryUtilization < 98;
+        }
+      }
+    };
   }
 
   /**
