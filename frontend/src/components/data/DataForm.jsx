@@ -24,7 +24,14 @@ function DataForm({ initialData, onSubmit, onCancel }) {
     }
   }, [initialData]);
 
-  const categories = ['Development', 'Marketing', 'Operations', 'Support', 'Security', 'Documentation'];
+  const categories = [
+    'Development',
+    'Marketing',
+    'Operations',
+    'Support',
+    'Security',
+    'Documentation',
+  ];
   const statuses = ['Active', 'Pending', 'Completed'];
   const priorities = ['Critical', 'High', 'Medium', 'Low'];
 
@@ -198,7 +205,12 @@ function DataForm({ initialData, onSubmit, onCancel }) {
             {isSubmitting ? '⏳ Saving...' : initialData ? '💾 Update' : '➕ Create'}
           </button>
           {onCancel && (
-            <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={isSubmitting}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
               ❌ Cancel
             </button>
           )}

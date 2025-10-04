@@ -8,7 +8,8 @@ function BulkActions({ selectedCount, onBulkDelete, onDeselectAll }) {
   return (
     <div className="bulk-actions">
       <div className="bulk-info">
-        <span className="selected-count">{selectedCount}</span> item{selectedCount !== 1 ? 's' : ''} selected
+        <span className="selected-count">{selectedCount}</span> item{selectedCount !== 1 ? 's' : ''}{' '}
+        selected
       </div>
       <div className="bulk-buttons">
         <button className="bulk-btn bulk-delete" onClick={onBulkDelete}>

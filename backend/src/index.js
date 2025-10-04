@@ -5,6 +5,10 @@ const compression = require('compression');
 const mongoose = require('mongoose');
 const { createClient } = require('redis');
 const { createHealthRouter } = require('./health');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('js-yaml');
+const fs = require('fs');
+const path = require('path');
 
 // Load environment variables
 require('dotenv').config();
@@ -19,6 +23,10 @@ const DataService = require('./services/dataService');
 const dataController = require('./controllers/dataController');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { requestLogger, errorLogger } = require('./middleware/requestLogger');
+
+// Load OpenAPI specification
+const openApiPath = path.join(__dirname, 'openapi.yaml');
+const openApiSpec = YAML.load(fs.readFileSync(openApiPath, 'utf8'));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -85,6 +93,16 @@ let redisClient;
 // Health check endpoints
 app.use('/health', createHealthRouter(mongoose.connection.getClient(), redisClient));
 
+// API Documentation with Swagger UI
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openApiSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'xRat Ecosystem API Documentation',
+  })
+);
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -94,6 +112,7 @@ app.get('/', (req, res) => {
       health: '/health',
       api: '/api',
       auth: '/api/auth',
+      docs: '/api-docs',
       data: '/api/data',
     },
   });
@@ -169,6 +188,7 @@ app.listen(PORT, '0.0.0.0', () => {
     port: PORT,
     environment: process.env.NODE_ENV || 'development',
     healthCheckUrl: `http://localhost:${PORT}/health`,
+    apiDocsUrl: `http://localhost:${PORT}/api-docs`,
   });
 });
 

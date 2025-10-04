@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required. Please provide a valid token.'
+        message: 'Authentication required. Please provide a valid token.',
       });
     }
 
@@ -28,7 +28,7 @@ const authenticate = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'User not found. Token is invalid.'
+        message: 'User not found. Token is invalid.',
       });
     }
 
@@ -39,21 +39,21 @@ const authenticate = async (req, res, next) => {
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        message: 'Invalid token'
+        message: 'Invalid token',
       });
     }
 
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Token expired. Please login again.'
+        message: 'Token expired. Please login again.',
       });
     }
 
     res.status(500).json({
       success: false,
       message: 'Authentication error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -87,5 +87,5 @@ const optionalAuth = async (req, res, next) => {
 
 module.exports = {
   authenticate,
-  optionalAuth
+  optionalAuth,
 };

@@ -1,6 +1,13 @@
 import './DataPagination.css';
 
-function DataPagination({ currentPage, totalPages, perPage, total, onPageChange, onPerPageChange }) {
+function DataPagination({
+  currentPage,
+  totalPages,
+  perPage,
+  total,
+  onPageChange,
+  onPerPageChange,
+}) {
   const pages = [];
   const maxVisiblePages = 5;
 
@@ -99,7 +106,11 @@ function DataPagination({ currentPage, totalPages, perPage, total, onPageChange,
 
       <div className="pagination-per-page">
         <label htmlFor="perPage">Per page:</label>
-        <select id="perPage" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
+        <select
+          id="perPage"
+          value={perPage}
+          onChange={(e) => onPerPageChange(Number(e.target.value))}
+        >
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>

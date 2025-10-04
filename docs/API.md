@@ -5,6 +5,21 @@
 **Development:** `http://localhost:3000`  
 **Production:** TBD
 
+## 📚 Interactive API Documentation
+
+**🎉 Swagger UI is available at: http://localhost:3000/api-docs**
+
+For the best API documentation experience, visit the interactive Swagger UI which provides:
+
+- ✅ Complete OpenAPI 3.0 specification
+- ✅ Try out endpoints directly from your browser
+- ✅ Request/response examples with real data
+- ✅ Authentication testing
+- ✅ Error code documentation
+- ✅ Schema definitions
+
+This document provides a text-based reference, but we recommend using the Swagger UI for interactive exploration.
+
 ## 📋 API Overview
 
 The xRat Ecosystem API provides RESTful endpoints for managing data, monitoring system health, and interacting with the ecosystem services.
@@ -680,7 +695,7 @@ curl -X POST http://localhost:3000/api/data \
     "_id": "507f1f77bcf86cd799439011",
     "name": "My Data",
     "description": "Data description",
-    "content": {"key": "value"},
+    "content": { "key": "value" },
     "type": "json",
     "tags": ["important", "project-a"],
     "status": "active",
@@ -735,7 +750,7 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
     {
       "_id": "507f1f77bcf86cd799439011",
       "name": "My Data",
-      "content": {"key": "value"},
+      "content": { "key": "value" },
       "type": "json",
       "status": "active",
       "tags": ["important"],
@@ -786,7 +801,7 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
     "_id": "507f1f77bcf86cd799439011",
     "name": "My Data",
     "description": "Data description",
-    "content": {"key": "value"},
+    "content": { "key": "value" },
     "type": "json",
     "tags": ["important"],
     "status": "active",
@@ -851,7 +866,7 @@ At least one field must be provided. All fields are optional:
   "type": "text",
   "tags": ["tag1"],
   "status": "archived",
-  "metadata": {"key": "value"}
+  "metadata": { "key": "value" }
 }
 ```
 
@@ -865,7 +880,7 @@ At least one field must be provided. All fields are optional:
     "_id": "507f1f77bcf86cd799439011",
     "name": "Updated Name",
     "description": "Updated description",
-    "content": {"key": "value"},
+    "content": { "key": "value" },
     "type": "json",
     "tags": ["new-tag"],
     "status": "active",
@@ -961,7 +976,7 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
     {
       "_id": "507f1f77bcf86cd799439011",
       "name": "Important Data",
-      "content": {"key": "value"},
+      "content": { "key": "value" },
       "type": "json",
       "status": "active"
     }
@@ -1137,7 +1152,7 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
     {
       "_id": "507f1f77bcf86cd799439011",
       "name": "My Data",
-      "content": {"key": "value"},
+      "content": { "key": "value" },
       "type": "json",
       "status": "active",
       "tags": ["important"],
@@ -1445,7 +1460,7 @@ token = auth_response.json()['data']['accessToken']
 
 # Create data
 headers = {'Authorization': f'Bearer {token}'}
-response = requests.post('http://localhost:3000/api/data', 
+response = requests.post('http://localhost:3000/api/data',
     json={
         'name': 'My Data',
         'content': {'key': 'value'},
@@ -1455,7 +1470,7 @@ response = requests.post('http://localhost:3000/api/data',
 )
 
 # List data
-data_list = requests.get('http://localhost:3000/api/data?page=1&limit=10', 
+data_list = requests.get('http://localhost:3000/api/data?page=1&limit=10',
     headers=headers).json()
 
 # Get data by ID

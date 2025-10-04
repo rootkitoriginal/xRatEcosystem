@@ -16,9 +16,7 @@ const createDataSchema = Joi.object({
   content: Joi.any().required().messages({
     'any.required': 'Content is required',
   }),
-  type: Joi.string()
-    .valid('text', 'json', 'number', 'boolean', 'array', 'object')
-    .optional(),
+  type: Joi.string().valid('text', 'json', 'number', 'boolean', 'array', 'object').optional(),
   tags: Joi.array().items(Joi.string().trim()).default([]),
   status: Joi.string().valid('active', 'archived', 'deleted').default('active'),
   metadata: Joi.object().pattern(Joi.string(), Joi.any()).optional(),
@@ -29,9 +27,7 @@ const updateDataSchema = Joi.object({
   name: Joi.string().min(2).max(100).trim().optional(),
   description: Joi.string().max(500).trim().allow('').optional(),
   content: Joi.any().optional(),
-  type: Joi.string()
-    .valid('text', 'json', 'number', 'boolean', 'array', 'object')
-    .optional(),
+  type: Joi.string().valid('text', 'json', 'number', 'boolean', 'array', 'object').optional(),
   tags: Joi.array().items(Joi.string().trim()).optional(),
   status: Joi.string().valid('active', 'archived', 'deleted').optional(),
   metadata: Joi.object().pattern(Joi.string(), Joi.any()).optional(),
@@ -43,9 +39,7 @@ const queryParamsSchema = Joi.object({
   limit: Joi.number().integer().min(1).max(100).default(10),
   sort: Joi.string().default('-createdAt'),
   status: Joi.string().valid('active', 'archived', 'deleted').optional(),
-  type: Joi.string()
-    .valid('text', 'json', 'number', 'boolean', 'array', 'object')
-    .optional(),
+  type: Joi.string().valid('text', 'json', 'number', 'boolean', 'array', 'object').optional(),
   tags: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).optional(),
   search: Joi.string().trim().optional(),
 });
@@ -55,15 +49,10 @@ const bulkOperationSchema = Joi.object({
   operation: Joi.string().valid('create', 'update', 'delete').required(),
   data: Joi.when('operation', {
     is: 'create',
-    then: Joi.array()
-      .items(createDataSchema)
-      .min(1)
-      .max(100)
-      .required()
-      .messages({
-        'array.min': 'At least one item is required',
-        'array.max': 'Maximum 100 items allowed per bulk operation',
-      }),
+    then: Joi.array().items(createDataSchema).min(1).max(100).required().messages({
+      'array.min': 'At least one item is required',
+      'array.max': 'Maximum 100 items allowed per bulk operation',
+    }),
     otherwise: Joi.array()
       .items(
         Joi.object({
@@ -85,9 +74,7 @@ const bulkOperationSchema = Joi.object({
 const exportParamsSchema = Joi.object({
   format: Joi.string().valid('json', 'csv').default('json'),
   status: Joi.string().valid('active', 'archived', 'deleted').optional(),
-  type: Joi.string()
-    .valid('text', 'json', 'number', 'boolean', 'array', 'object')
-    .optional(),
+  type: Joi.string().valid('text', 'json', 'number', 'boolean', 'array', 'object').optional(),
   tags: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).optional(),
   startDate: Joi.date().iso().optional(),
   endDate: Joi.date().iso().min(Joi.ref('startDate')).optional(),

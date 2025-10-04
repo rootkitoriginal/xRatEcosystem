@@ -5,7 +5,15 @@ function DataSearch({ onSearch, onFilterChange, filters }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const categories = ['All', 'Development', 'Marketing', 'Operations', 'Support', 'Security', 'Documentation'];
+  const categories = [
+    'All',
+    'Development',
+    'Marketing',
+    'Operations',
+    'Support',
+    'Security',
+    'Documentation',
+  ];
   const statuses = ['All', 'Active', 'Pending', 'Completed'];
   const priorities = ['All', 'Critical', 'High', 'Medium', 'Low'];
 
@@ -46,14 +54,30 @@ function DataSearch({ onSearch, onFilterChange, filters }) {
             aria-label="Search data"
           />
           {searchTerm && (
-            <button className="clear-search" onClick={() => handleSearchChange({ target: { value: '' } })} aria-label="Clear search">
+            <button
+              className="clear-search"
+              onClick={() => handleSearchChange({ target: { value: '' } })}
+              aria-label="Clear search"
+            >
               ✕
             </button>
           )}
         </div>
 
-        <button className="filter-toggle" onClick={() => setShowFilters(!showFilters)} aria-label="Toggle filters">
-          🎛️ Filters {hasActiveFilters && <span className="filter-badge">{[searchTerm, filters.category, filters.status, filters.priority].filter(Boolean).length}</span>}
+        <button
+          className="filter-toggle"
+          onClick={() => setShowFilters(!showFilters)}
+          aria-label="Toggle filters"
+        >
+          🎛️ Filters{' '}
+          {hasActiveFilters && (
+            <span className="filter-badge">
+              {
+                [searchTerm, filters.category, filters.status, filters.priority].filter(Boolean)
+                  .length
+              }
+            </span>
+          )}
         </button>
 
         {hasActiveFilters && (

@@ -77,9 +77,7 @@ describe('Data Management API', () => {
     });
 
     Data.findOne = jest.fn((query) => {
-      const data = mockDataStore.find(
-        (d) => d._id === query._id && d.userId === query.userId
-      );
+      const data = mockDataStore.find((d) => d._id === query._id && d.userId === query.userId);
       return Promise.resolve(data || null);
     });
 
@@ -206,9 +204,7 @@ describe('Data Management API', () => {
     });
 
     it('should filter data by status', async () => {
-      const response = await request(app)
-        .get('/api/data')
-        .query({ status: 'active' });
+      const response = await request(app).get('/api/data').query({ status: 'active' });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -285,9 +281,7 @@ describe('Data Management API', () => {
         description: 'Updated description',
       };
 
-      const response = await request(app)
-        .put('/api/data/507f1f77bcf86cd799439011')
-        .send(updates);
+      const response = await request(app).put('/api/data/507f1f77bcf86cd799439011').send(updates);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -306,9 +300,7 @@ describe('Data Management API', () => {
     });
 
     it('should reject empty update', async () => {
-      const response = await request(app)
-        .put('/api/data/507f1f77bcf86cd799439011')
-        .send({});
+      const response = await request(app).put('/api/data/507f1f77bcf86cd799439011').send({});
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -418,9 +410,7 @@ describe('Data Management API', () => {
     });
 
     it('should export data as JSON', async () => {
-      const response = await request(app)
-        .get('/api/data/export')
-        .query({ format: 'json' });
+      const response = await request(app).get('/api/data/export').query({ format: 'json' });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -428,9 +418,7 @@ describe('Data Management API', () => {
     });
 
     it('should export data as CSV', async () => {
-      const response = await request(app)
-        .get('/api/data/export')
-        .query({ format: 'csv' });
+      const response = await request(app).get('/api/data/export').query({ format: 'csv' });
 
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toContain('text/csv');

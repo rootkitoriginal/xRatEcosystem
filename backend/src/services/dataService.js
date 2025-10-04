@@ -234,10 +234,7 @@ class DataService {
         { $group: { _id: '$type', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
-      Data.aggregate([
-        { $match: { userId } },
-        { $group: { _id: '$status', count: { $sum: 1 } } },
-      ]),
+      Data.aggregate([{ $match: { userId } }, { $group: { _id: '$status', count: { $sum: 1 } } }]),
       Data.countDocuments({
         userId,
         createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },

@@ -132,9 +132,7 @@ export const mockDataService = {
         const bVal = b[params.sortBy];
 
         if (typeof aVal === 'string') {
-          return params.sortOrder === 'desc'
-            ? bVal.localeCompare(aVal)
-            : aVal.localeCompare(bVal);
+          return params.sortOrder === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
         }
 
         return params.sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
@@ -273,7 +271,16 @@ export const mockDataService = {
   exportCSV: async () => {
     await delay(300);
 
-    const headers = ['id', 'name', 'category', 'status', 'priority', 'value', 'createdAt', 'updatedAt'];
+    const headers = [
+      'id',
+      'name',
+      'category',
+      'status',
+      'priority',
+      'value',
+      'createdAt',
+      'updatedAt',
+    ];
     const csvRows = [headers.join(',')];
 
     dataStore.forEach((item) => {

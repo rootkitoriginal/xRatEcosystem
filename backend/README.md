@@ -105,6 +105,17 @@ npm start
 
 ## 📡 API Endpoints
 
+### Interactive API Documentation
+
+🎉 **Swagger UI is available at `/api-docs`**
+
+Access comprehensive interactive API documentation at:
+
+- Local: http://localhost:3000/api-docs
+- Try out endpoints directly from your browser
+- View request/response examples
+- See authentication requirements
+
 ### Health & Status
 
 - `GET /` - API information
@@ -143,7 +154,7 @@ npm start
 
 **Note:** Protected endpoints require a valid JWT token in the Authorization header.
 
-See [API Documentation](../docs/API.md) for detailed endpoint information.
+See [API Documentation](../docs/API.md) for detailed endpoint information or visit `/api-docs` for interactive documentation.
 
 ## 🧪 Testing
 
