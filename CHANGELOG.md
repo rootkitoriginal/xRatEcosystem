@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Backend and Frontend README documentation
 - Code quality tools (ESLint, Prettier, EditorConfig)
 
+### Merged (recent)
+- PR #30 — Fix DevOps monitor: fetch complete PR details (commits, changes) and improve CLI display
+- PR #26 — Add structured logging (Winston) with daily rotation and request logging middleware
+- PR #27 — Data Management API: models, services, controllers, routes, and integration tests
+- PR #28 — Data Management UI: React components, pages, and unit tests
+- PR #29 — API Documentation: Add OpenAPI spec and Swagger UI at `/api-docs`
+
 ## [1.0.0] - 2025-01-03
 
 ### Added
