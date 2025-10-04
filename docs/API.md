@@ -5,6 +5,20 @@
 **Development:** `http://localhost:3000`  
 **Production:** TBD
 
+## 📚 Interactive API Documentation
+
+**🎉 Swagger UI is available at: http://localhost:3000/api-docs**
+
+For the best API documentation experience, visit the interactive Swagger UI which provides:
+- ✅ Complete OpenAPI 3.0 specification
+- ✅ Try out endpoints directly from your browser
+- ✅ Request/response examples with real data
+- ✅ Authentication testing
+- ✅ Error code documentation
+- ✅ Schema definitions
+
+This document provides a text-based reference, but we recommend using the Swagger UI for interactive exploration.
+
 ## 📋 API Overview
 
 The xRat Ecosystem API provides RESTful endpoints for managing data, monitoring system health, and interacting with the ecosystem services.

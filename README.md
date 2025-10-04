@@ -106,6 +106,7 @@ docker-compose logs -f
 
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:3000
+- **API Documentation**: http://localhost:3000/api-docs 📚
 - **Health Check**: http://localhost:3000/health
 - **API Status**: http://localhost:3000/api/status
 
@@ -179,6 +180,18 @@ docker-compose restart frontend
 
 ## 📡 API Endpoints
 
+### 📚 Interactive API Documentation (Swagger UI)
+
+**Access comprehensive API documentation at: http://localhost:3000/api-docs**
+
+The API documentation includes:
+- ✅ All endpoints with detailed descriptions
+- ✅ Request/response examples
+- ✅ Authentication requirements (JWT Bearer token)
+- ✅ Error codes and handling
+- ✅ Try out endpoints directly from your browser
+- ✅ OpenAPI 3.0 specification
+
 ### Backend API
 
 #### GET `/`
@@ -215,20 +228,24 @@ curl http://localhost:3000/api/status
 ```
 
 #### POST `/api/data`
-Salvar dados no Redis cache
+Salvar dados no Redis cache (requires authentication)
 
 ```bash
 curl -X POST http://localhost:3000/api/data \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"key": "test", "value": "Hello xRat!"}'
 ```
 
 #### GET `/api/data/:key`
-Recuperar dados do Redis cache
+Recuperar dados do Redis cache (requires authentication)
 
 ```bash
-curl http://localhost:3000/api/data/test
+curl http://localhost:3000/api/data/test \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
+
+**For complete API documentation, visit http://localhost:3000/api-docs**
 
 ---
 
