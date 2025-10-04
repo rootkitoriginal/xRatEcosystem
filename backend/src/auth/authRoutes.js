@@ -30,13 +30,13 @@ router.post('/refresh', authController.refresh);
  * @desc    Logout user
  * @access  Protected
  */
-router.post('/logout', authenticate, authLimiter, authController.logout);
+router.post('/logout', authLimiter, authenticate, authController.logout);
 
 /**
  * @route   GET /api/auth/profile
  * @desc    Get user profile
  * @access  Protected
  */
-router.get('/profile', authenticate, authLimiter, authController.getProfile);
+router.get('/profile', authLimiter, authenticate, authController.getProfile);
 
 module.exports = router;
