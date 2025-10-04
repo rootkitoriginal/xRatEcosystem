@@ -6,7 +6,6 @@ const User = require('../../../src/models/User');
 jest.mock('bcryptjs');
 
 describe('User Model', () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -272,7 +271,7 @@ describe('User Model', () => {
       user.isModified = jest.fn(() => true);
 
       // Simulate the pre-save hook directly
-      const preSaveHook = async function(next) {
+      const preSaveHook = async function (next) {
         if (!this.isModified('password')) {
           return next();
         }
@@ -304,7 +303,7 @@ describe('User Model', () => {
       user.isModified = jest.fn(() => true);
 
       // Simulate the pre-save hook directly
-      const preSaveHook = async function(next) {
+      const preSaveHook = async function (next) {
         if (!this.isModified('password')) {
           return next();
         }
@@ -333,7 +332,7 @@ describe('User Model', () => {
       user.isModified = jest.fn(() => false);
 
       // Simulate the pre-save hook directly
-      const preSaveHook = async function(next) {
+      const preSaveHook = async function (next) {
         if (!this.isModified('password')) {
           return next();
         }
@@ -507,10 +506,10 @@ describe('User Model', () => {
       const oldTime = user.updatedAt;
 
       // Wait a bit to ensure time difference
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Simulate the updatedAt pre-save hook directly
-      const updatedAtHook = function(next) {
+      const updatedAtHook = function (next) {
         this.updatedAt = Date.now();
         next();
       };

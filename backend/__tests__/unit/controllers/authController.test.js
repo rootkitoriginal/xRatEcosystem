@@ -1,6 +1,6 @@
 const authController = require('../../../src/auth/authController');
 const User = require('../../../src/models/User');
-const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../../../src/utils/jwt');
+const { verifyRefreshToken } = require('../../../src/utils/jwt');
 const logger = require('../../../src/config/logger');
 
 // Mock dependencies
