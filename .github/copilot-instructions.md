@@ -232,11 +232,11 @@ All services are running successfully:
   - [ ] Update changelog
 
 #### Additional Workflows
-- [ ] Create `pr-checks.yml` - PR validation
-  - [ ] Check PR title format
-  - [ ] Check branch naming
-  - [ ] Verify tests pass
-  - [ ] Check code coverage
+- [x] Create `pr-checks.yml` - PR validation
+  - [x] Check PR title format
+  - [x] Check branch naming
+  - [x] Verify tests pass
+  - [x] Check code coverage
   
 - [ ] Create `docs.yml` - Documentation
   - [ ] Build documentation
