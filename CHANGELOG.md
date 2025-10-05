@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-05
+
+### Added - WebSocket Real-time Communication System
+- **WebSocket Server**: Complete Socket.IO implementation with JWT authentication
+- **Input Validation**: Joi schemas for 6 event types with XSS/SQL injection sanitization
+- **Authorization System**: 4-tier permission model (PUBLIC, OWNER_ONLY, PRIVATE, ROLE_BASED)
+- **Role-based Access Control**: Hierarchical roles (admin > moderator > user > guest)
+- **Room Management**: Join/leave rooms with permission validation and member tracking
+- **Real-time Features**: User presence, notifications, typing indicators, data subscriptions
+- **React Hooks**: `useWebSocket`, `useDataSubscription`, `useNotifications`, `useUserPresence`, `useRoom`
+- **React Components**: ConnectionStatus, NotificationToast, SystemStatus, UserPresence, WebSocketProvider
+- **Comprehensive Testing**: 76 new unit tests for validators and authorization systems
+
+### Changed
+- Backend test coverage increased from ~60% to 95.31% statements, 84.42% branches
+- Updated documentation with WebSocket API reference and examples
+- Enhanced DevOPS.chatmode.md with strict testing and documentation standards
+
+### Security
+- XSS attack prevention with HTML sanitization
+- SQL injection protection
+- Authorization audit logging for room access
+- Rate limiting for WebSocket connections
+- Input validation for all WebSocket events
+
+### Documentation
+- Added `docs/WEBSOCKET.md` - Complete WebSocket API documentation (1237 lines)
+- Added `docs/examples/websocket-client-example.js` - Node.js WebSocket client example
+- Added `docs/examples/websocket-react-example.jsx` - React hooks and components example
+- Updated architecture documentation with WebSocket components
+
+### Infrastructure
+- Cleaned up obsolete branches (16 branches removed)
+- Merged PR #38 - WebSocket Real-time Communication
+- Total test suite: 344 backend tests + 88 frontend tests (432 tests passing)
+
+## [1.0.0] - 2025-01-03
+
 ### Added
 - Comprehensive testing infrastructure with Jest and Vitest
 - Complete technical documentation (Architecture, API, Testing, Contributing, Deployment, Security)
@@ -16,12 +54,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Backend and Frontend README documentation
 - Code quality tools (ESLint, Prettier, EditorConfig)
 
-### Merged (recent)
+### Merged
 - PR #30 — Fix DevOps monitor: fetch complete PR details (commits, changes) and improve CLI display
 - PR #26 — Add structured logging (Winston) with daily rotation and request logging middleware
 - PR #27 — Data Management API: models, services, controllers, routes, and integration tests
 - PR #28 — Data Management UI: React components, pages, and unit tests
 - PR #29 — API Documentation: Add OpenAPI spec and Swagger UI at `/api-docs`
+
+## [0.1.0] - 2025-01-03
 
 ## [1.0.0] - 2025-01-03
 
