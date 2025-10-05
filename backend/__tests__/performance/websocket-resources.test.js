@@ -119,7 +119,7 @@ describe('WebSocket Resource Exhaustion Testing', () => {
 
       const cpuAfter = getCPUUsage();
 
-      console.log(`📊 CPU Usage:`);
+      console.log('📊 CPU Usage:');
       console.log(`  Before: ${cpuBefore.usage.toFixed(2)}%`);
       console.log(`  During load: ${cpuDuring.usage.toFixed(2)}%`);
       console.log(`  After: ${cpuAfter.usage.toFixed(2)}%`);
@@ -315,7 +315,7 @@ describe('WebSocket Resource Exhaustion Testing', () => {
 
       const successRate = ((targetConnections - connectionFailures) / targetConnections) * 100;
 
-      console.log(`📊 File Descriptor Test:`);
+      console.log('📊 File Descriptor Test:');
       console.log(`  Target connections: ${targetConnections}`);
       console.log(`  Successful: ${clients.length}`);
       console.log(`  Failed: ${connectionFailures}`);
@@ -467,7 +467,7 @@ describe('WebSocket Resource Exhaustion Testing', () => {
       const totalReceived = clients.reduce((sum, c) => sum + c.receivedBytes, 0);
       const throughputMBps = (totalReceived / 1024 / 1024) / (duration / 1000);
 
-      console.log(`📊 Bandwidth Saturation Test:`);
+      console.log('📊 Bandwidth Saturation Test:');
       console.log(`  Total sent: ${(totalDataSent / 1024 / 1024).toFixed(2)}MB`);
       console.log(`  Total received: ${(totalReceived / 1024 / 1024).toFixed(2)}MB`);
       console.log(`  Duration: ${duration}ms`);
@@ -519,7 +519,7 @@ describe('WebSocket Resource Exhaustion Testing', () => {
       const minDelivery = Math.min(...deliveryCounts);
       const maxDelivery = Math.max(...deliveryCounts);
 
-      console.log(`📊 Graceful Degradation:`);
+      console.log('📊 Graceful Degradation:');
       console.log(`  Clients: ${clientCount}`);
       console.log(`  Messages sent: ${messageCount}`);
       console.log(`  Avg received: ${avgDelivery.toFixed(1)}`);

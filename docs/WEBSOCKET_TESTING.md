@@ -1,21 +1,10 @@
-# WebS**📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)g Guide
+# WebSocket Testing Guide
 
 ## Overview
 
 This document provides comprehensive guidance on testing the xRat Ecosystem WebSocket implementation, covering unit tests, integration tests, and advanced testing patterns.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 **📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
-
-=======
-
-> > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
-
-=======
-**📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
-
-> > > > > > > copilot/fix-1d92b441-75d8-4086-ad2e-cd426dd28c5d
 
 ## Test Coverage Summary
 
@@ -92,7 +81,7 @@ Located in: `backend/__tests__/unit/websocket/socketService.test.js`
 
 Located in: `backend/__tests__/integration/websocket-auth.test.js`
 
-#### Test Categories
+#### Test Categories (Integration)
 
 1. **Connection Authentication** (7 tests)
    - Missing token rejection
@@ -572,20 +561,9 @@ When adding new WebSocket features:
 - [Socket.IO Client Testing](https://socket.io/docs/v4/client-api/)
 - [xRat WebSocket Documentation](./WEBSOCKET.md)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
 ## Performance & Stress Testing
 
 For comprehensive performance and stress testing documentation, including:
-
-=======
-
-## Performance & Stress Testing
-
-For comprehensive performance and stress testing documentation, including:
-
-> > > > > > > copilot/fix-1d92b441-75d8-4086-ad2e-cd426dd28c5d
 
 - Connection load testing (1,000+ concurrent connections)
 - Memory leak detection and management
@@ -610,28 +588,12 @@ npm run test:performance:resources   # Resource exhaustion tests
 
 **Note**: Performance tests are excluded from regular test runs to avoid long CI times. They should be run periodically or before major releases.
 
-# <<<<<<< HEAD
-
-> > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
-
-=======
-
-> > > > > > > copilot/fix-1d92b441-75d8-4086-ad2e-cd426dd28c5d
-
 ## Conclusion
 
 The xRat Ecosystem WebSocket implementation has achieved **production-grade test coverage** with:
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-- ✅ 150 comprehensive functional tests
-- # ✅ 38 performance & stress tests (NEW)
-- ✅ 150 comprehensive tests
-  > > > > > > > # copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
 - ✅ 150 comprehensive functional tests
 - ✅ 38 performance & stress tests (NEW)
-  > > > > > > > copilot/fix-1d92b441-75d8-4086-ad2e-cd426dd28c5d
 - ✅ 93.77% statement coverage
 - ✅ 91.04% branch coverage
 - ✅ 96.55% line coverage
@@ -639,11 +601,6 @@ The xRat Ecosystem WebSocket implementation has achieved **production-grade test
 - ✅ Complete error recovery testing
 - ✅ Rate limiting enforcement verified
 - ✅ Real Socket.IO integration tests
-  <<<<<<< HEAD
-  <<<<<<< HEAD
-- # ✅ Production-ready performance benchmarks (NEW)
-  > > > > > > > # copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
 - ✅ Production-ready performance benchmarks (NEW)
-  > > > > > > > copilot/fix-1d92b441-75d8-4086-ad2e-cd426dd28c5d
 
 This testing suite ensures **reliable, secure, and performant** real-time communication in the xRat Ecosystem.

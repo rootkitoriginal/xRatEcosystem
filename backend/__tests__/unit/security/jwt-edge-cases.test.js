@@ -92,7 +92,7 @@ describe('JWT Security - Advanced Edge Cases', () => {
     });
 
     it('should handle token with SQL injection attempts', async () => {
-      req.headers.authorization = "Bearer token' OR '1'='1";
+      req.headers.authorization = 'Bearer token\' OR \'1\'=\'1';
 
       const error = new Error('Invalid token');
       error.name = 'JsonWebTokenError';

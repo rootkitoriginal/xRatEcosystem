@@ -270,13 +270,13 @@ describe('WebSocket Validators', () => {
       const data = {
         entity: 'users',
         filters: {
-          id: "1' OR '1'='1",
+          id: '1\' OR \'1\'=\'1',
         },
       };
       const result = validateEvent('dataSubscribe', data);
       expect(result.valid).toBe(true);
       // Validator.escape should escape quotes
-      expect(result.sanitizedData.filters.id).not.toContain("'");
+      expect(result.sanitizedData.filters.id).not.toContain('\'');
     });
   });
 });

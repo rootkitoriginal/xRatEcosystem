@@ -111,7 +111,7 @@ describe('WebSocket Connection Stress Tests', () => {
       expect(successRate).toBeGreaterThanOrEqual(80);
       
       console.log(`✅ Connected ${successCount}/${connectionCount} clients (${successRate.toFixed(2)}%)`);
-      console.log(`   Note: Test scaled to 100 connections (production target: 1000+)`);
+      console.log('   Note: Test scaled to 100 connections (production target: 1000+)');
     }, 45000); // 45 second timeout
 
     test('should track all concurrent connections correctly', async () => {

@@ -173,7 +173,7 @@ describe('ProfilePage', () => {
     await waitFor(() => {
       expect(screen.queryByLabelText('Full Name')).toBeNull();
     });
-    
+
     // Profile display should be visible again
     expect(screen.getByText('John Doe')).toBeDefined();
   });

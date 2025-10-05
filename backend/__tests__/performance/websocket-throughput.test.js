@@ -90,7 +90,7 @@ describe('WebSocket Message Throughput Testing', () => {
 
       client.disconnect();
 
-      console.log(`📊 Throughput Test Results:`);
+      console.log('📊 Throughput Test Results:');
       console.log(`  Sent: ${messageCount} messages`);
       console.log(`  Received: ${receivedMessages.length} messages`);
       console.log(`  Duration: ${duration}ms`);
@@ -161,7 +161,7 @@ describe('WebSocket Message Throughput Testing', () => {
       // Cleanup
       clients.forEach((client) => client.disconnect());
 
-      console.log(`📊 Latency Statistics:`);
+      console.log('📊 Latency Statistics:');
       console.log(`  Average: ${avgLatency.toFixed(2)}ms`);
       console.log(`  Min: ${minLatency}ms`);
       console.log(`  Max: ${maxLatency}ms`);
@@ -247,7 +247,7 @@ describe('WebSocket Message Throughput Testing', () => {
 
       client.disconnect();
 
-      console.log(`📊 Large Payload Sequential Test:`);
+      console.log('📊 Large Payload Sequential Test:');
       console.log(`  Total data: ${totalMB.toFixed(2)}MB`);
       console.log(`  Duration: ${duration}ms`);
       console.log(`  Throughput: ${throughputMBps.toFixed(2)}MB/s`);
@@ -288,7 +288,7 @@ describe('WebSocket Message Throughput Testing', () => {
 
       const deliveryRate = (receivedCount / overflowMessageCount) * 100;
 
-      console.log(`📊 Message Overflow Test:`);
+      console.log('📊 Message Overflow Test:');
       console.log(`  Sent: ${overflowMessageCount} messages`);
       console.log(`  Received: ${receivedCount} messages`);
       console.log(`  Delivery rate: ${deliveryRate.toFixed(2)}%`);
@@ -392,7 +392,7 @@ describe('WebSocket Message Throughput Testing', () => {
       const totalActualDeliveries = clients.reduce((sum, c) => sum + c.receivedCount, 0);
       const deliveryRate = (totalActualDeliveries / totalExpectedDeliveries) * 100;
 
-      console.log(`📊 Room Broadcasting Test:`);
+      console.log('📊 Room Broadcasting Test:');
       console.log(`  Clients: ${clientCount}`);
       console.log(`  Broadcasts: ${broadcastCount}`);
       console.log(`  Expected deliveries: ${totalExpectedDeliveries}`);
@@ -475,7 +475,7 @@ describe('WebSocket Message Throughput Testing', () => {
       }
 
       expect(correctIsolation).toBe(true);
-      console.log(`✅ Cross-room message isolation verified`);
+      console.log('✅ Cross-room message isolation verified');
     }, 60000);
   });
 

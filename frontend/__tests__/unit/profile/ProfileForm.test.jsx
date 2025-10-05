@@ -19,7 +19,9 @@ describe('ProfileForm', () => {
   });
 
   it('renders form with initial data', () => {
-    render(<ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
+    );
 
     expect(screen.getByLabelText('Full Name')).toBeDefined();
     expect(screen.getByLabelText(/Bio/)).toBeDefined();
@@ -27,7 +29,9 @@ describe('ProfileForm', () => {
   });
 
   it('displays initial values in form fields', () => {
-    render(<ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
+    );
 
     const fullNameInput = screen.getByLabelText('Full Name');
     const bioInput = screen.getByLabelText(/Bio/);
@@ -39,7 +43,9 @@ describe('ProfileForm', () => {
   });
 
   it('shows character count for bio field', () => {
-    render(<ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
+    );
 
     expect(screen.getByText('(18/250)')).toBeDefined(); // "Software developer" is 18 chars
   });
@@ -101,7 +107,9 @@ describe('ProfileForm', () => {
   });
 
   it('calls onCancel when cancel button is clicked', async () => {
-    render(<ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
+    );
     const user = userEvent.setup();
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -112,7 +120,9 @@ describe('ProfileForm', () => {
 
   it('disables form during submission', async () => {
     mockOnSubmit.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
-    render(<ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
+    );
     const user = userEvent.setup();
 
     const submitButton = screen.getByRole('button', { name: /save changes/i });
@@ -124,7 +134,9 @@ describe('ProfileForm', () => {
 
   it('displays error message on submission failure', async () => {
     mockOnSubmit.mockRejectedValueOnce(new Error('Network error'));
-    render(<ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <ProfileForm initialData={mockProfile} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
+    );
     const user = userEvent.setup();
 
     const submitButton = screen.getByRole('button', { name: /save changes/i });

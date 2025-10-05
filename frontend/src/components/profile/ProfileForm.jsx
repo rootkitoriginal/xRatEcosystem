@@ -139,7 +139,12 @@ function ProfileForm({ initialData, onSubmit, onCancel }) {
         )}
 
         <div className="form-actions">
-          <button type="button" onClick={onCancel} className="btn btn-secondary" disabled={isSubmitting}>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="btn btn-secondary"
+            disabled={isSubmitting}
+          >
             Cancel
           </button>
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
