@@ -655,6 +655,65 @@ const JWT_REFRESH_EXPIRE = process.env.JWT_REFRESH_EXPIRE || '7d';
 - Passwords never returned in API responses
 - Token expiration enforced
 
+**JWT Security Testing:**
+
+The xRat Ecosystem implements comprehensive security testing for JWT authentication to prevent common vulnerabilities and edge cases. **Test coverage: 98 security tests** covering:
+
+1. **Token Structure Validation (43 tests)**
+   - Malformed token detection (missing parts, invalid structure)
+   - Signature manipulation and tampering prevention
+   - Algorithm specification attacks ("alg: none" attack)
+   - Header and payload corruption detection
+   - Base64 encoding edge cases
+   - Type confusion attacks (numeric, boolean, object tokens)
+   - Expiration scenarios and clock skew handling
+
+2. **Authentication Security Edge Cases (37 tests)**
+   - Token format edge cases (whitespace, special characters, SQL injection)
+   - Database connection failures during token validation
+   - Concurrent authentication attempt handling
+   - User data integrity validation
+   - Error message security (dev vs production modes)
+   - Request object pollution prevention
+   - Authorization header type validation
+
+3. **Rate Limiting & Brute Force Prevention (18 tests)**
+   - Authentication attempt rate limiting
+   - IP-based attack mitigation
+   - Distributed attack pattern detection
+   - Account lockout mechanisms
+   - Timing attack prevention
+   - Security header validation (RateLimit headers, Retry-After)
+
+**Security Vulnerabilities Tested & Mitigated:**
+
+- ✅ **Algorithm manipulation attacks**: "alg: none" and algorithm confusion prevented
+- ✅ **Token tampering**: Signature validation catches payload modifications
+- ✅ **Token replay attacks**: Documentation for replay prevention patterns
+- ✅ **Timing attacks**: Rate limiting applied before authentication processing
+- ✅ **Brute force attacks**: IP-based rate limiting with 5 attempts per 15 minutes
+- ✅ **Information disclosure**: Generic error messages in production mode
+- ✅ **Request pollution**: Token data cannot pollute request object
+- ✅ **Database failures**: Graceful handling with proper error responses
+- ✅ **Type confusion**: Non-string authorization headers handled safely
+
+**Test Files:**
+
+- `backend/__tests__/unit/utils/jwt.test.js` - JWT utility function security tests
+- `backend/__tests__/unit/security/jwt-edge-cases.test.js` - Auth middleware edge cases
+- `backend/__tests__/unit/security/rate-limit-auth.test.js` - Rate limiting security tests
+
+**Running Security Tests:**
+
+```bash
+# Run all JWT security tests
+npm test -- __tests__/unit/utils/jwt.test.js
+npm test -- __tests__/unit/security/
+
+# Run with coverage
+npm test -- --coverage __tests__/unit/security/
+```
+
 #### Rate Limiting
 
 **Implementation:**
