@@ -37,12 +37,12 @@ module.exports = {
       lines: 97,
       statements: 97,
     },
-    // Progressive threshold for socketService.js (improved from 26% to 46.88% statements)
+    // Progressive threshold for socketService.js (improved from 46.88% to 82.77% statements)
     'src/websocket/socketService.js': {
-      branches: 35,
-      functions: 45,
-      lines: 40,
-      statements: 40,
+      branches: 75,
+      functions: 68,
+      lines: 82,
+      statements: 80,
     },
   },
   testTimeout: 10000,

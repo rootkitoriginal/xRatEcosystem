@@ -1,6 +1,21 @@
 const http = require('http');
 const { SocketService } = require('../../../src/websocket');
 
+// Mock the websocket validators and authorization modules
+jest.mock('../../../src/websocket/validators', () => ({
+  validateEvent: jest.fn().mockReturnValue({
+    valid: true,
+    sanitizedData: {},
+  }),
+  sanitizeObject: jest.fn((data) => data),
+}));
+
+jest.mock('../../../src/websocket/authorization', () => ({
+  canJoinRoom: jest.fn().mockReturnValue({ authorized: true }),
+  canBroadcastToRoom: jest.fn().mockReturnValue({ authorized: true }),
+  auditRoomAccess: jest.fn(),
+}));
+
 describe('SocketService Unit Tests', () => {
   let socketService;
   let httpServer;
@@ -338,6 +353,9 @@ describe('SocketService Unit Tests', () => {
     });
 
     test('should handle broadcaster authorization - unauthorized', () => {
+      const { canBroadcastToRoom } = require('../../../src/websocket/authorization');
+      canBroadcastToRoom.mockReturnValueOnce({ authorized: false });
+
       const entity = 'users';
       const data = { id: '123', name: 'Test User' };
       const broadcaster = { _id: 'user-1', username: 'testuser', role: 'user' };
@@ -584,6 +602,376 @@ describe('SocketService Unit Tests', () => {
 
       // Should NOT broadcast offline status (user still has active connections)
       expect(socketService.broadcastUserStatus).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Event Handlers', () => {
+    let mockSocket;
+
+    beforeEach(() => {
+      socketService = new SocketService(httpServer, mockRedisClient);
+
+      // Mock socket object
+      mockSocket = {
+        id: 'socket-123',
+        user: { _id: 'user-456', username: 'testuser', role: 'user' },
+        join: jest.fn(),
+        leave: jest.fn(),
+        emit: jest.fn(),
+        to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+      };
+
+      // Initialize user rooms for socket
+      socketService.userRooms.set('socket-123', new Set());
+
+      // Mock checkRateLimit to allow requests by default
+      socketService.checkRateLimit = jest.fn().mockReturnValue(true);
+    });
+
+    describe('handleDataSubscribe', () => {
+      test('should handle valid data subscription', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: true,
+          sanitizedData: { entity: 'users', filters: { status: 'active' } },
+        });
+
+        const data = { entity: 'users', filters: { status: 'active' } };
+
+        socketService.handleDataSubscribe(mockSocket, data);
+
+        // Should join the room
+        expect(mockSocket.join).toHaveBeenCalledWith('data:users:status:active');
+
+        // Should track the room
+        expect(socketService.userRooms.get('socket-123').has('data:users:status:active')).toBe(
+          true
+        );
+
+        // Should emit subscription confirmation
+        expect(mockSocket.emit).toHaveBeenCalledWith('data:subscribed', {
+          entity: 'users',
+          filters: { status: 'active' },
+          room: 'data:users:status:active',
+        });
+      });
+
+      test('should handle validation failure', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: false,
+          error: 'Invalid entity',
+        });
+
+        const data = { entity: '', filters: {} };
+
+        socketService.handleDataSubscribe(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'data:subscribe',
+          message: 'Validation failed',
+          error: 'Invalid entity',
+        });
+        expect(mockSocket.join).not.toHaveBeenCalled();
+      });
+
+      test('should handle rate limit exceeded', () => {
+        socketService.checkRateLimit.mockReturnValue(false);
+
+        const data = { entity: 'users', filters: {} };
+
+        socketService.handleDataSubscribe(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'data:subscribe',
+          message: 'Rate limit exceeded',
+        });
+        expect(mockSocket.join).not.toHaveBeenCalled();
+      });
+
+      test('should handle authorization failure', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        const { canJoinRoom } = require('../../../src/websocket/authorization');
+
+        validateEvent.mockReturnValueOnce({
+          valid: true,
+          sanitizedData: { entity: 'users', filters: {} },
+        });
+
+        canJoinRoom.mockReturnValueOnce({
+          authorized: false,
+          reason: 'Insufficient permissions',
+        });
+
+        const data = { entity: 'users', filters: {} };
+
+        socketService.handleDataSubscribe(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'data:subscribe',
+          message: 'Insufficient permissions',
+        });
+        expect(mockSocket.join).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('handleRoomJoin', () => {
+      test('should handle valid room join', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: true,
+          sanitizedData: { roomId: 'chat:room123' },
+        });
+
+        const data = { roomId: 'chat:room123' };
+
+        socketService.handleRoomJoin(mockSocket, data);
+
+        // Should join the room
+        expect(mockSocket.join).toHaveBeenCalledWith('chat:room123');
+
+        // Should track the room
+        expect(socketService.userRooms.get('socket-123').has('chat:room123')).toBe(true);
+
+        // Should emit join confirmation
+        expect(mockSocket.emit).toHaveBeenCalledWith('room:joined', {
+          roomId: 'chat:room123',
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should handle validation failure', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: false,
+          error: 'Invalid room ID',
+        });
+
+        const data = { roomId: '' };
+
+        socketService.handleRoomJoin(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'room:join',
+          message: 'Validation failed',
+          error: 'Invalid room ID',
+        });
+        expect(mockSocket.join).not.toHaveBeenCalled();
+      });
+
+      test('should handle authorization failure', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        const { canJoinRoom } = require('../../../src/websocket/authorization');
+
+        validateEvent.mockReturnValueOnce({
+          valid: true,
+          sanitizedData: { roomId: 'private:room456' },
+        });
+
+        canJoinRoom.mockReturnValueOnce({
+          authorized: false,
+          reason: 'Room is private',
+        });
+
+        const data = { roomId: 'private:room456' };
+
+        socketService.handleRoomJoin(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'room:join',
+          message: 'Room is private',
+        });
+        expect(mockSocket.join).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('handleRoomLeave', () => {
+      beforeEach(() => {
+        // Add room to user's rooms
+        socketService.userRooms.get('socket-123').add('chat:room123');
+      });
+
+      test('should handle valid room leave', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: true,
+          sanitizedData: { roomId: 'chat:room123' },
+        });
+
+        const data = { roomId: 'chat:room123' };
+
+        socketService.handleRoomLeave(mockSocket, data);
+
+        // Should leave the room
+        expect(mockSocket.leave).toHaveBeenCalledWith('chat:room123');
+
+        // Should remove from tracked rooms
+        expect(socketService.userRooms.get('socket-123').has('chat:room123')).toBe(false);
+
+        // Should emit leave confirmation
+        expect(mockSocket.emit).toHaveBeenCalledWith('room:left', {
+          roomId: 'chat:room123',
+          timestamp: expect.any(String),
+        });
+
+        // Should notify others in the room
+        expect(mockSocket.to).toHaveBeenCalledWith('chat:room123');
+        expect(mockSocket.to().emit).toHaveBeenCalledWith('user:left', {
+          userId: 'user-456',
+          username: 'testuser',
+          roomId: 'chat:room123',
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should handle validation failure', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: false,
+          error: 'Invalid room ID',
+        });
+
+        const data = { roomId: '' };
+
+        socketService.handleRoomLeave(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'room:leave',
+          message: 'Validation failed',
+          error: 'Invalid room ID',
+        });
+        expect(mockSocket.leave).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('handleUserTyping', () => {
+      beforeEach(() => {
+        // Add room to user's rooms
+        socketService.userRooms.get('socket-123').add('chat:room123');
+      });
+
+      test('should handle valid typing event', () => {
+        const { validateEvent } = require('../../../src/websocket/validators');
+        validateEvent.mockReturnValueOnce({
+          valid: true,
+          sanitizedData: { roomId: 'chat:room123' },
+        });
+
+        const data = { roomId: 'chat:room123' };
+
+        socketService.handleUserTyping(mockSocket, data);
+
+        // Should broadcast to room (except sender)
+        expect(mockSocket.to).toHaveBeenCalledWith('chat:room123');
+        expect(mockSocket.to().emit).toHaveBeenCalledWith('user:typing', {
+          userId: 'user-456',
+          username: 'testuser',
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should handle user not in room', () => {
+        // Remove room from user's rooms
+        socketService.userRooms.get('socket-123').clear();
+
+        const data = { roomId: 'chat:room123' };
+
+        socketService.handleUserTyping(mockSocket, data);
+
+        expect(mockSocket.emit).toHaveBeenCalledWith('error', {
+          event: 'user:typing',
+          message: 'You are not in this room',
+        });
+        expect(mockSocket.to).not.toHaveBeenCalled();
+      });
+
+      test('should handle rate limit exceeded', () => {
+        socketService.checkRateLimit.mockReturnValue(false);
+
+        const data = { roomId: 'chat:room123' };
+
+        socketService.handleUserTyping(mockSocket, data);
+
+        // Should not emit anything when rate limited
+        expect(mockSocket.to).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('sendQueuedNotifications', () => {
+      test('should send queued notifications to user', async () => {
+        const userId = 'user-456';
+        const socketId = 'socket-123';
+
+        // Mock Redis response
+        const mockNotifications = [
+          JSON.stringify({ type: 'info', message: 'Welcome back!' }),
+          JSON.stringify({ type: 'warning', message: 'Password expires soon' }),
+        ];
+        mockRedisClient.lRange.mockResolvedValue(mockNotifications);
+        mockRedisClient.del.mockResolvedValue(1);
+
+        // Mock Socket.IO methods
+        socketService.io.to = jest.fn().mockReturnValue({ emit: jest.fn() });
+
+        await socketService.sendQueuedNotifications(userId, socketId);
+
+        // Should fetch notifications from queue
+        expect(mockRedisClient.lRange).toHaveBeenCalledWith('notifications:queue:user-456', 0, -1);
+
+        // Should emit each notification
+        expect(socketService.io.to).toHaveBeenCalledWith('socket-123');
+        expect(socketService.io.to().emit).toHaveBeenCalledTimes(2);
+        expect(socketService.io.to().emit).toHaveBeenCalledWith('notification', {
+          type: 'info',
+          message: 'Welcome back!',
+        });
+        expect(socketService.io.to().emit).toHaveBeenCalledWith('notification', {
+          type: 'warning',
+          message: 'Password expires soon',
+        });
+
+        // Should clear the queue
+        expect(mockRedisClient.del).toHaveBeenCalledWith('notifications:queue:user-456');
+      });
+
+      test('should handle empty notification queue', async () => {
+        const userId = 'user-456';
+        const socketId = 'socket-123';
+
+        mockRedisClient.lRange.mockResolvedValue([]);
+        socketService.io.to = jest.fn().mockReturnValue({ emit: jest.fn() });
+
+        await socketService.sendQueuedNotifications(userId, socketId);
+
+        expect(mockRedisClient.lRange).toHaveBeenCalledWith('notifications:queue:user-456', 0, -1);
+        expect(socketService.io.to).not.toHaveBeenCalled();
+        expect(mockRedisClient.del).not.toHaveBeenCalled();
+      });
+
+      test('should handle Redis unavailable', async () => {
+        const userId = 'user-456';
+        const socketId = 'socket-123';
+
+        // Set Redis client to null
+        socketService.redisClient = null;
+
+        await socketService.sendQueuedNotifications(userId, socketId);
+
+        // Should return early without any operations
+        expect(mockRedisClient.lRange).not.toHaveBeenCalled();
+      });
+
+      test('should handle Redis error', async () => {
+        const userId = 'user-456';
+        const socketId = 'socket-123';
+
+        mockRedisClient.lRange.mockRejectedValue(new Error('Redis connection error'));
+
+        await socketService.sendQueuedNotifications(userId, socketId);
+
+        expect(mockRedisClient.lRange).toHaveBeenCalledWith('notifications:queue:user-456', 0, -1);
+        // Should not crash, error should be logged
+      });
     });
   });
 });
