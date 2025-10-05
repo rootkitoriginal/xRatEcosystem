@@ -92,7 +92,7 @@ describe('JWT Security - Advanced Edge Cases', () => {
     });
 
     it('should handle token with SQL injection attempts', async () => {
-      req.headers.authorization = 'Bearer token\' OR \'1\'=\'1';
+      req.headers.authorization = "Bearer token' OR '1'='1";
 
       const error = new Error('Invalid token');
       error.name = 'JsonWebTokenError';
@@ -270,8 +270,12 @@ describe('JWT Security - Advanced Edge Cases', () => {
 
       await authenticate(req, res, next);
 
-      // NotBeforeError should be caught and handled as generic error
-      expect(res.status).toHaveBeenCalledWith(500);
+      // NotBeforeError should be handled as 401 (authentication issue)
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Token not yet valid. Please check your system time.',
+      });
     });
   });
 
@@ -604,9 +608,12 @@ describe('JWT Security - Advanced Edge Cases', () => {
 
       await authenticate(req, res, next);
 
-      // Non-string types cause TypeError when calling .startsWith()
-      // This results in 500 error instead of 401
-      expect(res.status).toHaveBeenCalledWith(500);
+      // Non-string types should be validated and return 401
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Authentication required. Please provide a valid token.',
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -615,8 +622,12 @@ describe('JWT Security - Advanced Edge Cases', () => {
 
       await authenticate(req, res, next);
 
-      // Non-string types cause TypeError when calling .startsWith()
-      expect(res.status).toHaveBeenCalledWith(500);
+      // Non-string types should be validated and return 401
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Authentication required. Please provide a valid token.',
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -625,8 +636,12 @@ describe('JWT Security - Advanced Edge Cases', () => {
 
       await authenticate(req, res, next);
 
-      // Non-string types cause TypeError when calling .startsWith()
-      expect(res.status).toHaveBeenCalledWith(500);
+      // Non-string types should be validated and return 401
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Authentication required. Please provide a valid token.',
+      });
       expect(next).not.toHaveBeenCalled();
     });
   });

@@ -10,7 +10,15 @@ const authenticate = async (req, res, next) => {
     // Get token from header
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Check if authorization header is present and is a string
+    if (!authHeader || typeof authHeader !== 'string') {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required. Please provide a valid token.',
+      });
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
         message: 'Authentication required. Please provide a valid token.',
@@ -50,6 +58,13 @@ const authenticate = async (req, res, next) => {
       });
     }
 
+    if (error.name === 'NotBeforeError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token not yet valid. Please check your system time.',
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Authentication error',
@@ -66,7 +81,7 @@ const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
       return next();
     }
 
