@@ -35,21 +35,16 @@ function ProfilePage() {
   };
 
   const handleUpdateProfile = async (profileData) => {
-    try {
-      const response = await userService.updateProfile(profileData);
-      setProfile(response.data);
-      setIsEditing(false);
+    const response = await userService.updateProfile(profileData);
+    setProfile(response.data);
+    setIsEditing(false);
 
-      // Show success notification
-      addNotification({
-        type: 'success',
-        title: 'Success',
-        message: 'Profile updated successfully!',
-      });
-    } catch (err) {
-      // Re-throw to let form handle the error
-      throw err;
-    }
+    // Show success notification
+    addNotification({
+      type: 'success',
+      title: 'Success',
+      message: 'Profile updated successfully!',
+    });
   };
 
   const handleCancelEdit = () => {
