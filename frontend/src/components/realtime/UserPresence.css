@@ -1,0 +1,103 @@
+.user-presence {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-presence.small .user-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 0.875rem;
+}
+
+.user-presence.medium .user-avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+}
+
+.user-presence.large .user-avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 1.125rem;
+}
+
+.avatar-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.presence-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.user-presence.small .presence-indicator {
+  width: 10px;
+  height: 10px;
+  border-width: 1.5px;
+}
+
+.user-presence.large .presence-indicator {
+  width: 14px;
+  height: 14px;
+  border-width: 2.5px;
+}
+
+.presence-indicator.online {
+  background: #48bb78;
+  animation: pulse 2s infinite;
+}
+
+.presence-indicator.offline {
+  background: #cbd5e0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #1a1a1a;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-status {
+  font-size: 0.75rem;
+  color: #718096;
+}

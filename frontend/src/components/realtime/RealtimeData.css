@@ -1,0 +1,37 @@
+.realtime-data {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.realtime-data.updating {
+  animation: flashUpdate 0.5s ease;
+}
+
+@keyframes flashUpdate {
+  0%,
+  100% {
+    background: transparent;
+  }
+  50% {
+    background: rgba(72, 187, 120, 0.1);
+    box-shadow: 0 0 0 4px rgba(72, 187, 120, 0.1);
+  }
+}
+
+.realtime-data::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #48bb78;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.realtime-data.updating::before {
+  opacity: 1;
+  animation: pulse 1s ease;
+}
