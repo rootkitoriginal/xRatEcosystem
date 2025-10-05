@@ -667,6 +667,7 @@ Veja também:
 - [📖 Architecture](docs/ARCHITECTURE.md) - Arquitetura do sistema
 - [📡 API Documentation](docs/API.md) - Documentação dos endpoints
 - [🔌 WebSocket Guide](docs/WEBSOCKET.md) - Real-time communication
+- [🔧 Redis Resilience](docs/REDIS_RESILIENCE.md) - Padrões de resiliência e testes de edge cases do Redis
 - [🧪 Testing Guide](docs/TESTING.md) - Guia de testes
 - [🤝 Contributing](docs/CONTRIBUTING.md) - Como contribuir
 - [🚀 Deployment](docs/DEPLOYMENT.md) - Guia de deployment
