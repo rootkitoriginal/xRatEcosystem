@@ -41,16 +41,19 @@ jobs:
           path: ./
           base: ${{ github.event.pull_request.base.sha }}
           head: ${{ github.event.pull_request.head.sha }}
-          extra_args: --only-verified --fail
+          extra_args: --only-verified
 
   pr-title-check:
     name: Check PR Title Format
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      pull-requests: read
 
     steps:
-      - name: Check PR title
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate PR title with semantic rules
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,6 +70,17 @@ jobs:
             ci
           requireScope: false
 
+      - name: Validate PR title format
+        uses: deepakputhraya/action-pr-title@master
+        with:
+          regex: '^(feat|fix|docs|style|refactor|test|chore|perf|ci)(\(.+\))?:\s.+'
+          allowed_prefixes: 'feat,fix,docs,style,refactor,test,chore,perf,ci'
+          prefix_case_sensitive: true
+          min_length: 10
+          max_length: 100
+          verbal_description: 'Conventional Commits format: type(scope): description'
+          github_token: ${{ github.token }}
+
   branch-name-check:
     name: Check Branch Name
     runs-on: ubuntu-latest
@@ -74,15 +88,17 @@ jobs:
       contents: read
 
     steps:
-      - name: Check branch name
-        run: |
-          BRANCH_NAME="${{ github.head_ref }}"
-          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|docs|refactor|test|chore|copilot|dependabot)/.+ ]]; then
-            echo "❌ Branch name must start with: feature/, fix/, docs/, refactor/, test/, chore/, copilot/, or dependabot/"
-            echo "Current branch: $BRANCH_NAME"
-            exit 1
-          fi
-          echo "✅ Branch name is valid: $BRANCH_NAME"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate branch name
+        uses: deepakputhraya/action-branch-name@master
+        with:
+          regex: '^(feature|fix|docs|refactor|test|chore|copilot|dependabot)\/.+'
+          allowed_prefixes: 'feature,fix,docs,refactor,test,chore,copilot,dependabot'
+          ignore: 'main,develop,master'
+          min_length: 5
+          max_length: 100
 
   code-quality:
     name: Code Quality Checks

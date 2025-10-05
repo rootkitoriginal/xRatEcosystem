@@ -21,6 +21,7 @@ const logger = require('./config/logger');
 // Import routes and middleware
 const authRoutes = require('./auth/authRoutes');
 const createDataRoutes = require('./routes/dataRoutes');
+const userRoutes = require('./routes/userRoutes');
 const DataService = require('./services/dataService');
 const dataController = require('./controllers/dataController');
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -122,6 +123,7 @@ app.get('/', (req, res) => {
       health: '/health',
       api: '/api',
       auth: '/api/auth',
+      users: '/api/users',
       docs: '/api-docs',
       data: '/api/data',
       websocket: 'ws://localhost:' + PORT,
@@ -131,6 +133,9 @@ app.get('/', (req, res) => {
 
 // Auth Routes (public)
 app.use('/api/auth', authRoutes);
+
+// User Routes (protected)
+app.use('/api/users', userRoutes);
 
 // API Routes
 // Apply general rate limiting to API routes

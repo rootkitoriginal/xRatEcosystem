@@ -316,6 +316,163 @@ describe('User Flow', () => {
 
 ---
 
+## 🔐 Security Testing
+
+### JWT Authentication Security Tests
+
+The xRat Ecosystem implements comprehensive security testing for JWT authentication to prevent vulnerabilities and edge cases.
+
+**Test Coverage: 98 security tests**
+
+#### JWT Utility Tests (43 tests)
+
+Location: `backend/__tests__/unit/utils/jwt.test.js`
+
+**What's tested:**
+
+- Token generation and verification
+- Malformed token detection (missing parts, invalid structure)
+- Signature manipulation and tampering
+- Algorithm specification attacks ("alg: none" bypass)
+- Header and payload corruption
+- Expiration and timing scenarios
+- Type confusion attacks
+
+**Example:**
+
+```javascript
+describe('JWT Security - Algorithm Manipulation', () => {
+  it('should reject token with "alg: none" attack', () => {
+    const header = Buffer.from(
+      JSON.stringify({ alg: 'none', typ: 'JWT' })
+    ).toString('base64url');
+    const payload = Buffer.from(JSON.stringify(testPayload)).toString('base64url');
+    const noneToken = `${header}.${payload}.`;
+
+    expect(() => {
+      verifyAccessToken(noneToken);
+    }).toThrow();
+  });
+
+  it('should reject token with modified payload', () => {
+    const token = generateAccessToken(testPayload);
+    const parts = token.split('.');
+    const modifiedPayload = Buffer.from(
+      JSON.stringify({ userId: 'hacked', role: 'admin' })
+    ).toString('base64url');
+    const tamperedToken = `${parts[0]}.${modifiedPayload}.${parts[2]}`;
+
+    expect(() => {
+      verifyAccessToken(tamperedToken);
+    }).toThrow();
+  });
+});
+```
+
+#### Auth Middleware Security Tests (37 tests)
+
+Location: `backend/__tests__/unit/security/jwt-edge-cases.test.js`
+
+**What's tested:**
+
+- Token format edge cases (whitespace, special characters)
+- Database connection failures during validation
+- Concurrent authentication attempts
+- Error message security (dev vs production)
+- Request object pollution prevention
+- Authorization header type validation
+
+**Example:**
+
+```javascript
+describe('Error Message Security', () => {
+  it('should not expose sensitive details in production', async () => {
+    process.env.NODE_ENV = 'production';
+    req.headers.authorization = 'Bearer invalid_token';
+
+    const error = new Error('Sensitive information');
+    verifyAccessToken.mockImplementation(() => {
+      throw error;
+    });
+
+    await authenticate(req, res, next);
+
+    const jsonCall = res.json.mock.calls[0][0];
+    expect(jsonCall.error).toBeUndefined(); // No details leaked
+    expect(jsonCall.message).toBe('Authentication error');
+
+    delete process.env.NODE_ENV;
+  });
+});
+```
+
+#### Rate Limiting Security Tests (18 tests)
+
+Location: `backend/__tests__/unit/security/rate-limit-auth.test.js`
+
+**What's tested:**
+
+- Brute force prevention
+- IP-based rate limiting
+- Distributed attack patterns
+- Account lockout mechanisms
+- Timing attack prevention
+- Security header validation
+
+**Example:**
+
+```javascript
+describe('Authentication Rate Limiting', () => {
+  it('should block authentication after exceeding rate limit', async () => {
+    // Make 5 failed login attempts
+    for (let i = 0; i < 5; i++) {
+      await request(app)
+        .post('/auth/login')
+        .send({ username: 'test', password: 'wrong' });
+    }
+
+    // 6th attempt should be rate limited
+    const response = await request(app)
+      .post('/auth/login')
+      .send({ username: 'test', password: 'wrong' });
+
+    expect(response.status).toBe(429);
+    expect(response.body.message).toBe(
+      'Too many authentication attempts. Please try again later.'
+    );
+  });
+});
+```
+
+### Running Security Tests
+
+```bash
+# Run all JWT security tests
+cd backend
+npm test -- __tests__/unit/utils/jwt.test.js
+npm test -- __tests__/unit/security/
+
+# Run with coverage
+npm test -- --coverage __tests__/unit/security/
+
+# Run specific security test suite
+npm test -- __tests__/unit/security/jwt-edge-cases.test.js
+npm test -- __tests__/unit/security/rate-limit-auth.test.js
+```
+
+### Security Vulnerabilities Prevented
+
+- ✅ **Algorithm manipulation**: "alg: none" and algorithm confusion attacks
+- ✅ **Token tampering**: Signature validation catches modifications
+- ✅ **Brute force**: Rate limiting (5 attempts per 15 minutes)
+- ✅ **Information disclosure**: Generic error messages in production
+- ✅ **Request pollution**: Token data isolation
+- ✅ **Database failures**: Graceful error handling
+- ✅ **Type confusion**: Safe handling of non-string headers
+- ✅ **Timing attacks**: Rate limiting applied before auth processing
+
+---
+
 ## 🎭 Mocking
 
 ### Mocking Modules (Backend)

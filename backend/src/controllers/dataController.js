@@ -6,6 +6,20 @@ const mongoose = require('mongoose');
  */
 
 /**
+ * Get socketService instance for notifications
+ * Handles circular dependency and gracefully fails if not available
+ */
+const getSocketService = () => {
+  try {
+    const { socketService } = require('../index');
+    return socketService ? socketService() : null;
+  } catch (error) {
+    // Service not available (e.g., during initialization or tests)
+    return null;
+  }
+};
+
+/**
  * Create a new data entity
  * POST /api/data
  */
@@ -15,6 +29,23 @@ const createData = (dataService) => async (req, res) => {
     const dataObj = req.validatedBody;
 
     const data = await dataService.create(dataObj, userId);
+
+    // Send real-time notification to user
+    const service = getSocketService();
+    if (service) {
+      service.sendNotificationToUser(userId, {
+        type: 'success',
+        message: `New data entry "${data.name}" has been created`,
+        data: {
+          id: data._id,
+          name: data.name,
+          type: data.type,
+        },
+      });
+
+      // Broadcast data update to subscribers
+      service.broadcastDataUpdate('data', data);
+    }
 
     res.status(201).json({
       success: true,
@@ -129,6 +160,23 @@ const updateData = (dataService) => async (req, res) => {
         success: false,
         message: 'Data not found',
       });
+    }
+
+    // Send real-time notification to user
+    const service = getSocketService();
+    if (service) {
+      service.sendNotificationToUser(userId, {
+        type: 'info',
+        message: `Data entry "${data.name}" has been updated`,
+        data: {
+          id: data._id,
+          name: data.name,
+          type: data.type,
+        },
+      });
+
+      // Broadcast data update to subscribers
+      service.broadcastDataUpdate('data', data);
     }
 
     res.json({
@@ -246,6 +294,12 @@ const bulkOperations = (dataService) => async (req, res) => {
         try {
           const created = await dataService.create(item, userId);
           results.success.push({ id: created._id, data: created });
+
+          // Broadcast data update to subscribers
+          const service = getSocketService();
+          if (service) {
+            service.broadcastDataUpdate('data', created);
+          }
         } catch (error) {
           results.failed.push({ data: item, error: error.message });
         }
@@ -256,6 +310,12 @@ const bulkOperations = (dataService) => async (req, res) => {
           const updated = await dataService.update(item.id, userId, item.updates || {});
           if (updated) {
             results.success.push({ id: updated._id, data: updated });
+
+            // Broadcast data update to subscribers
+            const service = getSocketService();
+            if (service) {
+              service.broadcastDataUpdate('data', updated);
+            }
           } else {
             results.failed.push({ id: item.id, error: 'Not found' });
           }
@@ -276,6 +336,22 @@ const bulkOperations = (dataService) => async (req, res) => {
           results.failed.push({ id: item.id, error: error.message });
         }
       }
+    }
+
+    // Send summary notification for bulk operations
+    const service = getSocketService();
+    if (service && results.success.length > 0) {
+      service.sendNotificationToUser(userId, {
+        type: results.failed.length === 0 ? 'success' : 'info',
+        message: `Bulk ${operation} completed: ${results.success.length} succeeded${
+          results.failed.length > 0 ? `, ${results.failed.length} failed` : ''
+        }`,
+        data: {
+          operation,
+          succeeded: results.success.length,
+          failed: results.failed.length,
+        },
+      });
     }
 
     res.json({
