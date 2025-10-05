@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { WebSocketProvider, useWebSocket } from '../../../src/components/realtime/WebSocketProvider';
+import {
+  WebSocketProvider,
+  useWebSocket,
+} from '../../../src/components/realtime/WebSocketProvider';
 import { AuthProvider } from '../../../src/contexts/AuthContext';
 
 // Mock AuthContext

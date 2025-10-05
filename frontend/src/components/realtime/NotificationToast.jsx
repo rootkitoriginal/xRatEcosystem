@@ -41,7 +41,9 @@ const NotificationToast = ({ notification, onClose, duration = 5000 }) => {
   };
 
   return (
-    <div className={`notification-toast ${notification.type || 'info'} ${visible ? 'show' : 'hide'}`}>
+    <div
+      className={`notification-toast ${notification.type || 'info'} ${visible ? 'show' : 'hide'}`}
+    >
       <div className="toast-content">
         <span className="toast-icon">{getIcon()}</span>
         <div className="toast-message">

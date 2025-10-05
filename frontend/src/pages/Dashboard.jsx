@@ -48,14 +48,14 @@ function Dashboard() {
       const data = await response.json();
       const success = data.success;
       setMessage(success ? '✅ Data saved successfully!' : '❌ Failed to save data');
-      
+
       // Show notification
       addNotification({
         type: success ? 'success' : 'error',
         title: success ? 'Success' : 'Error',
         message: success ? 'Data saved to Redis cache' : 'Failed to save data',
       });
-      
+
       setKey('');
       setValue('');
       setTimeout(() => setMessage(''), 3000);

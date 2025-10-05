@@ -27,7 +27,9 @@ const UserPresence = ({ userId, userName, showName = true, size = 'medium' }) =>
       {showName && (
         <div className="user-info">
           <div className="user-name">{userName || 'Unknown User'}</div>
-          <div className="user-status">{isOnline ? 'Online' : `Last seen ${formatLastSeen(userPresence?.lastSeen)}`}</div>
+          <div className="user-status">
+            {isOnline ? 'Online' : `Last seen ${formatLastSeen(userPresence?.lastSeen)}`}
+          </div>
         </div>
       )}
     </div>

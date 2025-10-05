@@ -35,7 +35,11 @@ const NotificationPanel = () => {
 
   return (
     <div className="notification-panel">
-      <button className="notification-trigger" onClick={() => setIsOpen(!isOpen)} aria-label="Open notifications">
+      <button
+        className="notification-trigger"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Open notifications"
+      >
         🔔
         {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
       </button>
@@ -58,13 +62,20 @@ const NotificationPanel = () => {
               </div>
             ) : (
               notifications.map((notification) => (
-                <div key={notification.id} className={`notification-item ${notification.type || 'info'}`}>
+                <div
+                  key={notification.id}
+                  className={`notification-item ${notification.type || 'info'}`}
+                >
                   <div className="notification-item-content">
                     <span className="notification-item-icon">{getIcon(notification.type)}</span>
                     <div className="notification-item-body">
-                      {notification.title && <div className="notification-item-title">{notification.title}</div>}
+                      {notification.title && (
+                        <div className="notification-item-title">{notification.title}</div>
+                      )}
                       <div className="notification-item-message">{notification.message}</div>
-                      <div className="notification-item-time">{formatTime(notification.timestamp)}</div>
+                      <div className="notification-item-time">
+                        {formatTime(notification.timestamp)}
+                      </div>
                     </div>
                     <button
                       className="notification-item-close"

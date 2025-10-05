@@ -11,7 +11,11 @@ const NotificationContainer = () => {
   return (
     <div className="notification-container">
       {recentNotifications.map((notification) => (
-        <NotificationToast key={notification.id} notification={notification} onClose={removeNotification} />
+        <NotificationToast
+          key={notification.id}
+          notification={notification}
+          onClose={removeNotification}
+        />
       ))}
     </div>
   );
