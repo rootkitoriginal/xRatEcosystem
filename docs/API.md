@@ -1515,6 +1515,487 @@ All API requests are logged with:
 
 ---
 
+## 🔌 WebSocket Real-Time Communication
+
+The xRat Ecosystem supports real-time bidirectional communication using Socket.IO for live updates, notifications, and presence tracking.
+
+### WebSocket URL
+
+**Development:** `ws://localhost:3000`  
+**Production:** TBD
+
+### Authentication
+
+WebSocket connections require JWT authentication. Include your access token when connecting:
+
+**JavaScript Client:**
+
+```javascript
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000', {
+  auth: {
+    token: 'YOUR_ACCESS_TOKEN'
+  }
+});
+```
+
+**Alternative:** Include token in Authorization header:
+
+```javascript
+const socket = io('http://localhost:3000', {
+  extraHeaders: {
+    Authorization: 'Bearer YOUR_ACCESS_TOKEN'
+  }
+});
+```
+
+### Connection Events
+
+#### `connected`
+
+Emitted when connection is successfully established.
+
+**Payload:**
+
+```json
+{
+  "socketId": "abc123",
+  "userId": "user_id_here",
+  "timestamp": "2025-01-04T12:00:00.000Z"
+}
+```
+
+#### `connect_error`
+
+Emitted when connection fails (e.g., invalid token).
+
+**Example:**
+
+```javascript
+socket.on('connect_error', (error) => {
+  console.error('Connection failed:', error.message);
+  // 'Authentication required' or 'Authentication failed'
+});
+```
+
+### Server Events (Received by Client)
+
+#### `data:updated`
+
+Real-time data update broadcast to subscribers.
+
+**Payload:**
+
+```json
+{
+  "entity": "products",
+  "data": {
+    "_id": "123",
+    "name": "Updated Product",
+    "price": 99.99
+  },
+  "timestamp": "2025-01-04T12:00:00.000Z"
+}
+```
+
+**Usage:**
+
+```javascript
+socket.on('data:updated', (update) => {
+  console.log(`Data updated in ${update.entity}:`, update.data);
+});
+```
+
+#### `notification`
+
+Push notification sent to specific user.
+
+**Payload:**
+
+```json
+{
+  "type": "info",
+  "message": "Your order has been shipped",
+  "user": "user_id",
+  "timestamp": "2025-01-04T12:00:00.000Z"
+}
+```
+
+**Notification Types:**
+- `info` - Informational message
+- `warning` - Warning message
+- `error` - Error notification
+- `success` - Success notification
+
+**Usage:**
+
+```javascript
+socket.on('notification', (notification) => {
+  console.log(`[${notification.type}] ${notification.message}`);
+});
+```
+
+#### `user:online`
+
+User presence status broadcast.
+
+**Payload:**
+
+```json
+{
+  "userId": "user_id_here",
+  "status": "online",
+  "timestamp": "2025-01-04T12:00:00.000Z"
+}
+```
+
+**Status Values:**
+- `online` - User is connected
+- `offline` - User disconnected
+
+**Usage:**
+
+```javascript
+socket.on('user:online', (status) => {
+  console.log(`User ${status.userId} is now ${status.status}`);
+});
+```
+
+#### `system:health`
+
+System health metrics broadcast.
+
+**Payload:**
+
+```json
+{
+  "status": "ok",
+  "metrics": {
+    "cpu": 45.2,
+    "memory": 78.5,
+    "connections": 150
+  },
+  "timestamp": "2025-01-04T12:00:00.000Z"
+}
+```
+
+**Usage:**
+
+```javascript
+socket.on('system:health', (health) => {
+  console.log('System metrics:', health.metrics);
+});
+```
+
+#### `user:typing`
+
+User typing indicator in a room.
+
+**Payload:**
+
+```json
+{
+  "userId": "user_id",
+  "username": "johndoe",
+  "timestamp": "2025-01-04T12:00:00.000Z"
+}
+```
+
+#### `notification:read:ack`
+
+Acknowledgment that notification was marked as read.
+
+**Payload:**
+
+```json
+{
+  "notificationId": "notif_123"
+}
+```
+
+#### `data:subscribed`
+
+Confirmation of successful subscription to data updates.
+
+**Payload:**
+
+```json
+{
+  "entity": "products",
+  "filters": { "category": "electronics" },
+  "room": "data:products:category:electronics"
+}
+```
+
+### Client Events (Sent by Client)
+
+#### `data:subscribe`
+
+Subscribe to real-time updates for a specific entity.
+
+**Emit:**
+
+```javascript
+socket.emit('data:subscribe', {
+  entity: 'products',
+  filters: { category: 'electronics' }
+});
+
+// Listen for subscription confirmation
+socket.on('data:subscribed', (confirmation) => {
+  console.log('Subscribed to:', confirmation.room);
+});
+```
+
+**Payload:**
+
+```json
+{
+  "entity": "products",
+  "filters": {
+    "category": "electronics"
+  }
+}
+```
+
+**Notes:**
+- Filters are optional
+- Multiple subscriptions allowed per connection
+- Updates are sent to the room automatically
+
+#### `notification:read`
+
+Mark a notification as read.
+
+**Emit:**
+
+```javascript
+socket.emit('notification:read', {
+  notificationId: 'notif_123'
+});
+
+// Listen for acknowledgment
+socket.on('notification:read:ack', (ack) => {
+  console.log('Notification marked as read:', ack.notificationId);
+});
+```
+
+**Payload:**
+
+```json
+{
+  "notificationId": "notif_123"
+}
+```
+
+#### `user:typing`
+
+Broadcast typing status to a room.
+
+**Emit:**
+
+```javascript
+socket.emit('user:typing', {
+  roomId: 'chat-room-1'
+});
+```
+
+**Payload:**
+
+```json
+{
+  "roomId": "chat-room-1"
+}
+```
+
+**Notes:**
+- Broadcast to all users in the room except sender
+- Typically used for chat-like features
+
+### Rate Limiting
+
+WebSocket connections are rate-limited to prevent abuse:
+
+- **Limit:** 100 messages per minute per connection
+- **Window:** 60 seconds (rolling window)
+- **Exceeded:** Connection receives error event
+
+**Error Response:**
+
+```json
+{
+  "message": "Rate limit exceeded"
+}
+```
+
+**Handling:**
+
+```javascript
+socket.on('error', (error) => {
+  if (error.message === 'Rate limit exceeded') {
+    console.warn('Slow down! Too many messages sent.');
+  }
+});
+```
+
+### Offline Message Queuing
+
+Messages sent to offline users are automatically queued in Redis:
+
+- **Storage:** Redis lists
+- **TTL:** 7 days
+- **Delivery:** Automatic on reconnection
+- **Max Size:** No explicit limit (managed by Redis)
+
+**Automatic Delivery:**
+
+When a user reconnects, all queued notifications are automatically sent:
+
+```javascript
+socket.on('notification', (notification) => {
+  if (notification.queuedAt) {
+    console.log('Offline message:', notification);
+  }
+});
+```
+
+### WebSocket Statistics
+
+Get real-time connection statistics.
+
+#### `GET /api/websocket/stats`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "stats": {
+    "totalConnections": 25,
+    "connectedUsers": 18,
+    "activeRooms": 12
+  }
+}
+```
+
+**Fields:**
+- `totalConnections` - Total active WebSocket connections
+- `connectedUsers` - Number of unique connected users
+- `activeRooms` - Number of active subscription rooms
+
+### Complete Example
+
+```javascript
+import { io } from 'socket.io-client';
+
+// Connect with authentication
+const socket = io('http://localhost:3000', {
+  auth: {
+    token: localStorage.getItem('accessToken')
+  }
+});
+
+// Connection events
+socket.on('connect', () => {
+  console.log('Connected to WebSocket');
+});
+
+socket.on('connected', (data) => {
+  console.log('Connection confirmed:', data);
+  
+  // Subscribe to product updates
+  socket.emit('data:subscribe', {
+    entity: 'products',
+    filters: { category: 'electronics' }
+  });
+});
+
+// Listen for data updates
+socket.on('data:updated', (update) => {
+  console.log('Data updated:', update);
+  // Update UI with new data
+});
+
+// Listen for notifications
+socket.on('notification', (notification) => {
+  console.log('New notification:', notification);
+  // Show notification to user
+  
+  // Mark as read
+  socket.emit('notification:read', {
+    notificationId: notification.id
+  });
+});
+
+// User presence
+socket.on('user:online', (status) => {
+  console.log(`User ${status.userId} is ${status.status}`);
+  // Update user list in UI
+});
+
+// Error handling
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error.message);
+});
+
+socket.on('error', (error) => {
+  console.error('Socket error:', error);
+});
+
+// Disconnection
+socket.on('disconnect', (reason) => {
+  console.log('Disconnected:', reason);
+  // Socket.IO will automatically reconnect
+});
+```
+
+### Best Practices
+
+1. **Authentication**
+   - Always include a valid JWT token
+   - Refresh tokens before they expire
+   - Handle authentication errors gracefully
+
+2. **Rate Limiting**
+   - Batch updates when possible
+   - Avoid sending rapid consecutive messages
+   - Implement client-side throttling
+
+3. **Connection Management**
+   - Let Socket.IO handle reconnection automatically
+   - Clean up event listeners on component unmount
+   - Handle connection state in your UI
+
+4. **Error Handling**
+   - Always listen for `connect_error` and `error` events
+   - Implement retry logic for failed operations
+   - Show user-friendly error messages
+
+5. **Performance**
+   - Subscribe only to necessary data streams
+   - Unsubscribe when no longer needed
+   - Use filters to reduce message volume
+
+### Troubleshooting
+
+**Connection Fails:**
+- Verify JWT token is valid and not expired
+- Check WebSocket URL is correct
+- Ensure CORS is configured properly
+
+**Not Receiving Updates:**
+- Verify subscription with `data:subscribed` event
+- Check filters match your data
+- Ensure you're in the correct room
+
+**Rate Limit Exceeded:**
+- Reduce message frequency
+- Implement client-side throttling
+- Check for message loops
+
+---
+
 ## 🚀 Future Endpoints
 
 ### User Management
@@ -1532,6 +2013,6 @@ All API requests are logged with:
 
 ---
 
-**Last Updated:** 2025-01-03  
+**Last Updated:** 2025-01-04  
 **API Version:** 1.0.0  
-**Documentation Version:** 1.0.0
+**Documentation Version:** 1.1.0 (WebSocket support added)

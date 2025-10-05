@@ -4,7 +4,7 @@
 [![Build](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/build.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/build.yml)
 [![CodeQL](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/codeql.yml/badge.svg)](https://github.com/xLabInternet/xRatEcosystem/actions/workflows/codeql.yml)
 [![Coverage](https://img.shields.io/badge/coverage-82.2%25-brightgreen.svg)](https://github.com/xLabInternet/xRatEcosystem)
-[![Tests](https://img.shields.io/badge/tests-205%20passing-brightgreen.svg)](https://github.com/xLabInternet/xRatEcosystem)
+[![Tests](https://img.shields.io/badge/tests-220%20passing-brightgreen.svg)](https://github.com/xLabInternet/xRatEcosystem)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/docker-%3E%3D20.10-blue.svg)](https://www.docker.com/)
@@ -30,16 +30,18 @@ O **xRat Ecosystem** é um ambiente de desenvolvimento totalmente containerizado
 ✅ Health checks para todos os serviços  
 ✅ Persistência de dados com volumes Docker  
 ✅ Hot-reload para desenvolvimento  
-✅ **Cobertura de testes profissional com 205 testes passando**
+✅ **WebSocket real-time communication** com Socket.IO  
+✅ **Cobertura de testes profissional com 220 testes passando**
 
 ### 🧪 Status dos Testes
 
 - **🎯 Cobertura Total**: 82.2% (acima do threshold recomendado)
-- **📊 Total de Testes**: 205 testes executando com sucesso
-- **⚡ Performance**: 2.3s tempo de execução
+- **📊 Total de Testes**: 220 testes executando com sucesso
+- **⚡ Performance**: 3.0s tempo de execução
 - **🔧 Middleware**: 100% de cobertura (auth, rateLimiter, requestLogger)
 - **📦 Models**: Cobertura significativa (Data: 75%, User: 59%)
-- **✅ Test Suites**: 14 suítes de teste implementadas
+- **🔌 WebSocket**: 15 testes de unidade para Socket.IO
+- **✅ Test Suites**: 15 suítes de teste implementadas
 
 ---
 
@@ -73,9 +75,12 @@ xRatEcosystem/
 │   │   │   └── dataRoutes.js     # Rotas de dados
 │   │   ├── 📁 services/          # Serviços de negócio
 │   │   │   └── dataService.js    # Serviço de dados
-│   │   └── 📁 utils/             # Utilitários
-│   │       ├── jwt.js            # Utilities JWT
-│   │       └── validation.js     # Validações
+│   │   ├── 📁 utils/             # Utilitários
+│   │   │   ├── jwt.js            # Utilities JWT
+│   │   │   └── validation.js     # Validações
+│   │   └── 📁 websocket/         # WebSocket real-time
+│   │       ├── socketService.js  # Serviço Socket.IO
+│   │       └── index.js          # Exportações
 │   ├── 📁 __tests__/             # Testes principais
 │   │   ├── 📁 integration/       # Testes de integração
 │   │   │   ├── api.test.js       # Testes gerais da API
@@ -86,6 +91,8 @@ xRatEcosystem/
 │   │   └── 📁 unit/              # Testes unitários
 │   │       ├── auth.test.js      # Middleware auth
 │   │       ├── logger.test.js    # Sistema de logging
+│   │       ├── 📁 websocket/     # Testes WebSocket
+│   │       │   └── socketService.test.js # Serviço Socket.IO
 │   │       ├── rateLimiter.test.js # Rate limiter
 │   │       ├── requestLogger.test.js # Request logger
 │   │       └── 📁 models/        # Testes de modelos
@@ -659,6 +666,7 @@ Veja também:
 
 - [📖 Architecture](docs/ARCHITECTURE.md) - Arquitetura do sistema
 - [📡 API Documentation](docs/API.md) - Documentação dos endpoints
+- [🔌 WebSocket Guide](docs/WEBSOCKET.md) - Real-time communication
 - [🧪 Testing Guide](docs/TESTING.md) - Guia de testes
 - [🤝 Contributing](docs/CONTRIBUTING.md) - Como contribuir
 - [🚀 Deployment](docs/DEPLOYMENT.md) - Guia de deployment
@@ -687,17 +695,24 @@ Agradecimentos a todos que contribuíram para este projeto:
 
 - ✅ **Fase 1:** Setup inicial e infraestrutura básica - **Completo**
 - ✅ **Fase 2:** Testes, documentação e CI/CD - **Completo**
-- ✅ **Fase 2.5:** Comprehensive Testing Suite - **Completo** (205 testes)
+- ✅ **Fase 2.5:** Comprehensive Testing Suite - **Completo** (220 testes)
 - 🟡 **Fase 3:** Production Features (Health Checks) - **Em Progresso**
 - 🟡 **Fase 4:** Authentication System (JWT Backend + UI) - **Em Progresso**
 - ⏳ **Fase 5:** Data Management API - **Planejado**
-- ⏳ **Fase 6:** WebSocket & Real-time Features - **Planejado**
+- ✅ **Fase 6:** WebSocket & Real-time Features - **Completo**
 
 ### 🎯 Últimas Conquistas
 
+- **Issue #20** - WebSocket Real-time Communication ✅
+  - Socket.IO v4.7.5 integration
+  - JWT authentication for WebSocket
+  - Room-based messaging system
+  - Offline message queuing with Redis
+  - Rate limiting (100 msgs/min)
+  - 15 comprehensive unit tests
 - **PR #36** - Middleware Testing Suite (100% coverage) ✅
 - **PR #37** - Model Testing Suite (significativo aumento de coverage) ✅
-- **205 testes** implementados com sucesso
+- **220 testes** implementados com sucesso
 - **82.2% cobertura** total do backend
 - **Middleware**: 100% de cobertura (auth, rateLimiter, requestLogger)
 - **Models**: Data.js (75%), User.js (59%)
