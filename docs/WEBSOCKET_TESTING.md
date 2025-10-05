@@ -4,7 +4,7 @@
 
 This document provides comprehensive guidance on testing the xRat Ecosystem WebSocket implementation, covering unit tests, integration tests, and advanced testing patterns.
 
-**📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
+**📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./websocket-performance.md)
 
 ## Test Coverage Summary
 
@@ -571,7 +571,7 @@ For comprehensive performance and stress testing documentation, including:
 - Resource exhaustion scenarios
 - Production performance benchmarks
 
-**See**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
+**See**: [WebSocket Performance Testing Guide](./websocket-performance.md)
 
 ### Quick Start: Performance Tests
 
