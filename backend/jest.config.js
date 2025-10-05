@@ -10,6 +10,10 @@ module.exports = {
     '!**/node_modules/**',
   ],
   testMatch: ['**/__tests__/**/*.js', '**/*.test.js'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/__tests__/performance/', // Exclude performance tests from regular runs
+  ],
   coverageThreshold: {
     global: {
       branches: 80,

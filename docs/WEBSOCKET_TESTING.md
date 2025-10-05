@@ -4,6 +4,8 @@
 
 This document provides comprehensive guidance on testing the xRat Ecosystem WebSocket implementation, covering unit tests, integration tests, and advanced testing patterns.
 
+**📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
+
 ## Test Coverage Summary
 
 ### Current Coverage Metrics
@@ -550,11 +552,38 @@ When adding new WebSocket features:
 - [Socket.IO Client Testing](https://socket.io/docs/v4/client-api/)
 - [xRat WebSocket Documentation](./WEBSOCKET.md)
 
+## Performance & Stress Testing
+
+For comprehensive performance and stress testing documentation, including:
+- Connection load testing (1,000+ concurrent connections)
+- Memory leak detection and management
+- Message throughput and latency testing
+- Resource exhaustion scenarios
+- Production performance benchmarks
+
+**See**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
+
+### Quick Start: Performance Tests
+
+```bash
+# Run all performance tests
+npm run test:performance
+
+# Run specific performance test suites
+npm run test:performance:stress      # Connection stress tests
+npm run test:performance:memory      # Memory leak detection
+npm run test:performance:throughput  # Message throughput tests
+npm run test:performance:resources   # Resource exhaustion tests
+```
+
+**Note**: Performance tests are excluded from regular test runs to avoid long CI times. They should be run periodically or before major releases.
+
 ## Conclusion
 
 The xRat Ecosystem WebSocket implementation has achieved **production-grade test coverage** with:
 
-- ✅ 150 comprehensive tests
+- ✅ 150 comprehensive functional tests
+- ✅ 38 performance & stress tests (NEW)
 - ✅ 93.77% statement coverage
 - ✅ 91.04% branch coverage
 - ✅ 96.55% line coverage
@@ -562,5 +591,6 @@ The xRat Ecosystem WebSocket implementation has achieved **production-grade test
 - ✅ Complete error recovery testing
 - ✅ Rate limiting enforcement verified
 - ✅ Real Socket.IO integration tests
+- ✅ Production-ready performance benchmarks (NEW)
 
 This testing suite ensures **reliable, secure, and performant** real-time communication in the xRat Ecosystem.
