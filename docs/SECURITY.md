@@ -4,14 +4,20 @@
 
 The xRat Ecosystem takes security seriously. This document outlines our security policies, best practices, and procedures for reporting vulnerabilities.
 
+**Last Updated**: October 5, 2025  
+**Security Incident**: API Key exposure remediated (details below)
+
 ---
 
 ## 📋 Table of Contents
 
 - [Supported Versions](#supported-versions)
+- [Recent Security Incident](#recent-security-incident)
+- [API Key Rotation Procedure](#api-key-rotation-procedure)
 - [Reporting a Vulnerability](#reporting-a-vulnerability)
 - [Security Best Practices](#security-best-practices)
 - [Security Features](#security-features)
+- [Automated Security Scanning](#automated-security-scanning)
 - [Known Security Considerations](#known-security-considerations)
 - [Security Checklist](#security-checklist)
 
@@ -21,10 +27,143 @@ The xRat Ecosystem takes security seriously. This document outlines our security
 
 We release security updates for the following versions:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version | Supported          | Notes                  |
+| ------- | ------------------ | ---------------------- |
+| 1.1.x   | :white_check_mark: | Current stable release |
+| 1.0.x   | :white_check_mark: | Security fixes only    |
+| < 1.0   | :x:                | No longer supported    |
+
+---
+
+## 🚨 Recent Security Incident
+
+### API Key Exposure (October 4-5, 2025)
+
+**Status**: ✅ RESOLVED
+
+**Summary**: A Google Gemini API key was inadvertently exposed in `bin/gemini-helper.js` (commit `ab62be6`).
+
+**Timeline**:
+
+- **October 4, 2025**: API key committed to repository in PR #30
+- **October 5, 2025**: Vulnerability discovered and remediated
+
+**Actions Taken**:
+
+1. ✅ Removed hardcoded API key from codebase (commit `80724b4`)
+2. ✅ Added mandatory environment variable validation
+3. ✅ Implemented secret scanning workflows (TruffleHog, Gitleaks, detect-secrets)
+4. ✅ Added pre-commit hooks for secret detection
+5. ⚠️ **ACTION REQUIRED**: Original API key must be rotated
+
+**Affected Files**:
+
+- `bin/gemini-helper.js` (fixed)
+- `.gemini/settings.json` (local only, not in repository)
+
+**Remediation Commits**:
+
+- Security fix: `80724b4`
+- Secret scanning: `[pending commit]`
+
+---
+
+## 🔑 API Key Rotation Procedure
+
+### When to Rotate API Keys
+
+Immediately rotate API keys if:
+
+- ✅ Key is committed to version control
+- ✅ Key is shared in plain text (email, chat, etc.)
+- ✅ Suspicious activity detected on the key
+- ✅ Team member with key access leaves
+- ✅ Regular rotation schedule (recommended: every 90 days)
+
+### How to Rotate Google Gemini API Key
+
+1. **Revoke Compromised Key**:
+
+   ```bash
+   # Visit Google AI Studio
+   https://aistudio.google.com/app/apikey
+
+   # Steps:
+   # 1. Sign in with your Google account
+   # 2. Locate the compromised key
+   # 3. Click "Delete" or "Revoke"
+   # 4. Confirm deletion
+   ```
+
+2. **Create New API Key**:
+
+   ```bash
+   # In Google AI Studio:
+   # 1. Click "Create API Key"
+   # 2. Select appropriate project
+   # 3. Copy the new key immediately
+   # 4. Store securely (never commit to git!)
+   ```
+
+3. **Update Local Environment**:
+
+   ```bash
+   # Set environment variable
+   export GEMINI_API_KEY="your-new-api-key-here"
+
+   # Make it permanent (choose one):
+
+   # For bash:
+   echo 'export GEMINI_API_KEY="your-new-key"' >> ~/.bashrc
+   source ~/.bashrc
+
+   # For zsh:
+   echo 'export GEMINI_API_KEY="your-new-key"' >> ~/.zshrc
+   source ~/.zshrc
+
+   # For fish:
+   set -Ux GEMINI_API_KEY "your-new-key"
+   ```
+
+4. **Update GitHub Secrets** (if applicable):
+
+   ```bash
+   # Navigate to:
+   https://github.com/xLabInternet/xRatEcosystem/settings/secrets/actions
+
+   # Update secret:
+   # Name: GEMINI_API_KEY
+   # Value: [your-new-key]
+   ```
+
+5. **Verify New Key**:
+
+   ```bash
+   # Test the script
+   node bin/gemini-helper.js
+
+   # Should connect successfully
+   ```
+
+6. **Document Rotation**:
+   ```bash
+   # Update internal security log with:
+   # - Date of rotation
+   # - Reason for rotation
+   # - Who performed rotation
+   # - Verification that old key was revoked
+   ```
+
+### Other API Keys Rotation
+
+For other API keys (GitHub, Docker, etc.), follow similar procedures:
+
+1. Generate new key in respective service
+2. Update environment variables
+3. Update GitHub Secrets
+4. Revoke old key
+5. Test and verify
+6. Document the change
 
 ---
 
@@ -73,6 +212,214 @@ We follow **responsible disclosure**:
 4. Security advisory is published
 5. Fix is released
 6. Public disclosure after users have time to update (typically 7-14 days)
+
+---
+
+## 🤖 Automated Security Scanning
+
+### Overview
+
+The xRat Ecosystem implements multiple layers of automated security scanning to prevent secrets exposure and detect vulnerabilities.
+
+### Secret Detection Tools
+
+#### 1. **TruffleHog** (GitHub Actions)
+
+- **What it does**: Scans git history for high-entropy secrets and verified credentials
+- **When it runs**: Every push, pull request, and weekly
+- **Workflow**: `.github/workflows/secret-scan.yml`
+- **Features**:
+  - Detects 700+ secret types
+  - Verifies credentials against live services
+  - Scans entire git history
+  - Only alerts on verified secrets (reduces false positives)
+
+#### 2. **Gitleaks** (GitHub Actions)
+
+- **What it does**: Fast, configurable secret scanner
+- **When it runs**: Every push and pull request
+- **Workflow**: `.github/workflows/secret-scan.yml`
+- **Features**:
+  - Pre-configured rules for common secrets
+  - SARIF output for GitHub Security tab
+  - Customizable patterns
+
+#### 3. **detect-secrets** (Pre-commit + CI)
+
+- **What it does**: Baseline-based secret detection
+- **When it runs**:
+  - Pre-commit hook (local)
+  - GitHub Actions (CI)
+  - PR checks
+- **Configuration**: `.secrets.baseline`
+- **Features**:
+  - Creates baseline of "known" secrets
+  - Only alerts on new secrets
+  - Low false positive rate
+  - Integrated with Husky pre-commit hooks
+
+### Workflow Integration
+
+#### Secret Scanning Workflow
+
+```yaml
+# Runs on: push, pull_request, schedule (weekly)
+File: .github/workflows/secret-scan.yml
+
+Jobs: 1. TruffleHog scan (verified secrets only)
+  2. Gitleaks scan (all patterns)
+  3. detect-secrets baseline check
+  4. Summary report
+```
+
+#### PR Checks Integration
+
+```yaml
+# Blocks PRs with exposed secrets
+File: .github/workflows/pr-checks.yml
+
+Jobs:
+  secret-scan:
+    - detect-secrets baseline validation
+    - TruffleHog verified secrets check
+    - Fails PR if secrets detected
+```
+
+#### Pre-commit Hooks
+
+```bash
+# Prevents commits with secrets
+File: .husky/pre-commit
+
+Steps:
+  1. Run detect-secrets scan
+  2. Compare against baseline
+  3. Block commit if new secrets found
+  4. Run lint-staged for code quality
+```
+
+### How to Use
+
+#### For Developers
+
+**Before Committing:**
+
+```bash
+# Automatic via Husky pre-commit hook
+git commit -m "your message"
+
+# Manual scan:
+detect-secrets scan --baseline .secrets.baseline
+```
+
+**Update Baseline** (if false positive):
+
+```bash
+# Re-generate baseline
+detect-secrets scan > .secrets.baseline
+
+# Audit and mark false positives
+detect-secrets audit .secrets.baseline
+```
+
+**View Scan Results:**
+
+```bash
+# In GitHub Actions:
+# 1. Go to Actions tab
+# 2. Select "Secret Scanning" workflow
+# 3. View detailed results
+
+# Locally:
+detect-secrets scan --baseline .secrets.baseline --verbose
+```
+
+### Dependency Vulnerability Scanning
+
+#### GitHub Dependabot
+
+- **Automatic**: Enabled on repository
+- **Alerts**: Security tab → Dependabot alerts
+- **Auto-PRs**: Creates PRs to update vulnerable dependencies
+- **Configuration**: `.github/dependabot.yml` (if needed)
+
+#### npm audit
+
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Auto-fix (non-breaking)
+npm audit fix
+
+# Fix with breaking changes
+npm audit fix --force
+
+# View detailed report
+npm audit --json
+```
+
+### Security Monitoring
+
+#### GitHub Advanced Security (if enabled)
+
+- **Code Scanning**: CodeQL analysis
+- **Secret Scanning**: GitHub's built-in scanner
+- **Dependency Review**: PR-based dependency analysis
+- **Security Overview**: Dashboard with all alerts
+
+### Incident Response
+
+If a secret is detected:
+
+1. **Immediate Actions**:
+
+   ```bash
+   # Stop! Do not force push to hide it
+   # Secrets remain in git history even after deletion
+
+   # 1. Revoke/rotate the exposed secret immediately
+   # 2. Update local environment variables
+   # 3. Update GitHub Secrets (if applicable)
+   ```
+
+2. **Fix the Code**:
+
+   ```bash
+   # Remove hardcoded secret
+   # Replace with environment variable
+   git add <fixed-files>
+   git commit -m "security: Remove exposed secret"
+   ```
+
+3. **Verify Clean History**:
+
+   ```bash
+   # Scan git history
+   git log -p --all -S 'your-secret-pattern'
+
+   # Use TruffleHog
+   trufflehog git file://. --only-verified
+   ```
+
+4. **Document the Incident**:
+   - Update SECURITY.md with incident details
+   - Note which secret was exposed
+   - Document remediation steps
+   - Set up monitoring for the new secret
+
+### Prevention Checklist
+
+- ✅ Never commit `.env` files
+- ✅ Use `.gitignore` for sensitive files
+- ✅ Store secrets in environment variables
+- ✅ Use GitHub Secrets for CI/CD
+- ✅ Enable pre-commit hooks (Husky)
+- ✅ Review PRs for hardcoded secrets
+- ✅ Run `npm audit` regularly
+- ✅ Monitor Dependabot alerts
+- ✅ Rotate secrets periodically (every 90 days)
+- ✅ Use strong, randomly generated secrets
 
 ---
 

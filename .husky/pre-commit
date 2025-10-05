@@ -1,1 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run detect-secrets before committing
+echo "🔍 Scanning for secrets..."
+detect-secrets scan --baseline .secrets.baseline || {
+  echo "⚠️  Potential secrets detected!"
+  echo "Run: detect-secrets audit .secrets.baseline"
+  exit 1
+}
+
 npx lint-staged

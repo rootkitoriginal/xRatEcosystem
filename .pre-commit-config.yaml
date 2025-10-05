@@ -1,0 +1,67 @@
+# Pre-commit Configuration for Secret Detection
+# Install: pip install pre-commit
+# Setup: pre-commit install
+
+repos:
+  # Detect secrets before committing
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args:
+          - '--baseline'
+          - '.secrets.baseline'
+          - '--exclude-files'
+          - 'package-lock.json'
+          - '--exclude-files'
+          - 'node_modules/'
+          - '--exclude-files'
+          - 'coverage/'
+          - '--exclude-files'
+          - '.secrets.baseline'
+
+  # Check for merge conflicts
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+        args: ['--unsafe'] # Allow custom tags in YAML
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: mixed-line-ending
+
+  # Prevent commits to main/master
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: no-commit-to-branch
+        args: ['--branch', 'main', '--branch', 'master']
+        stages: [commit]
+
+  # ESLint for JavaScript/TypeScript
+  - repo: local
+    hooks:
+      - id: eslint-backend
+        name: ESLint Backend
+        entry: bash -c 'cd backend && npm run lint'
+        language: system
+        files: '^backend/.*\.(js|jsx|ts|tsx)$'
+        pass_filenames: false
+
+      - id: eslint-frontend
+        name: ESLint Frontend
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: '^frontend/.*\.(js|jsx|ts|tsx)$'
+        pass_filenames: false
+
+  # Prettier for formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: '\.(js|jsx|ts|tsx|json|css|md|yml|yaml)$'
+        exclude: 'package-lock.json|.secrets.baseline'
