@@ -2,7 +2,6 @@ const request = require('supertest');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { authenticate } = require('../../../src/middleware/auth');
-const { authLimiter } = require('../../../src/middleware/rateLimiter');
 
 // Mock the auth middleware to avoid real authentication
 jest.mock('../../../src/middleware/auth');
@@ -31,7 +30,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
       });
 
       // Mock authenticate to simulate login attempts
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         // Simulate failed authentication
         if (req.body.password !== 'correct_password') {
           return res.status(401).json({
@@ -114,7 +113,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
         legacyHeaders: false,
       });
 
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         res.status(401).json({ success: false, message: 'Unauthorized' });
       });
 
@@ -158,7 +157,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
         message: { success: false, message: 'Rate limit exceeded' },
       });
 
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         res.status(401).json({ success: false });
       });
 
@@ -206,7 +205,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
         message: { success: false, message: 'Too many attempts' },
       });
 
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         const username = req.body.username;
 
         // Track failed attempts per username
@@ -279,7 +278,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
         message: { success: false, message: 'Rate limited' },
       });
 
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         res.status(401).json({ success: false });
       });
 
@@ -343,7 +342,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
         message: { success: false, message: 'Too many requests' },
       });
 
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         // Simulate constant time response
         setTimeout(() => {
           res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -382,7 +381,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
         legacyHeaders: false,
       });
 
-      authenticate.mockImplementation((req, res, next) => {
+      authenticate.mockImplementation((req, res, _next) => {
         res.status(401).json({ success: false });
       });
 

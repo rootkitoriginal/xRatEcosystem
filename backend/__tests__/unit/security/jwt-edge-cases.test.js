@@ -1,7 +1,6 @@
 const { authenticate, optionalAuth } = require('../../../src/middleware/auth');
 const { verifyAccessToken } = require('../../../src/utils/jwt');
 const User = require('../../../src/models/User');
-const jwt = require('jsonwebtoken');
 
 // Mock dependencies
 jest.mock('../../../src/utils/jwt');
