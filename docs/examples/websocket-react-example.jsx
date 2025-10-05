@@ -67,11 +67,12 @@ export function useWebSocket(token, url = 'http://localhost:3000') {
 }
 
 /**
- * Custom hook for data subscriptions
+ * Custom hook for data subscriptions with validation
  */
 export function useDataSubscription(socket, entity, filters = {}) {
   const [data, setData] = useState([]);
   const [subscribed, setSubscribed] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!socket || !entity) return;
@@ -79,11 +80,20 @@ export function useDataSubscription(socket, entity, filters = {}) {
     // Subscribe to entity
     socket.emit('data:subscribe', { entity, filters });
 
-    // Listen for subscription confirmation
+    // Handle subscription confirmation
     const handleSubscribed = (confirmation) => {
       if (confirmation.entity === entity) {
         setSubscribed(true);
+        setError(null);
         console.log('Subscribed to', confirmation.room);
+      }
+    };
+
+    // Handle validation errors
+    const handleValidationError = (validationError) => {
+      if (validationError.event === 'data:subscribe') {
+        setError(validationError.error);
+        setSubscribed(false);
       }
     };
 
@@ -95,16 +105,18 @@ export function useDataSubscription(socket, entity, filters = {}) {
     };
 
     socket.on('data:subscribed', handleSubscribed);
+    socket.on('validation:error', handleValidationError);
     socket.on('data:updated', handleUpdate);
 
     // Cleanup
     return () => {
       socket.off('data:subscribed', handleSubscribed);
+      socket.off('validation:error', handleValidationError);
       socket.off('data:updated', handleUpdate);
     };
   }, [socket, entity, filters]);
 
-  return { data, subscribed };
+  return { data, subscribed, error };
 }
 
 /**
@@ -187,6 +199,91 @@ export function useUserPresence(socket) {
   }, [socket]);
 
   return onlineUsers;
+}
+
+/**
+ * Custom hook for room management
+ */
+export function useRoom(socket, roomId) {
+  const [joined, setJoined] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!socket || !roomId) return;
+
+    const handleJoined = (data) => {
+      if (data.room === roomId) {
+        setJoined(true);
+        setMembers(data.members || []);
+        setError(null);
+        console.log(`Joined room: ${roomId}`);
+      }
+    };
+
+    const handleLeft = (data) => {
+      if (data.room === roomId) {
+        setJoined(false);
+        setMembers([]);
+        console.log(`Left room: ${roomId}`);
+      }
+    };
+
+    const handleUserJoined = (data) => {
+      if (data.room === roomId) {
+        setMembers((prev) => [...prev, data.userId]);
+        console.log(`User ${data.userId} joined ${roomId}`);
+      }
+    };
+
+    const handleUserLeft = (data) => {
+      if (data.room === roomId) {
+        setMembers((prev) => prev.filter((id) => id !== data.userId));
+        console.log(`User ${data.userId} left ${roomId}`);
+      }
+    };
+
+    const handleError = (err) => {
+      if (err.room === roomId) {
+        setError(err.message);
+        setJoined(false);
+        console.error(`Room error for ${roomId}:`, err.message);
+      }
+    };
+
+    // Subscribe to room events
+    socket.on('room:joined', handleJoined);
+    socket.on('room:left', handleLeft);
+    socket.on('user:joined', handleUserJoined);
+    socket.on('user:left', handleUserLeft);
+    socket.on('error', handleError);
+
+    // Auto-join room on mount
+    socket.emit('room:join', { roomId });
+
+    return () => {
+      // Leave room and cleanup on unmount
+      if (joined) {
+        socket.emit('room:leave', { roomId });
+      }
+      socket.off('room:joined', handleJoined);
+      socket.off('room:left', handleLeft);
+      socket.off('user:joined', handleUserJoined);
+      socket.off('user:left', handleUserLeft);
+      socket.off('error', handleError);
+    };
+  }, [socket, roomId, joined]);
+
+  const sendMessage = useCallback(
+    (message) => {
+      if (socket && joined) {
+        socket.emit('room:message', { roomId, message });
+      }
+    },
+    [socket, roomId, joined]
+  );
+
+  return { joined, members, error, sendMessage };
 }
 
 /**
