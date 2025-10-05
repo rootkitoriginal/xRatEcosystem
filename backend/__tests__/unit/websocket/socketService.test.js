@@ -1111,4 +1111,375 @@ describe('SocketService Unit Tests', () => {
       });
     });
   });
+
+  describe('Advanced Broadcasting and Notification', () => {
+    let mockSocket;
+
+    beforeEach(() => {
+      socketService = new SocketService(httpServer, mockRedisClient);
+
+      // Mock socket object
+      mockSocket = {
+        id: 'socket-123',
+        user: { _id: 'user-456', username: 'testuser', role: 'admin' },
+        join: jest.fn(),
+        leave: jest.fn(),
+        emit: jest.fn(),
+        to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+      };
+    });
+
+    describe('broadcastDataUpdate', () => {
+      test('should broadcast data update without authorization check', () => {
+        const { sanitizeObject } = require('../../../src/websocket/validators');
+        socketService.io.to = jest.fn().mockReturnValue({ emit: jest.fn() });
+
+        const entity = 'users';
+        const data = { id: '123', name: 'John Doe', status: 'active' };
+
+        socketService.broadcastDataUpdate(entity, data);
+
+        expect(socketService.io.to).toHaveBeenCalledWith('data:users');
+        expect(socketService.io.to().emit).toHaveBeenCalledWith('data:updated', {
+          entity: 'users',
+          data: data,
+          timestamp: expect.any(String),
+        });
+        expect(sanitizeObject).toHaveBeenCalledWith(data);
+      });
+
+      test('should broadcast with authorization when broadcaster provided', () => {
+        const { canBroadcastToRoom } = require('../../../src/websocket/authorization');
+        socketService.io.to = jest.fn().mockReturnValue({ emit: jest.fn() });
+
+        canBroadcastToRoom.mockReturnValue({ authorized: true });
+
+        const entity = 'products';
+        const data = { id: '456', name: 'Product A' };
+        const broadcaster = { _id: 'admin-123', username: 'admin', role: 'admin' };
+
+        socketService.broadcastDataUpdate(entity, data, broadcaster);
+
+        expect(canBroadcastToRoom).toHaveBeenCalledWith(broadcaster, 'data:products');
+        expect(socketService.io.to).toHaveBeenCalledWith('data:products');
+        expect(socketService.io.to().emit).toHaveBeenCalledWith('data:updated', {
+          entity: 'products',
+          data: data,
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should deny broadcast when authorization fails', () => {
+        const { canBroadcastToRoom } = require('../../../src/websocket/authorization');
+        socketService.io.to = jest.fn().mockReturnValue({ emit: jest.fn() });
+
+        canBroadcastToRoom.mockReturnValue({
+          authorized: false,
+          reason: 'Insufficient permissions',
+        });
+
+        const entity = 'admin-data';
+        const data = { id: '789', sensitive: 'info' };
+        const broadcaster = { _id: 'user-123', username: 'regularuser', role: 'user' };
+
+        socketService.broadcastDataUpdate(entity, data, broadcaster);
+
+        expect(canBroadcastToRoom).toHaveBeenCalledWith(broadcaster, 'data:admin-data');
+        expect(socketService.io.to).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('sendNotificationToUser', () => {
+      test('should send notification to online user with multiple connections', () => {
+        socketService.io.to = jest.fn().mockReturnValue({ emit: jest.fn() });
+
+        // User has multiple connections
+        socketService.connectedUsers.set('user-789', new Set(['socket-a', 'socket-b', 'socket-c']));
+
+        const notification = { type: 'info', message: 'New message received' };
+
+        socketService.sendNotificationToUser('user-789', notification);
+
+        // Should emit to all sockets
+        expect(socketService.io.to).toHaveBeenCalledTimes(3);
+        expect(socketService.io.to).toHaveBeenCalledWith('socket-a');
+        expect(socketService.io.to).toHaveBeenCalledWith('socket-b');
+        expect(socketService.io.to).toHaveBeenCalledWith('socket-c');
+        expect(socketService.io.to().emit).toHaveBeenCalledWith('notification', {
+          type: 'info',
+          message: 'New message received',
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should queue notification for offline user', async () => {
+        mockRedisClient.rPush.mockResolvedValue(1);
+        mockRedisClient.expire.mockResolvedValue(1);
+
+        const notification = { type: 'warning', message: 'System update scheduled' };
+
+        socketService.sendNotificationToUser('offline-user-123', notification);
+
+        // Wait for async queueing
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        expect(mockRedisClient.rPush).toHaveBeenCalledWith(
+          'notifications:queue:offline-user-123',
+          expect.stringContaining('"type":"warning"')
+        );
+        expect(mockRedisClient.expire).toHaveBeenCalledWith(
+          'notifications:queue:offline-user-123',
+          604800
+        );
+      });
+
+      test('should handle empty socket set for user', async () => {
+        mockRedisClient.rPush.mockResolvedValue(1);
+        mockRedisClient.expire.mockResolvedValue(1);
+
+        // User exists but has no sockets
+        socketService.connectedUsers.set('user-empty', new Set());
+
+        const notification = { type: 'info', message: 'Test notification' };
+
+        socketService.sendNotificationToUser('user-empty', notification);
+
+        // Wait for async queueing
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        expect(mockRedisClient.rPush).toHaveBeenCalled();
+      });
+    });
+
+    describe('broadcastUserStatus', () => {
+      test('should broadcast user online status', () => {
+        socketService.io.emit = jest.fn();
+
+        socketService.broadcastUserStatus('user-123', 'online');
+
+        expect(socketService.io.emit).toHaveBeenCalledWith('user:online', {
+          userId: 'user-123',
+          status: 'online',
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should broadcast user offline status', () => {
+        socketService.io.emit = jest.fn();
+
+        socketService.broadcastUserStatus('user-456', 'offline');
+
+        expect(socketService.io.emit).toHaveBeenCalledWith('user:online', {
+          userId: 'user-456',
+          status: 'offline',
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should broadcast custom status', () => {
+        socketService.io.emit = jest.fn();
+
+        socketService.broadcastUserStatus('user-789', 'away');
+
+        expect(socketService.io.emit).toHaveBeenCalledWith('user:online', {
+          userId: 'user-789',
+          status: 'away',
+          timestamp: expect.any(String),
+        });
+      });
+    });
+
+    describe('broadcastSystemHealth', () => {
+      test('should broadcast system health metrics', () => {
+        socketService.io.emit = jest.fn();
+
+        const metrics = {
+          cpu: 45.2,
+          memory: 67.8,
+          activeConnections: 1234,
+          uptime: 86400,
+        };
+
+        socketService.broadcastSystemHealth(metrics);
+
+        expect(socketService.io.emit).toHaveBeenCalledWith('system:health', {
+          status: 'ok',
+          metrics: metrics,
+          timestamp: expect.any(String),
+        });
+      });
+
+      test('should broadcast empty health metrics', () => {
+        socketService.io.emit = jest.fn();
+
+        socketService.broadcastSystemHealth({});
+
+        expect(socketService.io.emit).toHaveBeenCalledWith('system:health', {
+          status: 'ok',
+          metrics: {},
+          timestamp: expect.any(String),
+        });
+      });
+    });
+
+    describe('queueNotification', () => {
+      test('should queue notification with Redis', async () => {
+        mockRedisClient.rPush.mockResolvedValue(1);
+        mockRedisClient.expire.mockResolvedValue(1);
+
+        const notification = { type: 'error', message: 'Critical alert' };
+
+        await socketService.queueNotification('user-999', notification);
+
+        expect(mockRedisClient.rPush).toHaveBeenCalledWith(
+          'notifications:queue:user-999',
+          expect.stringContaining('"type":"error"')
+        );
+        expect(mockRedisClient.expire).toHaveBeenCalledWith('notifications:queue:user-999', 604800);
+      });
+
+      test('should handle Redis unavailable when queuing', async () => {
+        socketService.redisClient = null;
+
+        const notification = { type: 'info', message: 'Test' };
+
+        await socketService.queueNotification('user-888', notification);
+
+        // Should not crash
+        expect(mockRedisClient.rPush).not.toHaveBeenCalled();
+      });
+
+      test('should handle Redis error when queuing', async () => {
+        mockRedisClient.rPush.mockRejectedValue(new Error('Redis error'));
+
+        const notification = { type: 'warning', message: 'Test' };
+
+        await socketService.queueNotification('user-777', notification);
+
+        expect(mockRedisClient.rPush).toHaveBeenCalled();
+        // Should not crash, error should be logged
+      });
+    });
+  });
+
+  describe('Rate Limiting Edge Cases', () => {
+    beforeEach(() => {
+      socketService = new SocketService(httpServer, mockRedisClient);
+    });
+
+    test('should enforce rate limit of 100 requests per minute', () => {
+      const socketId = 'rate-test-socket';
+
+      // First 100 requests should pass
+      for (let i = 0; i < 100; i++) {
+        expect(socketService.checkRateLimit(socketId)).toBe(true);
+      }
+
+      // 101st request should fail
+      expect(socketService.checkRateLimit(socketId)).toBe(false);
+    });
+
+    test('should reset rate limit after time window', () => {
+      const socketId = 'reset-test-socket';
+
+      // Use up the limit
+      for (let i = 0; i < 100; i++) {
+        socketService.checkRateLimit(socketId);
+      }
+
+      // Should be rate limited
+      expect(socketService.checkRateLimit(socketId)).toBe(false);
+
+      // Manually reset the time window (simulate time passing)
+      const limiter = socketService.rateLimiters.get(socketId);
+      limiter.resetTime = Date.now() - 61000; // 61 seconds ago
+
+      // Should now allow requests again
+      expect(socketService.checkRateLimit(socketId)).toBe(true);
+    });
+
+    test('should track rate limits per socket independently', () => {
+      const socket1 = 'socket-1';
+      const socket2 = 'socket-2';
+
+      // Use up socket1 limit
+      for (let i = 0; i < 100; i++) {
+        socketService.checkRateLimit(socket1);
+      }
+
+      // Socket1 should be limited
+      expect(socketService.checkRateLimit(socket1)).toBe(false);
+
+      // Socket2 should still work
+      expect(socketService.checkRateLimit(socket2)).toBe(true);
+    });
+  });
+
+  describe('Connection Pool Management', () => {
+    beforeEach(() => {
+      socketService = new SocketService(httpServer, mockRedisClient);
+    });
+
+    test('should track multiple sockets for same user', () => {
+      const userId = 'multi-socket-user';
+
+      // Simulate multiple connections
+      if (!socketService.connectedUsers.has(userId)) {
+        socketService.connectedUsers.set(userId, new Set());
+      }
+
+      socketService.connectedUsers.get(userId).add('socket-1');
+      socketService.connectedUsers.get(userId).add('socket-2');
+      socketService.connectedUsers.get(userId).add('socket-3');
+
+      const stats = socketService.getStats();
+      expect(stats.connectedUsers).toBe(1);
+      expect(socketService.connectedUsers.get(userId).size).toBe(3);
+    });
+
+    test('should handle graceful disconnection cleanup', () => {
+      const mockSocket = {
+        id: 'cleanup-socket',
+        user: { _id: 'cleanup-user', username: 'cleanuptest' },
+      };
+
+      // Setup connection
+      socketService.connectedUsers.set('cleanup-user', new Set(['cleanup-socket']));
+      socketService.userRooms.set('cleanup-socket', new Set(['room1', 'room2']));
+      socketService.rateLimiters.set('cleanup-socket', { count: 50, resetTime: Date.now() });
+
+      // Mock broadcast
+      socketService.broadcastUserStatus = jest.fn();
+
+      // Disconnect
+      socketService.handleDisconnection(mockSocket);
+
+      // Verify cleanup
+      expect(socketService.connectedUsers.has('cleanup-user')).toBe(false);
+      expect(socketService.userRooms.has('cleanup-socket')).toBe(false);
+      expect(socketService.rateLimiters.has('cleanup-socket')).toBe(false);
+      expect(socketService.broadcastUserStatus).toHaveBeenCalledWith('cleanup-user', 'offline');
+    });
+
+    test('should not broadcast offline when user has other connections', () => {
+      const mockSocket = {
+        id: 'socket-to-disconnect',
+        user: { _id: 'active-user', username: 'activetest' },
+      };
+
+      // User has multiple connections
+      socketService.connectedUsers.set(
+        'active-user',
+        new Set(['socket-to-disconnect', 'socket-still-active'])
+      );
+      socketService.broadcastUserStatus = jest.fn();
+
+      // Disconnect one socket
+      socketService.handleDisconnection(mockSocket);
+
+      // User should still be marked as having connections
+      expect(socketService.connectedUsers.get('active-user').size).toBe(1);
+      expect(socketService.broadcastUserStatus).not.toHaveBeenCalled();
+    });
+  });
 });
