@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import UserProfile from '../components/auth/UserProfile';
 import SystemStatus from '../components/realtime/SystemStatus';
 import { useWebSocket } from '../components/realtime/WebSocketProvider';
+import DataSummaryWidget from '../components/widgets/DataSummaryWidget';
+import RecentActivityWidget from '../components/widgets/RecentActivityWidget';
 import '../App.css';
+import './Dashboard.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -75,6 +78,13 @@ function Dashboard() {
       <main className="main">
         <section style={{ marginBottom: '2rem' }}>
           <UserProfile />
+        </section>
+
+        <section className="widgets-section">
+          <div className="widgets-grid">
+            <DataSummaryWidget />
+            <RecentActivityWidget />
+          </div>
         </section>
 
         <section style={{ marginBottom: '2rem' }}>
