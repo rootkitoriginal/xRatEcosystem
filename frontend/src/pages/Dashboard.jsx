@@ -87,9 +87,12 @@ function Dashboard() {
           </div>
         </section>
 
-        <section style={{ marginBottom: '2rem' }}>
+        <section style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <Link to="/data" className="data-link">
             <button className="submit-btn">📊 Go to Data Management</button>
+          </Link>
+          <Link to="/profile" className="data-link">
+            <button className="submit-btn">👤 My Profile</button>
           </Link>
         </section>
 
