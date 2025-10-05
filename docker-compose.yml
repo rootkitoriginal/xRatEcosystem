@@ -4,6 +4,9 @@ services:
     image: mongo:7
     container_name: xrat-mongodb
     restart: unless-stopped
+    networks:
+      xrat-internal:
+        ipv4_address: 172.22.0.11
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-xrat_secret_2025}
@@ -11,13 +14,11 @@ services:
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
-    networks:
-      - xrat-internal
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    #healthcheck:
+    #  test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+    #  interval: 10s
+    #  timeout: 5s
+    #  retries: 5
 
   # Redis - Internal only, not exposed
   redis:
@@ -29,21 +30,19 @@ services:
       - redis_data:/data
     networks:
       - xrat-internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    #healthcheck:
+    #  test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+    #  interval: 10s
+    #  timeout: 5s
+    #  retries: 5
 
-  # Backend - Exposed port
+  # Backend - Internal only, not exposed
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: xrat-backend
     restart: unless-stopped
-    ports:
-      - "${BACKEND_PORT:-3000}:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
@@ -53,27 +52,26 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-xrat_redis_2025}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     depends_on:
-      mongodb:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mongodb
+      - redis
     networks:
       - xrat-internal
     volumes:
       - ./backend:/app
       - /app/node_modules
 
-  # Frontend - Exposed port
+  # Frontend - Internal only, not exposed
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: xrat-frontend
     restart: unless-stopped
-    ports:
-      - "${FRONTEND_PORT:-5173}:5173"
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+      VITE_API_URL: /api # Use relative path for Nginx proxy
+      VITE_USE_MOCK_AUTH: ${VITE_USE_MOCK_AUTH:-false}
+      VITE_USE_MOCK_DATA: ${VITE_USE_MOCK_DATA:-false}
+      VITE_USE_MOCK_WEBSOCKET: ${VITE_USE_MOCK_WEBSOCKET:-false}
     depends_on:
       - backend
     networks:
@@ -84,11 +82,27 @@ services:
     stdin_open: true
     tty: true
 
+  # Nginx Reverse Proxy - Exposed via static IP
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: xrat-nginx
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      xrat-internal:
+        ipv4_address: 172.22.0.10
+
 networks:
   xrat-internal:
     name: xrat-network
     driver: bridge
-    internal: false
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
 
 volumes:
   mongodb_data:
