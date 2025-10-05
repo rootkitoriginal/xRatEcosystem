@@ -7,8 +7,15 @@
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAad7j529fLDYA9IiTabQIOQ5jVv-cdLuo';
+// SECURITY: API key must be provided via environment variable
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+
+if (!GEMINI_API_KEY) {
+  console.error('❌ ERROR: GEMINI_API_KEY environment variable is required');
+  console.error('Please set: export GEMINI_API_KEY="your-api-key"');
+  process.exit(1);
+}
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
