@@ -50,6 +50,18 @@ socket.on('connected', (data) => {
     entity: 'orders',
     filters: { status: 'pending' },
   });
+
+  // Example 3: Join a public chat room
+  console.log('💬 Joining chat room...');
+  socket.emit('room:join', {
+    roomId: 'chat:general',
+  });
+
+  // Example 4: Join user's private notifications room
+  console.log('🔔 Joining notifications room...');
+  socket.emit('room:join', {
+    roomId: `notifications:${data.userId}`,
+  });
 });
 
 socket.on('disconnect', (reason) => {
@@ -130,11 +142,41 @@ socket.on('user:typing', (data) => {
   console.log(`\n⌨️  ${data.username} is typing...`);
 });
 
+// Room events
+socket.on('room:joined', (data) => {
+  console.log('✅ Joined room:', data.roomId);
+});
+
+socket.on('room:left', (data) => {
+  console.log('👋 Left room:', data.roomId);
+});
+
+socket.on('user:joined', (data) => {
+  console.log(`👤 ${data.username} joined ${data.roomId}`);
+});
+
+socket.on('user:left', (data) => {
+  console.log(`👤 ${data.username} left ${data.roomId}`);
+});
+
+// Validation errors
+socket.on('validation:error', (error) => {
+  console.error('\n⚠️  Validation error:', {
+    event: error.event,
+    message: error.message,
+    error: error.error,
+    timestamp: error.timestamp,
+  });
+});
+
 // Error handling
 socket.on('error', (error) => {
   console.error('\n❌ Socket error:', error);
   if (error.message === 'Rate limit exceeded') {
     console.warn('⚠️  Rate limit exceeded. Slowing down...');
+  }
+  if (error.message?.includes('Access denied')) {
+    console.error('🔒 Authorization failed:', error.message);
   }
 });
 

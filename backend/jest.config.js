@@ -7,7 +7,6 @@ module.exports = {
     '!src/**/*.test.js',
     '!src/**/routes.js',
     '!src/**/*Routes.js',
-    '!src/websocket/**/*.js', // Exclude WebSocket files temporarily until fully tested
     '!**/node_modules/**',
   ],
   testMatch: ['**/__tests__/**/*.js', '**/*.test.js'],
@@ -18,12 +17,19 @@ module.exports = {
       lines: 80,
       statements: 80,
     },
-    // Specific thresholds for middleware (the focus of this PR)
+    // Specific thresholds for middleware
     'src/middleware/**/*.js': {
       branches: 100,
       functions: 100,
       lines: 100,
       statements: 100,
+    },
+    // Specific thresholds for websocket (new validation and authorization)
+    'src/websocket/**/*.js': {
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
     },
   },
   testTimeout: 10000,

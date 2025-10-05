@@ -2,6 +2,8 @@ const { Server } = require('socket.io');
 const { verifyAccessToken } = require('../utils/jwt');
 const User = require('../models/User');
 const logger = require('../config/logger');
+const { validateEvent, sanitizeObject } = require('./validators');
+const { canJoinRoom, canBroadcastToRoom, auditRoomAccess } = require('./authorization');
 
 /**
  * WebSocket Service
@@ -115,6 +117,12 @@ class SocketService {
     // Subscribe to data updates
     socket.on('data:subscribe', (data) => this.handleDataSubscribe(socket, data));
 
+    // Join room with authorization
+    socket.on('room:join', (data) => this.handleRoomJoin(socket, data));
+
+    // Leave room
+    socket.on('room:leave', (data) => this.handleRoomLeave(socket, data));
+
     // Handle notification read
     socket.on('notification:read', (data) => this.handleNotificationRead(socket, data));
 
@@ -136,13 +144,50 @@ class SocketService {
    * Handle data subscription
    */
   handleDataSubscribe(socket, data) {
-    if (!this.checkRateLimit(socket.id)) {
-      socket.emit('error', { message: 'Rate limit exceeded' });
+    // Validate input
+    const context = {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+    };
+
+    const validation = validateEvent('dataSubscribe', data, context);
+    if (!validation.valid) {
+      socket.emit('error', {
+        event: 'data:subscribe',
+        message: 'Validation failed',
+        error: validation.error,
+      });
       return;
     }
 
-    const { entity, filters } = data;
+    const sanitizedData = validation.sanitizedData;
+
+    // Check rate limit
+    if (!this.checkRateLimit(socket.id)) {
+      socket.emit('error', {
+        event: 'data:subscribe',
+        message: 'Rate limit exceeded',
+      });
+      return;
+    }
+
+    const { entity, filters = {} } = sanitizedData;
     const roomName = this.buildRoomName(entity, filters);
+
+    // Check authorization to join room
+    const authCheck = canJoinRoom(socket.user, roomName);
+    if (!authCheck.authorized) {
+      auditRoomAccess(socket.user, roomName, false, authCheck.reason);
+      socket.emit('error', {
+        event: 'data:subscribe',
+        message: authCheck.reason,
+      });
+      return;
+    }
+
+    // Audit successful access
+    auditRoomAccess(socket.user, roomName, true);
 
     // Join room
     socket.join(roomName);
@@ -166,11 +211,29 @@ class SocketService {
    * Handle notification read
    */
   handleNotificationRead(socket, data) {
+    // Validate input
+    const context = {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+    };
+
+    const validation = validateEvent('notificationRead', data, context);
+    if (!validation.valid) {
+      socket.emit('error', {
+        event: 'notification:read',
+        message: 'Validation failed',
+        error: validation.error,
+      });
+      return;
+    }
+
+    // Check rate limit
     if (!this.checkRateLimit(socket.id)) {
       return;
     }
 
-    const { notificationId } = data;
+    const { notificationId } = validation.sanitizedData;
 
     logger.info('Notification marked as read', {
       socketId: socket.id,
@@ -186,17 +249,170 @@ class SocketService {
    * Handle user typing event
    */
   handleUserTyping(socket, data) {
+    // Validate input
+    const context = {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+    };
+
+    const validation = validateEvent('userTyping', data, context);
+    if (!validation.valid) {
+      socket.emit('error', {
+        event: 'user:typing',
+        message: 'Validation failed',
+        error: validation.error,
+      });
+      return;
+    }
+
+    // Check rate limit
     if (!this.checkRateLimit(socket.id)) {
       return;
     }
 
-    const { roomId } = data;
+    const { roomId } = validation.sanitizedData;
     const userId = socket.user._id.toString();
+
+    // Check if user is in the room
+    const userRooms = this.userRooms.get(socket.id) || new Set();
+    if (!userRooms.has(roomId)) {
+      logger.warn('User:typing event for room user is not in', {
+        socketId: socket.id,
+        userId,
+        roomId,
+      });
+      socket.emit('error', {
+        event: 'user:typing',
+        message: 'You are not in this room',
+      });
+      return;
+    }
 
     // Broadcast to room (except sender)
     socket.to(roomId).emit('user:typing', {
       userId,
       username: socket.user.username,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Handle room join with authorization
+   */
+  handleRoomJoin(socket, data) {
+    // Validate input
+    const context = {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+    };
+
+    const validation = validateEvent('roomJoin', data, context);
+    if (!validation.valid) {
+      socket.emit('error', {
+        event: 'room:join',
+        message: 'Validation failed',
+        error: validation.error,
+      });
+      return;
+    }
+
+    // Check rate limit
+    if (!this.checkRateLimit(socket.id)) {
+      socket.emit('error', {
+        event: 'room:join',
+        message: 'Rate limit exceeded',
+      });
+      return;
+    }
+
+    const { roomId } = validation.sanitizedData;
+
+    // Check authorization
+    const authCheck = canJoinRoom(socket.user, roomId);
+    if (!authCheck.authorized) {
+      auditRoomAccess(socket.user, roomId, false, authCheck.reason);
+      socket.emit('error', {
+        event: 'room:join',
+        message: authCheck.reason,
+      });
+      return;
+    }
+
+    // Audit successful access
+    auditRoomAccess(socket.user, roomId, true);
+
+    // Join the room
+    socket.join(roomId);
+    this.userRooms.get(socket.id).add(roomId);
+
+    logger.info('Socket joined room', {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+      roomId,
+    });
+
+    // Notify user
+    socket.emit('room:joined', {
+      roomId,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Notify others in the room
+    socket.to(roomId).emit('user:joined', {
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+      roomId,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Handle room leave
+   */
+  handleRoomLeave(socket, data) {
+    // Validate input
+    const context = {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+    };
+
+    const validation = validateEvent('roomLeave', data, context);
+    if (!validation.valid) {
+      socket.emit('error', {
+        event: 'room:leave',
+        message: 'Validation failed',
+        error: validation.error,
+      });
+      return;
+    }
+
+    const { roomId } = validation.sanitizedData;
+
+    // Leave the room
+    socket.leave(roomId);
+    this.userRooms.get(socket.id)?.delete(roomId);
+
+    logger.info('Socket left room', {
+      socketId: socket.id,
+      userId: socket.user._id.toString(),
+      roomId,
+    });
+
+    // Notify user
+    socket.emit('room:left', {
+      roomId,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Notify others in the room
+    socket.to(roomId).emit('user:left', {
+      userId: socket.user._id.toString(),
+      username: socket.user.username,
+      roomId,
       timestamp: new Date().toISOString(),
     });
   }
@@ -233,12 +449,29 @@ class SocketService {
   /**
    * Broadcast data update to subscribers
    */
-  broadcastDataUpdate(entity, data) {
+  broadcastDataUpdate(entity, data, broadcaster = null) {
     const roomName = this.buildRoomName(entity);
+
+    // If broadcaster is provided, check authorization
+    if (broadcaster) {
+      const authCheck = canBroadcastToRoom(broadcaster, roomName);
+      if (!authCheck.authorized) {
+        logger.warn('Broadcast denied', {
+          userId: broadcaster._id.toString(),
+          username: broadcaster.username,
+          roomName,
+          reason: authCheck.reason,
+        });
+        return;
+      }
+    }
+
+    // Sanitize data before broadcasting
+    const sanitizedData = sanitizeObject(data);
 
     this.io.to(roomName).emit('data:updated', {
       entity,
-      data,
+      data: sanitizedData,
       timestamp: new Date().toISOString(),
     });
 

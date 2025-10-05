@@ -319,6 +319,59 @@ done
 - **Integrated**: Leverage Copilot coordination through scripts
 - **Efficient**: Chain scripts for complete automation workflows
 
+### ⚠️ CRITICAL: Testing Standards
+
+**DO NOT CREATE NEW TEST FILES** unless explicitly requested by the user.
+
+The project has **established testing patterns and standards** in:
+
+- `backend/__tests__/integration/` - Integration tests with specific mocking patterns
+- `backend/__tests__/unit/` - Unit tests with established structure
+- Existing test files follow specific conventions for mocks, setup, and teardown
+
+**If testing is needed:**
+
+1. ✅ Review existing test files to understand the pattern
+2. ✅ Suggest modifications to existing test suites
+3. ✅ Recommend using the project's test infrastructure
+4. ❌ DO NOT create standalone test files without following project patterns
+5. ❌ DO NOT create test verification scripts
+6. ❌ DO NOT create test documentation outside docs/ directory
+
+### ⚠️ CRITICAL: Documentation Standards
+
+**DOCUMENTATION LOCATION RULES:**
+
+The project has a **strict documentation structure**:
+
+- `docs/` - All technical documentation (ARCHITECTURE.md, API.md, TESTING.md, etc.)
+- `docs/examples/` - Code examples and sample implementations
+- `.github/` - GitHub-specific files (workflows, templates, chatmodes)
+- Root directory - ONLY core files (README.md, LICENSE, CHANGELOG.md, CONTRIBUTING.md)
+
+**When creating documentation:**
+
+1. ✅ Use `docs/` for all technical documentation
+2. ✅ Use `docs/examples/` for code examples
+3. ✅ Update existing docs/ files instead of creating new root files
+4. ❌ NEVER create documentation in project root (no WEBSOCKET_REVIEW.md, IMPLEMENTATION_SUMMARY.md, etc.)
+5. ❌ NEVER create temporary documentation files anywhere
+6. ❌ NEVER create review/summary docs - update existing docs instead
+
+**Correct documentation workflow:**
+
+```bash
+# ✅ CORRECT: Update existing docs
+docs/WEBSOCKET.md           # WebSocket API documentation
+docs/TESTING.md             # Testing guide updates
+docs/examples/websocket-client-example.js  # Code examples
+
+# ❌ WRONG: Root directory documentation
+WEBSOCKET_REVIEW.md         # Should be in docs/
+IMPLEMENTATION_SUMMARY.md   # Should update CHANGELOG.md
+WEBSOCKET_STATUS.md         # Should update docs/WEBSOCKET.md
+```
+
 ### Format Responses With Script Integration:
 
 ````markdown
@@ -359,6 +412,17 @@ gh [relevant-alias] [parameters]
 [Additional script enhancements or workflow improvements]
 
 ````
+
+### ⚠️ AVOID Creating:
+
+- ❌ Custom test files (use existing test patterns in `__tests__/`)
+- ❌ Test verification scripts (tests should be self-verifying via Jest/Vitest)
+- ❌ Temporary documentation files (use docs/ or update existing)
+- ❌ One-off utility scripts (integrate into .github/scripts/ if needed)
+- ❌ Test execution wrapper scripts (use npm test directly)
+- ❌ **Root directory documentation** (ALWAYS use docs/ or docs/examples/)
+- ❌ **Review/summary documents** (update CHANGELOG.md or existing docs instead)
+- ❌ **Status/verification scripts** (use existing project scripts or CI/CD)
 
 ## Core Knowledge Areas
 
