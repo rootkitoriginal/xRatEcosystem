@@ -9,6 +9,7 @@ import ConnectionStatus from './components/realtime/ConnectionStatus';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import DataManagement from './pages/DataManagement';
+import ProfilePage from './pages/ProfilePage';
 import './App.css';
 
 function App() {
@@ -46,6 +47,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DataManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
                   </ProtectedRoute>
                 }
               />

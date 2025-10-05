@@ -6,18 +6,22 @@ Welcome to the xRat Ecosystem documentation!
 
 ### Testing & Development
 - **[ACT_TESTING.md](./ACT_TESTING.md)** - Complete guide for testing GitHub Actions locally with act
+- **[TESTING.md](./TESTING.md)** - Testing guidelines and best practices
 
 ### Architecture & Design
-- **ARCHITECTURE.md** *(Coming soon)* - System architecture and design decisions
-- **API.md** *(Coming soon)* - API documentation and endpoints
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture and design decisions
+- **[API.md](./API.md)** - API documentation and endpoints
+- **[WEBSOCKET.md](./WEBSOCKET.md)** - Real-time communication with WebSockets
+
+### Resilience & Reliability
+- **[REDIS_RESILIENCE.md](./REDIS_RESILIENCE.md)** - Redis connection edge cases, failover patterns, and resilience testing
 
 ### Contributing
-- **CONTRIBUTING.md** *(Coming soon)* - How to contribute to the project
-- **TESTING.md** *(Coming soon)* - Testing guidelines and best practices
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
 
 ### Operations
-- **DEPLOYMENT.md** *(Coming soon)* - Deployment instructions
-- **SECURITY.md** *(Coming soon)* - Security policies and practices
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Deployment instructions
+- **[SECURITY.md](./SECURITY.md)** - Security policies and practices
 
 ## 🚀 Quick Links
 

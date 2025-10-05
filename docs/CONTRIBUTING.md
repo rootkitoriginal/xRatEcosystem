@@ -52,34 +52,39 @@ We are committed to providing a welcoming and inclusive environment for all cont
 1. **Fork the repository** on GitHub
 
 2. **Clone your fork:**
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/xRatEcosystem.git
    cd xRatEcosystem
    ```
 
 3. **Add upstream remote:**
+
    ```bash
    git remote add upstream https://github.com/xLabInternet/xRatEcosystem.git
    ```
 
 4. **Install dependencies:**
+
    ```bash
    # Backend
    cd backend
    npm install
-   
+
    # Frontend
    cd ../frontend
    npm install
    ```
 
 5. **Set up environment variables:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 6. **Start the development environment:**
+
    ```bash
    docker-compose up -d
    ```
@@ -107,21 +112,45 @@ git checkout -b feature/your-feature-name
 
 ### Branch Naming Conventions
 
-- `feature/` - New features
-- `fix/` - Bug fixes
+Branch names are automatically validated by GitHub Actions and must follow these patterns:
+
+#### Required Prefixes
+
+- `feature/` - New features and enhancements
+- `fix/` - Bug fixes and patches
 - `docs/` - Documentation updates
-- `refactor/` - Code refactoring
+- `refactor/` - Code refactoring without behavior changes
 - `test/` - Test additions or modifications
-- `chore/` - Maintenance tasks
+- `chore/` - Maintenance tasks, dependency updates
+- `copilot/` - Branches created by GitHub Copilot (auto-generated)
+- `dependabot/` - Dependency updates by Dependabot
+
+#### Validation Rules
+
+- **Length**: 5-100 characters
+- **Format**: `prefix/description-with-hyphens`
+- **Ignored branches**: `main`, `develop`, `master`
 
 **Examples:**
+
+```bash
+feature/add-websocket-authentication
+fix/redis-connection-timeout-issue
+docs/update-api-documentation-swagger
+refactor/improve-error-handling-middleware
+test/add-integration-tests-auth
+chore/update-dependencies-security
+copilot/fix-e538b55c-0fd7-4d72-b3da-563805acd31c
+dependabot/npm_and_yarn/backend/express-4.18.2
 ```
-feature/add-authentication
-fix/redis-connection-timeout
-docs/update-api-documentation
-refactor/improve-error-handling
-test/add-integration-tests
-chore/update-dependencies
+
+**⚠️ Invalid Examples:**
+
+```bash
+❌ my-feature (no prefix)
+❌ FEATURE/test (wrong case)
+❌ feat/test (wrong prefix)
+❌ fix (too short)
 ```
 
 ### 2. Make Your Changes
@@ -195,6 +224,7 @@ git push origin feature/your-feature-name
 - **Trailing commas:** In multiline arrays/objects
 
 **Example:**
+
 ```javascript
 // Good
 const getUserData = async (userId) => {
@@ -209,11 +239,11 @@ const getUserData = async (userId) => {
 };
 
 // Bad
-var getUserData = function(userId) {
-  return fetch("/api/users/" + userId).then(function(response) {
-    return response.json()
-  })
-}
+var getUserData = function (userId) {
+  return fetch('/api/users/' + userId).then(function (response) {
+    return response.json();
+  });
+};
 ```
 
 ### File Organization
@@ -266,6 +296,7 @@ src/
 - Use JSDoc for functions and classes
 
 **Example:**
+
 ```javascript
 /**
  * Calculates the total price including tax
@@ -353,35 +384,79 @@ BREAKING CHANGE: User response now returns array instead of object
 
 ### PR Title Format
 
-Follow the same format as commit messages:
+PR titles are automatically validated by GitHub Actions and must follow [Conventional Commits](https://conventionalcommits.org/) format:
 
+**Format**: `type(scope): description`
+
+#### Required Types
+
+- `feat` - New features
+- `fix` - Bug fixes
+- `docs` - Documentation changes
+- `style` - Code style changes (formatting, etc.)
+- `refactor` - Code refactoring
+- `test` - Adding or modifying tests
+- `chore` - Maintenance tasks
+- `perf` - Performance improvements
+- `ci` - CI/CD changes
+
+#### PR Title Validation Rules
+
+- **Length**: 10-100 characters
+- **Format**: Must match `type(scope): description` or `type: description`
+- **Case**: Type must be lowercase
+- **Description**: Must be present after colon and space
+
+**Valid Examples:**
+
+```bash
+feat(auth): add JWT authentication middleware
+fix(redis): resolve connection timeout issues
+docs: update API documentation with examples
+style(frontend): apply consistent formatting
+refactor(controllers): simplify error handling
+test(websocket): add real-time messaging tests
+chore(deps): update security dependencies
+perf(api): optimize database queries
+ci: add branch name validation workflow
 ```
-feat(auth): add user authentication
-fix(api): resolve timeout issues
-docs: update contribution guide
+
+**⚠️ Invalid Examples:**
+
+```bash
+❌ Add new feature (no type)
+❌ FEAT: test (wrong case)
+❌ feat test (missing colon)
+❌ feat: (missing description)
+❌ fix (too short)
 ```
 
 ### PR Description Template
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests pass
 - [ ] Integration tests pass
 - [ ] Manual testing completed
 
 ## Screenshots (if applicable)
+
 Add screenshots for UI changes
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Comments added for complex code
@@ -488,6 +563,7 @@ See [TESTING.md](./TESTING.md) for detailed testing guidelines.
 Clear description of the bug
 
 **To Reproduce**
+
 1. Go to '...'
 2. Click on '...'
 3. See error
@@ -499,6 +575,7 @@ What you expected to happen
 If applicable
 
 **Environment**
+
 - OS: [e.g., Ubuntu 22.04]
 - Docker version: [e.g., 24.0.0]
 - Node version: [e.g., 20.0.0]
@@ -537,6 +614,7 @@ Any other relevant information
 ## 🏆 Recognition
 
 Contributors are listed in:
+
 - GitHub contributors page
 - CHANGELOG.md for significant contributions
 - README.md contributors section

@@ -36,12 +36,13 @@ O **xRat Ecosystem** é um ambiente de desenvolvimento totalmente containerizado
 ### 🧪 Status dos Testes
 
 - **🎯 Cobertura Total**: 82.2% (acima do threshold recomendado)
-- **📊 Total de Testes**: 220 testes executando com sucesso
-- **⚡ Performance**: 3.0s tempo de execução
+- **📊 Total de Testes Funcionais**: 571 testes executando com sucesso
+- **🚀 Testes de Performance**: 38 testes de estresse e carga (NEW)
+- **⚡ Performance**: 5.2s tempo de execução (testes funcionais)
 - **🔧 Middleware**: 100% de cobertura (auth, rateLimiter, requestLogger)
 - **📦 Models**: Cobertura significativa (Data: 75%, User: 59%)
-- **🔌 WebSocket**: 15 testes de unidade para Socket.IO
-- **✅ Test Suites**: 15 suítes de teste implementadas
+- **🔌 WebSocket**: 150 testes funcionais + 38 testes de performance
+- **✅ Test Suites**: 31 suítes de teste implementadas (27 funcionais + 4 performance)
 
 ---
 
@@ -303,7 +304,24 @@ npm run test:e2e --prefix frontend
 
 # Testes em modo watch (desenvolvimento)
 npm run test:watch --prefix backend
+
+# Executar testes de performance e estresse (NEW)
+npm run test:performance --prefix backend
+
+# Executar testes de performance específicos
+npm run test:performance:stress --prefix backend      # Testes de conexão
+npm run test:performance:memory --prefix backend      # Detecção de memory leaks
+npm run test:performance:throughput --prefix backend  # Throughput de mensagens
+npm run test:performance:resources --prefix backend   # Exaustão de recursos
 ```
+
+**📊 Testes de Performance** (NEW):
+- 38 testes de estresse e carga
+- Validação de 100+ conexões simultâneas
+- Detecção de memory leaks
+- Benchmarks de throughput (500-1000 msg/sec)
+- Testes de exaustão de recursos
+- Documentação completa: `docs/WEBSOCKET_PERFORMANCE_TESTING.md`
 
 ---
 
@@ -667,6 +685,7 @@ Veja também:
 - [📖 Architecture](docs/ARCHITECTURE.md) - Arquitetura do sistema
 - [📡 API Documentation](docs/API.md) - Documentação dos endpoints
 - [🔌 WebSocket Guide](docs/WEBSOCKET.md) - Real-time communication
+- [🔧 Redis Resilience](docs/REDIS_RESILIENCE.md) - Padrões de resiliência e testes de edge cases do Redis
 - [🧪 Testing Guide](docs/TESTING.md) - Guia de testes
 - [🤝 Contributing](docs/CONTRIBUTING.md) - Como contribuir
 - [🚀 Deployment](docs/DEPLOYMENT.md) - Guia de deployment
