@@ -31,6 +31,27 @@ const userSchema = new mongoose.Schema({
   refreshToken: {
     type: String,
   },
+  fullName: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Full name must not exceed 100 characters'],
+  },
+  bio: {
+    type: String,
+    trim: true,
+    maxlength: [250, 'Bio must not exceed 250 characters'],
+  },
+  avatarUrl: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function (v) {
+        if (!v) return true; // Allow empty string
+        return /^https?:\/\/.+/.test(v);
+      },
+      message: 'Avatar URL must be a valid URL starting with http:// or https://',
+    },
+  },
   createdAt: {
     type: Date,
     default: Date.now,
