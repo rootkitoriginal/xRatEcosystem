@@ -29,7 +29,7 @@ describe('SocketService Internal Methods Testing', () => {
   beforeAll(() => {
     httpServer = http.createServer();
     // Increase max listeners to avoid warnings during tests
-    httpServer.setMaxListeners(50);
+    httpServer.setMaxListeners(100);
   });
 
   afterAll(async () => {
