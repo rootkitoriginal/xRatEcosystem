@@ -74,9 +74,6 @@ describe('SocketService Unit Tests', () => {
   });
 
   describe('Authentication Middleware', () => {
-    let mockSocket;
-    let mockNext;
-
     beforeEach(() => {
       socketService = new SocketService(httpServer, mockRedisClient);
 
@@ -93,10 +90,13 @@ describe('SocketService Unit Tests', () => {
     });
 
     test('should reject connection without token', async () => {
+      // eslint-disable-next-line no-unused-vars
       const { verifyAccessToken } = require('../../../src/utils/jwt');
+      // eslint-disable-next-line no-unused-vars
       const User = require('../../../src/models/User');
 
       // Get the authentication middleware
+      // eslint-disable-next-line no-unused-vars
       const authMiddleware = socketService.io._nsps.get('/').adapter.sids.constructor.prototype;
 
       // Simulate middleware call
@@ -1113,8 +1113,6 @@ describe('SocketService Unit Tests', () => {
   });
 
   describe('Advanced Broadcasting and Notification', () => {
-    let mockSocket;
-
     beforeEach(() => {
       socketService = new SocketService(httpServer, mockRedisClient);
 

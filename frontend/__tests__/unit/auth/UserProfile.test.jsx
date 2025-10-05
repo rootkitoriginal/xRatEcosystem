@@ -1,7 +1,24 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { AuthProvider } from '../../../src/contexts/AuthContext';
 import UserProfile from '../../../src/components/auth/UserProfile';
+
+// Mock authService
+vi.mock('../../../src/services/authService', () => ({
+  authService: {
+    register: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    getProfile: vi.fn(),
+  },
+  isUsingMockAuth: vi.fn(() => true),
+  authConfig: {
+    useMock: true,
+    apiUrl: 'http://localhost:3000',
+  }
+}));
+
+import { authService } from '../../../src/services/authService';
 
 const renderUserProfile = () => {
   return render(
@@ -14,6 +31,14 @@ const renderUserProfile = () => {
 describe('UserProfile', () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.clearAllMocks();
+    
+    // Mock successful profile fetch
+    authService.getProfile.mockResolvedValue({
+      id: 1,
+      email: 'test@example.com',
+      name: 'Test User'
+    });
   });
 
   it('renders nothing when not authenticated', async () => {

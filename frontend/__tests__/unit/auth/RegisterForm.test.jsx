@@ -4,6 +4,23 @@ import userEvent from '@testing-library/user-event';
 import { AuthProvider } from '../../../src/contexts/AuthContext';
 import RegisterForm from '../../../src/components/auth/RegisterForm';
 
+// Mock authService
+vi.mock('../../../src/services/authService', () => ({
+  authService: {
+    register: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    getProfile: vi.fn(),
+  },
+  isUsingMockAuth: vi.fn(() => true),
+  authConfig: {
+    useMock: true,
+    apiUrl: 'http://localhost:3000',
+  }
+}));
+
+import { authService } from '../../../src/services/authService';
+
 const renderRegisterForm = (props = {}) => {
   return render(
     <AuthProvider>
@@ -15,6 +32,14 @@ const renderRegisterForm = (props = {}) => {
 describe('RegisterForm', () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.clearAllMocks();
+    
+    // Configure successful registration by default
+    authService.register.mockResolvedValue({
+      user: { id: '1', name: 'Test User', email: 'test@example.com' },
+      accessToken: 'fake-token',
+      refreshToken: 'fake-refresh-token'
+    });
   });
 
   it('renders register form correctly', () => {
@@ -73,7 +98,7 @@ describe('RegisterForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Password must be at least 6 characters')).toBeDefined();
+      expect(screen.getByText('Password must be at least 8 characters')).toBeDefined();
     });
   });
 
@@ -121,6 +146,12 @@ describe('RegisterForm', () => {
   });
 
   it('disables form during submission', async () => {
+    // Make register return a delayed promise
+    let resolveRegister;
+    authService.register.mockReturnValue(new Promise((resolve) => {
+      resolveRegister = resolve;
+    }));
+
     renderRegisterForm();
     const user = userEvent.setup();
 
@@ -136,7 +167,17 @@ describe('RegisterForm', () => {
     await user.type(confirmPasswordInput, 'password123');
     await user.click(submitButton);
 
-    expect(screen.getByRole('button', { name: /registering/i })).toBeDefined();
+    // Check if button shows loading state
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /registering/i })).toBeDefined();
+    });
+
+    // Resolve the promise to cleanup
+    resolveRegister({
+      user: { id: '1', name: 'Test User', email: 'test@example.com' },
+      accessToken: 'fake-token',
+      refreshToken: 'fake-refresh-token'
+    });
   });
 
   it('shows switch to login link', () => {

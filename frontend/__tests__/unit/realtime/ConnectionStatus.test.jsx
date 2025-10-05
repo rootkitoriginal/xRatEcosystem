@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
 import ConnectionStatus from '../../../src/components/realtime/ConnectionStatus';
 
 // Mock useWebSocket hook
@@ -11,7 +10,7 @@ vi.mock('../../../src/components/realtime/WebSocketProvider', () => ({
 import { useWebSocket } from '../../../src/components/realtime/WebSocketProvider';
 
 describe('ConnectionStatus', () => {
-  it('renders nothing when connected without error', () => {
+  it('always renders nothing (hidden component)', () => {
     useWebSocket.mockReturnValue({
       connected: true,
       error: null,
@@ -23,7 +22,7 @@ describe('ConnectionStatus', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('shows mock mode indicator', () => {
+  it('renders nothing even with mock mode', () => {
     useWebSocket.mockReturnValue({
       connected: true,
       error: null,
@@ -31,11 +30,11 @@ describe('ConnectionStatus', () => {
       isMockMode: true,
     });
 
-    render(<ConnectionStatus />);
-    expect(screen.getByText(/mock mode/i)).toBeDefined();
+    const { container } = render(<ConnectionStatus />);
+    expect(container.firstChild).toBeNull();
   });
 
-  it('shows disconnected status', () => {
+  it('renders nothing even when disconnected', () => {
     useWebSocket.mockReturnValue({
       connected: false,
       error: null,
@@ -43,11 +42,11 @@ describe('ConnectionStatus', () => {
       isMockMode: false,
     });
 
-    render(<ConnectionStatus />);
-    expect(screen.getByText('Disconnected from server')).toBeDefined();
+    const { container } = render(<ConnectionStatus />);
+    expect(container.firstChild).toBeNull();
   });
 
-  it('shows error message', () => {
+  it('renders nothing even with error', () => {
     useWebSocket.mockReturnValue({
       connected: false,
       error: 'Connection timeout',
@@ -55,12 +54,11 @@ describe('ConnectionStatus', () => {
       isMockMode: false,
     });
 
-    render(<ConnectionStatus />);
-    expect(screen.getByText('Connection timeout')).toBeDefined();
+    const { container } = render(<ConnectionStatus />);
+    expect(container.firstChild).toBeNull();
   });
 
-  it('calls reconnect when button is clicked', async () => {
-    const user = userEvent.setup();
+  it('component is completely hidden', () => {
     const mockReconnect = vi.fn();
 
     useWebSocket.mockReturnValue({
@@ -70,11 +68,8 @@ describe('ConnectionStatus', () => {
       isMockMode: false,
     });
 
-    render(<ConnectionStatus />);
-
-    const reconnectButton = screen.getByText('Reconnect');
-    await user.click(reconnectButton);
-
-    expect(mockReconnect).toHaveBeenCalled();
+    const { container } = render(<ConnectionStatus />);
+    expect(container.firstChild).toBeNull();
+    // Component doesn't render anything, so no interaction possible
   });
 });

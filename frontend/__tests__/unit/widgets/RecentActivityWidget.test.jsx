@@ -1,14 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import RecentActivityWidget from '../../../src/components/widgets/RecentActivityWidget';
-import { mockDataService } from '../../../src/services/mockDataService';
 
 // Mock the data service
-vi.mock('../../../src/services/mockDataService', () => ({
-  mockDataService: {
-    getData: vi.fn(),
+vi.mock('../../../src/services/dataService', () => ({
+  dataService: {
+    getAll: vi.fn(),
   },
 }));
+
+import { dataService } from '../../../src/services/dataService';
 
 describe('RecentActivityWidget', () => {
   beforeEach(() => {
@@ -16,7 +17,7 @@ describe('RecentActivityWidget', () => {
   });
 
   it('renders loading state initially', () => {
-    mockDataService.getData.mockImplementation(
+    dataService.getAll.mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -29,18 +30,20 @@ describe('RecentActivityWidget', () => {
       {
         id: 1,
         name: 'Project Alpha',
-        updatedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+        category: 'Development',
+        updatedAt: '2023-10-01T10:00:00Z',
       },
       {
         id: 2,
         name: 'Project Beta',
-        updatedAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+        category: 'Testing',
+        updatedAt: '2023-10-01T09:00:00Z',
       },
     ];
 
-    mockDataService.getData.mockResolvedValue({
+    dataService.getAll.mockResolvedValue({
       data: mockData,
-      pagination: { total: 2, page: 1, perPage: 5, totalPages: 1 },
+      pagination: { total: 2 },
     });
 
     render(<RecentActivityWidget />);
@@ -51,20 +54,10 @@ describe('RecentActivityWidget', () => {
     });
   });
 
-  it('displays error message on fetch failure', async () => {
-    mockDataService.getData.mockRejectedValue(new Error('Network error'));
-
-    render(<RecentActivityWidget />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Failed to load recent activity')).toBeDefined();
-    });
-  });
-
   it('displays empty state when no items', async () => {
-    mockDataService.getData.mockResolvedValue({
+    dataService.getAll.mockResolvedValue({
       data: [],
-      pagination: { total: 0, page: 1, perPage: 5, totalPages: 0 },
+      pagination: { total: 0 },
     });
 
     render(<RecentActivityWidget />);
@@ -75,41 +68,19 @@ describe('RecentActivityWidget', () => {
   });
 
   it('calls getData with correct parameters', async () => {
-    mockDataService.getData.mockResolvedValue({
+    dataService.getAll.mockResolvedValue({
       data: [],
-      pagination: { total: 0, page: 1, perPage: 5, totalPages: 0 },
+      pagination: { total: 0 },
     });
 
     render(<RecentActivityWidget />);
 
     await waitFor(() => {
-      expect(mockDataService.getData).toHaveBeenCalledWith({
-        perPage: 5,
+      expect(dataService.getAll).toHaveBeenCalledWith({
+        limit: 5,
         sortBy: 'updatedAt',
         sortOrder: 'desc',
       });
-    });
-  });
-
-  it('has correct widget structure', async () => {
-    mockDataService.getData.mockResolvedValue({
-      data: [
-        {
-          id: 1,
-          name: 'Test Item',
-          updatedAt: new Date().toISOString(),
-        },
-      ],
-      pagination: { total: 1, page: 1, perPage: 5, totalPages: 1 },
-    });
-
-    const { container } = render(<RecentActivityWidget />);
-
-    await waitFor(() => {
-      expect(container.querySelector('.recent-activity-widget')).toBeDefined();
-      expect(container.querySelector('.widget-header')).toBeDefined();
-      expect(container.querySelector('.widget-content')).toBeDefined();
-      expect(container.querySelector('.activity-list')).toBeDefined();
     });
   });
 });

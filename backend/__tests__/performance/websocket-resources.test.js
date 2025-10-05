@@ -241,7 +241,6 @@ describe('WebSocket Resource Exhaustion Testing', () => {
       }
 
       // Send very large payloads rapidly
-      let errorOccurred = false;
       try {
         const veryLargePayload = 'x'.repeat(1024 * 1024); // 1MB
         
@@ -254,7 +253,6 @@ describe('WebSocket Resource Exhaustion Testing', () => {
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
       } catch (error) {
-        errorOccurred = true;
         console.log('Expected error during OOM simulation:', error.message);
       }
 

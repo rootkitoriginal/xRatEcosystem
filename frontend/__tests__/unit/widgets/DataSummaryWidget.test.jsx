@@ -1,14 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DataSummaryWidget from '../../../src/components/widgets/DataSummaryWidget';
-import { mockDataService } from '../../../src/services/mockDataService';
 
 // Mock the data service
-vi.mock('../../../src/services/mockDataService', () => ({
-  mockDataService: {
-    getStats: vi.fn(),
+vi.mock('../../../src/services/dataService', () => ({
+  dataService: {
+    getAnalytics: vi.fn(),
   },
 }));
+
+import { dataService } from '../../../src/services/dataService';
 
 describe('DataSummaryWidget', () => {
   beforeEach(() => {
@@ -16,7 +17,7 @@ describe('DataSummaryWidget', () => {
   });
 
   it('renders loading state initially', () => {
-    mockDataService.getStats.mockImplementation(
+    dataService.getAnalytics.mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 
@@ -25,12 +26,10 @@ describe('DataSummaryWidget', () => {
   });
 
   it('displays total count after loading', async () => {
-    mockDataService.getStats.mockResolvedValue({
-      total: 42,
-      byStatus: {},
-      byCategory: {},
-      byPriority: {},
-      totalValue: 0,
+    dataService.getAnalytics.mockResolvedValue({
+      analytics: {
+        total: 42,
+      }
     });
 
     render(<DataSummaryWidget />);
@@ -42,30 +41,12 @@ describe('DataSummaryWidget', () => {
   });
 
   it('displays error message on fetch failure', async () => {
-    mockDataService.getStats.mockRejectedValue(new Error('Network error'));
+    dataService.getAnalytics.mockRejectedValue(new Error('Network error'));
 
     render(<DataSummaryWidget />);
 
     await waitFor(() => {
       expect(screen.getByText('Failed to load data count')).toBeDefined();
-    });
-  });
-
-  it('has correct widget structure', async () => {
-    mockDataService.getStats.mockResolvedValue({
-      total: 10,
-      byStatus: {},
-      byCategory: {},
-      byPriority: {},
-      totalValue: 0,
-    });
-
-    const { container } = render(<DataSummaryWidget />);
-
-    await waitFor(() => {
-      expect(container.querySelector('.data-summary-widget')).toBeDefined();
-      expect(container.querySelector('.widget-header')).toBeDefined();
-      expect(container.querySelector('.widget-content')).toBeDefined();
     });
   });
 });
