@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Run detect-secrets before committing
 echo "🔍 Scanning for secrets..."
 detect-secrets scan --baseline .secrets.baseline || {
