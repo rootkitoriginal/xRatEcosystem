@@ -1,12 +1,12 @@
-# WebSocket Examples
+# WebSocket Integration Examples
 
-This directory contains example code for integrating with the xRat Ecosystem WebSocket service.
+Example code for integrating with the xRat Ecosystem WebSocket service.
 
-## Examples
+## Available Examples
 
 ### 1. Node.js Client Example
 
-**File:** `websocket-client-example.js`
+**File:** `examples/websocket-client-example.js`
 
 A complete Node.js example showing how to connect to the WebSocket server and handle all event types.
 
@@ -32,12 +32,12 @@ curl -X POST http://localhost:3000/api/auth/login \
 
 # Set token and run
 export JWT_TOKEN="your_jwt_token_here"
-node websocket-client-example.js
+node examples/websocket-client-example.js
 ```
 
 ### 2. React Hooks Example
 
-**File:** `websocket-react-example.jsx`
+**File:** `examples/websocket-react-example.jsx`
 
 Complete React hooks and components for integrating WebSocket functionality in a React application.
 
@@ -182,6 +182,27 @@ socket.on('user:typing', (data) => {
 });
 ```
 
+### Room-based Messaging
+
+```javascript
+// Join a room
+socket.emit('room:join', { room: 'general' });
+
+// Send message to room
+socket.emit('room:message', {
+  room: 'general',
+  message: 'Hello everyone!'
+});
+
+// Receive room messages
+socket.on('room:message', (data) => {
+  console.log(`${data.username}: ${data.message}`);
+});
+
+// Leave room
+socket.emit('room:leave', { room: 'general' });
+```
+
 ## Error Handling
 
 ### Connection Errors
@@ -209,6 +230,19 @@ socket.on('error', (error) => {
 });
 ```
 
+### Disconnection Handling
+
+```javascript
+socket.on('disconnect', (reason) => {
+  if (reason === 'io server disconnect') {
+    // Server disconnected the socket
+    // Try to reconnect manually
+    socket.connect();
+  }
+  // else: automatic reconnection will be attempted
+});
+```
+
 ## Testing
 
 ### Test WebSocket Connection
@@ -229,7 +263,7 @@ npm install -g socket.io-client
 
 # Connect and test (with valid token)
 export JWT_TOKEN="your_token"
-node websocket-client-example.js
+node examples/websocket-client-example.js
 ```
 
 ## Troubleshooting
@@ -270,6 +304,88 @@ node websocket-client-example.js
 2. Implement client-side throttling
 3. Batch operations when possible
 
+## Complete Node.js Example
+
+```javascript
+const { io } = require('socket.io-client');
+
+// Configuration
+const SERVER_URL = 'http://localhost:3000';
+const JWT_TOKEN = process.env.JWT_TOKEN;
+
+// Create socket connection
+const socket = io(SERVER_URL, {
+  auth: { token: JWT_TOKEN }
+});
+
+// Connection events
+socket.on('connect', () => {
+  console.log('✅ Connected to WebSocket server');
+  
+  // Subscribe to data updates
+  socket.emit('data:subscribe', {
+    entity: 'products',
+    filters: { category: 'electronics' }
+  });
+  
+  // Join a room
+  socket.emit('room:join', { room: 'general' });
+});
+
+socket.on('disconnect', () => {
+  console.log('❌ Disconnected from server');
+});
+
+socket.on('connect_error', (error) => {
+  console.error('Connection error:', error.message);
+});
+
+// Data subscriptions
+socket.on('data:subscribed', (data) => {
+  console.log('📡 Subscribed:', data.entity);
+});
+
+socket.on('data:updated', (update) => {
+  console.log('🔄 Data updated:', update.data);
+});
+
+// Notifications
+socket.on('notification', (notification) => {
+  console.log('🔔 Notification:', notification.message);
+  
+  // Mark as read
+  socket.emit('notification:read', {
+    notificationId: notification.id
+  });
+});
+
+// User presence
+socket.on('user:online', (status) => {
+  console.log(`👤 User ${status.username} is ${status.status}`);
+});
+
+// Room messages
+socket.on('room:message', (data) => {
+  console.log(`💬 [${data.room}] ${data.username}: ${data.message}`);
+});
+
+// System status
+socket.on('system:status', (status) => {
+  console.log('📊 System:', {
+    cpu: `${status.cpu}%`,
+    memory: `${status.memory}%`,
+    uptime: `${Math.floor(status.uptime / 3600)}h`
+  });
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n👋 Closing connection...');
+  socket.disconnect();
+  process.exit(0);
+});
+```
+
 ## Best Practices
 
 1. **Always authenticate** - Include valid JWT token
@@ -279,11 +395,15 @@ node websocket-client-example.js
 5. **Reconnection** - Let Socket.IO handle automatic reconnection
 6. **Secure tokens** - Store JWT tokens securely (httpOnly cookies)
 7. **User feedback** - Show connection status to users
+8. **Rate limiting awareness** - Respect server rate limits
+9. **Room management** - Always leave rooms when done
+10. **Test thoroughly** - Test all connection scenarios
 
 ## Resources
 
-- [API Documentation](../API.md#websocket-real-time-communication)
-- [WebSocket Guide](../WEBSOCKET.md)
+- [API Documentation](./API.md#websocket-real-time-communication)
+- [WebSocket Guide](./WEBSOCKET.md)
+- [Real-time Components](./realtime-components.md)
 - [Socket.IO Client Documentation](https://socket.io/docs/v4/client-api/)
 - [React Hooks Documentation](https://react.dev/reference/react)
 
@@ -291,5 +411,12 @@ node websocket-client-example.js
 
 For issues or questions:
 - Open an issue on GitHub
-- Check the [troubleshooting guide](../WEBSOCKET.md#troubleshooting)
-- Review the [API documentation](../API.md)
+- Check the [troubleshooting guide](./WEBSOCKET.md#troubleshooting)
+- Review the [API documentation](./API.md)
+
+---
+
+**Related Files:**
+- Example files: `docs/examples/`
+- Component documentation: [Real-time Components](./realtime-components.md)
+- API reference: [API Documentation](./API.md)

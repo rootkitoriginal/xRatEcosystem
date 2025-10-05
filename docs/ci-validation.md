@@ -231,7 +231,7 @@ act -W .github/workflows/test.yml --list
 
 - [nektos/act - GitHub Actions local runner](https://github.com/nektos/act)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [xRat Ecosystem - ACT_TESTING.md](../ACT_TESTING.md)
+- [xRat Ecosystem - Local Testing Guide](./local-testing.md)
 
 ---
 

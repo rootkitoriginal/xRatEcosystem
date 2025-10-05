@@ -105,7 +105,7 @@ For full-scale testing:
 ## Documentation
 
 For detailed documentation, see:
-- [WebSocket Performance Testing Guide](../../docs/WEBSOCKET_PERFORMANCE_TESTING.md)
+- [WebSocket Performance Testing Guide](../../docs/websocket-performance.md)
 - [WebSocket Testing Guide](../../docs/WEBSOCKET_TESTING.md)
 
 ## Contributing

@@ -1,6 +1,6 @@
-# Smoke Tests
+# Smoke Testing Guide
 
-This directory contains smoke tests for critical scripts and tools in the xRat Ecosystem.
+This guide covers smoke tests for critical scripts and tools in the xRat Ecosystem.
 
 ## What are Smoke Tests?
 
@@ -111,8 +111,46 @@ Key settings:
 4. **Fast execution**: All smoke tests should complete in < 10 seconds
 5. **Clear assertions**: Make test failures obvious
 
+## Example Smoke Test Structure
+
+```javascript
+describe('Critical Script Smoke Tests', () => {
+  // Test module exports
+  it('should export required functions', () => {
+    expect(module.functionA).toBeDefined();
+    expect(module.functionB).toBeDefined();
+  });
+
+  // Test basic functionality with mocks
+  it('should execute main function', async () => {
+    // Mock external dependencies
+    const mockAPI = jest.fn().mockResolvedValue({ data: 'test' });
+    
+    // Execute function
+    const result = await module.mainFunction(mockAPI);
+    
+    // Verify basic behavior
+    expect(result).toBeDefined();
+    expect(mockAPI).toHaveBeenCalled();
+  });
+
+  // Test error handling
+  it('should handle errors gracefully', async () => {
+    const mockAPI = jest.fn().mockRejectedValue(new Error('API Error'));
+    
+    await expect(module.mainFunction(mockAPI))
+      .rejects.toThrow('API Error');
+  });
+});
+```
+
 ## Related Documentation
 
-- [Testing Guide](../../docs/TESTING.md)
-- [CI/CD Documentation](../../docs/DEPLOYMENT.md)
-- [Contributing Guidelines](../../CONTRIBUTING.md)
+- [Testing Guide](./TESTING.md)
+- [CI/CD Documentation](./DEPLOYMENT.md)
+- [Contributing Guidelines](./CONTRIBUTING.md)
+- [DevOps Tools](./devops-tools.md)
+
+---
+
+**Need help?** Open an issue on [GitHub](https://github.com/xLabInternet/xRatEcosystem/issues)

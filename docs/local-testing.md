@@ -95,7 +95,7 @@ xRatEcosystem/
 │       └── gemini-scheduled-triage.yml # Scheduled triage
 ├── .secrets                           # Local secrets (NEVER commit!)
 └── docs/
-    └── ACT_TESTING.md                 # This file
+    └── local-testing.md               # This file
 ```
 
 ## 🎛️ Advanced Options

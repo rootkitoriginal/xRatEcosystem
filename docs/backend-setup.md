@@ -1,4 +1,4 @@
-# xRat Ecosystem - Backend
+# Backend Development Setup
 
 Node.js + Express API server for the xRat Ecosystem.
 
@@ -60,10 +60,10 @@ REDIS_PASSWORD=
 JWT_SECRET=your_jwt_secret_key_minimum_32_characters
 JWT_REFRESH_SECRET=your_jwt_refresh_secret_key_minimum_32_characters
 JWT_EXPIRE=1h
+JWT_REFRESH_EXPIRE=7d
 
 # Logging
 LOG_LEVEL=info  # Options: error, warn, info, debug
-JWT_REFRESH_EXPIRE=7d
 ```
 
 **Generate secure secrets:**
@@ -110,7 +110,6 @@ npm start
 🎉 **Swagger UI is available at `/api-docs`**
 
 Access comprehensive interactive API documentation at:
-
 - Local: http://localhost:3000/api-docs
 - Try out endpoints directly from your browser
 - View request/response examples
@@ -143,7 +142,6 @@ Access comprehensive interactive API documentation at:
 - `GET /api/data/analytics` - Get data analytics (protected)
 
 **Features:**
-
 - ✅ CRUD operations with validation
 - ✅ Redis caching for read operations
 - ✅ Full-text search capability
@@ -154,7 +152,7 @@ Access comprehensive interactive API documentation at:
 
 **Note:** Protected endpoints require a valid JWT token in the Authorization header.
 
-See [API Documentation](../docs/API.md) for detailed endpoint information or visit `/api-docs` for interactive documentation.
+See [API Documentation](./API.md) for detailed endpoint information or visit `/api-docs` for interactive documentation.
 
 ## 🧪 Testing
 
@@ -179,7 +177,7 @@ npm run test:docker
 - **E2E Tests:** Complete workflow testing
 - **Coverage Target:** 80% minimum
 
-See [Testing Documentation](../docs/TESTING.md) for more details.
+See [Testing Documentation](./TESTING.md) for more details.
 
 ## 🔐 Security Features
 
@@ -195,7 +193,6 @@ See [Testing Documentation](../docs/TESTING.md) for more details.
 ### Authentication Flow
 
 1. **Register:** `POST /api/auth/register`
-
    ```bash
    curl -X POST http://localhost:3000/api/auth/register \
      -H "Content-Type: application/json" \
@@ -203,7 +200,6 @@ See [Testing Documentation](../docs/TESTING.md) for more details.
    ```
 
 2. **Login:** `POST /api/auth/login`
-
    ```bash
    curl -X POST http://localhost:3000/api/auth/login \
      -H "Content-Type: application/json" \
@@ -211,7 +207,6 @@ See [Testing Documentation](../docs/TESTING.md) for more details.
    ```
 
 3. **Use Token:** Include in Authorization header
-
    ```bash
    curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
      http://localhost:3000/api/auth/profile
@@ -224,7 +219,7 @@ See [Testing Documentation](../docs/TESTING.md) for more details.
      -d '{"refreshToken":"YOUR_REFRESH_TOKEN"}'
    ```
 
-See [Security Documentation](../docs/SECURITY.md) for more details.
+See [Security Documentation](./SECURITY.md) for more details.
 
 ## 📦 Dependencies
 
@@ -263,7 +258,7 @@ npm run test:coverage # Run tests with coverage report
 
 ### Structured Logging
 
-The application uses Winston for structured logging. See [docs/LOGGING.md](./docs/LOGGING.md) for details.
+The application uses Winston for structured logging. See [backend/docs/LOGGING.md](../backend/docs/LOGGING.md) for details.
 
 ```bash
 # View real-time logs (development)
@@ -306,7 +301,6 @@ mongoose
 ```
 
 **Connection Status:**
-
 - Check via `/health` endpoint
 - Check via `/api/status` endpoint
 
@@ -322,14 +316,13 @@ const redisClient = createClient({
 ```
 
 **Cache Operations:**
-
 - Store: `POST /api/data`
 - Retrieve: `GET /api/data/:key`
 - TTL: 3600 seconds (1 hour)
 
 ## 🚀 Deployment
 
-See [Deployment Documentation](../docs/DEPLOYMENT.md) for production deployment instructions.
+See [Deployment Documentation](./DEPLOYMENT.md) for production deployment instructions.
 
 ### Quick Deploy
 
@@ -347,39 +340,35 @@ docker-compose logs -f backend
 ## 📝 Adding New Endpoints
 
 1. **Define route:**
-
-```javascript
-app.get('/api/new-endpoint', async (req, res) => {
-  try {
-    // Implementation
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-```
+   ```javascript
+   app.get('/api/new-endpoint', async (req, res) => {
+     try {
+       // Implementation
+       res.json({ success: true });
+     } catch (error) {
+       res.status(500).json({ success: false, error: error.message });
+     }
+   });
+   ```
 
 2. **Add tests:**
-
-```javascript
-describe('GET /api/new-endpoint', () => {
-  it('should return success', async () => {
-    const response = await request(app).get('/api/new-endpoint');
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-  });
-});
-```
+   ```javascript
+   describe('GET /api/new-endpoint', () => {
+     it('should return success', async () => {
+       const response = await request(app).get('/api/new-endpoint');
+       expect(response.status).toBe(200);
+       expect(response.body.success).toBe(true);
+     });
+   });
+   ```
 
 3. **Update documentation:**
-
-- Update [API.md](../docs/API.md)
-- Add JSDoc comments
+   - Update [API.md](./API.md)
+   - Add JSDoc comments
 
 ## 🤝 Contributing
 
-See [Contributing Guidelines](../docs/CONTRIBUTING.md) for:
-
+See [Contributing Guidelines](./CONTRIBUTING.md) for:
 - Code style guidelines
 - Commit message format
 - Pull request process
@@ -391,10 +380,6 @@ See [Contributing Guidelines](../docs/CONTRIBUTING.md) for:
 - [Mongoose Documentation](https://mongoosejs.com/)
 - [Redis Documentation](https://redis.io/documentation)
 - [Jest Documentation](https://jestjs.io/)
-
-## 📄 License
-
-MIT License - See LICENSE file in project root
 
 ---
 

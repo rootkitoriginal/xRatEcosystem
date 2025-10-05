@@ -148,7 +148,7 @@ xRatEcosystem/
 │   ├── CONTRIBUTING.md           # Guia contribuição
 │   ├── DEPLOYMENT.md             # Guia deployment
 │   ├── SECURITY.md               # Políticas segurança
-│   └── ACT_TESTING.md            # Testes locais
+│   └── local-testing.md          # Testes locais
 ├── 📁 .github/                    # GitHub workflows e templates
 │   ├── 📁 workflows/             # GitHub Actions
 │   └── 📁 ISSUE_TEMPLATE/        # Templates issues/PRs
@@ -321,7 +321,7 @@ npm run test:performance:resources --prefix backend   # Exaustão de recursos
 - Detecção de memory leaks
 - Benchmarks de throughput (500-1000 msg/sec)
 - Testes de exaustão de recursos
-- Documentação completa: `docs/WEBSOCKET_PERFORMANCE_TESTING.md`
+- Documentação completa: `docs/websocket-performance.md`
 
 ---
 
@@ -690,7 +690,11 @@ Veja também:
 - [🤝 Contributing](docs/CONTRIBUTING.md) - Como contribuir
 - [🚀 Deployment](docs/DEPLOYMENT.md) - Guia de deployment
 - [🔐 Security](docs/SECURITY.md) - Políticas de segurança
-- [📝 ACT Testing](docs/ACT_TESTING.md) - Teste local de workflows
+- [📝 Local Testing](docs/local-testing.md) - Teste local de workflows com act
+- [⚙️ Backend Setup](docs/backend-setup.md) - Configuração do backend
+- [🎨 Frontend Setup](docs/frontend-setup.md) - Configuração do frontend
+- [🛠️ DevOps Tools](docs/devops-tools.md) - Ferramentas de monitoramento
+- [🤖 Automation Scripts](docs/automation-scripts.md) - Scripts de automação
 
 ---
 

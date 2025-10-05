@@ -1,46 +1,154 @@
-# Documentation
+# Documentation Index
 
-Welcome to the xRat Ecosystem documentation!
+Welcome to the xRat Ecosystem documentation! All project documentation is organized here for easy access.
 
-## 📚 Available Documentation
+## 🚀 Quick Start
 
-### Testing & Development
-- **[ACT_TESTING.md](./ACT_TESTING.md)** - Complete guide for testing GitHub Actions locally with act
-- **[TESTING.md](./TESTING.md)** - Testing guidelines and best practices
+- **[Main README](../README.md)** - Project overview and getting started
+- **[Quick Start Guide](../QUICKSTART.md)** - Get up and running in 5 minutes
 
-### Architecture & Design
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture and design decisions
-- **[API.md](./API.md)** - API documentation and endpoints
-- **[WEBSOCKET.md](./WEBSOCKET.md)** - Real-time communication with WebSockets
+## 📖 Setup Guides
 
-### Resilience & Reliability
-- **[REDIS_RESILIENCE.md](./REDIS_RESILIENCE.md)** - Redis connection edge cases, failover patterns, and resilience testing
+Complete setup instructions for each part of the system:
 
-### Contributing
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute to the project
+- **[Backend Setup](./backend-setup.md)** - Node.js + Express backend development
+- **[Frontend Setup](./frontend-setup.md)** - React + Vite frontend development
+- **[DevOps Tools](./devops-tools.md)** - Monitoring and automation tools
 
-### Operations
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Deployment instructions
-- **[SECURITY.md](./SECURITY.md)** - Security policies and practices
+## 🏗️ Architecture & Design
 
-## 🚀 Quick Links
+System design and technical architecture:
 
-- [Main README](../README.md)
-- [Quick Start Guide](../QUICKSTART.md)
-- [GitHub Repository](https://github.com/rootkitoriginal/xRatEcosystem)
+- **[Architecture](./ARCHITECTURE.md)** - System architecture and design decisions
+- **[API Documentation](./API.md)** - Complete API endpoints reference
+- **[WebSocket](./WEBSOCKET.md)** - Real-time communication with WebSockets
 
-## 📖 Documentation Roadmap
+## 🧪 Testing Documentation
 
-As part of Phase 2, we're creating comprehensive documentation:
+Comprehensive testing guides and strategies:
 
-1. ✅ **ACT Testing Guide** - Local workflow testing
-2. ⏳ **Architecture Documentation** - System design
-3. ⏳ **API Documentation** - Endpoints and usage
-4. ⏳ **Testing Guide** - Writing and running tests
-5. ⏳ **Contributing Guide** - Development workflow
-6. ⏳ **Deployment Guide** - Production deployment
-7. ⏳ **Security Guide** - Security best practices
+- **[Testing Guide](./TESTING.md)** - Testing guidelines and best practices
+- **[Smoke Testing](./smoke-testing.md)** - Critical path smoke tests
+- **[Performance Testing](./performance-testing.md)** - Load testing and benchmarks
+- **[Local Testing](./local-testing.md)** - Test GitHub Actions locally with act
+- **[CI Validation](./ci-validation.md)** - CI/CD workflow validation
+
+### Testing Summaries
+
+- **[WebSocket Testing Summary](./websocket-testing-summary.md)** - WebSocket test results
+- **[Redis Testing](./redis-testing.md)** - Redis resilience testing results
+- **[WebSocket Performance](./websocket-performance.md)** - Performance benchmarks
+- **[Implementation Summary](./implementation-summary.md)** - Feature implementation status
+
+## 💻 Development Guides
+
+Tools and components for development:
+
+- **[Real-time Components](./realtime-components.md)** - WebSocket UI components
+- **[Examples](./examples.md)** - Code examples and integration guides
+- **[Automation Scripts](./automation-scripts.md)** - GitHub CLI automation
+- **[Copilot ChatModes](./copilot-chatmodes.md)** - AI-assisted development
+
+## 🔐 Security & Operations
+
+Production deployment and security:
+
+- **[Security](./SECURITY.md)** - Security policies and best practices
+- **[Deployment](./DEPLOYMENT.md)** - Production deployment guide
+- **[Redis Resilience](./REDIS_RESILIENCE.md)** - Redis failover and resilience
+
+## 🤝 Contributing
+
+How to contribute to the project:
+
+- **[Contributing Guide](./CONTRIBUTING.md)** - Development workflow and guidelines
+
+## 📊 Additional Resources
+
+### Diagrams
+
+- **[diagrams/](./diagrams/)** - Architecture and flow diagrams
+
+### Examples
+
+- **[examples/](./examples/)** - Complete code examples
+  - WebSocket client examples (Node.js)
+  - React hooks examples
+  - Integration patterns
+
+## 📑 Documentation by Category
+
+### By Role
+
+**Backend Developers:**
+- [Backend Setup](./backend-setup.md)
+- [API Documentation](./API.md)
+- [Testing Guide](./TESTING.md)
+
+**Frontend Developers:**
+- [Frontend Setup](./frontend-setup.md)
+- [Real-time Components](./realtime-components.md)
+- [Examples](./examples.md)
+
+**DevOps Engineers:**
+- [DevOps Tools](./devops-tools.md)
+- [Automation Scripts](./automation-scripts.md)
+- [CI Validation](./ci-validation.md)
+- [Deployment](./DEPLOYMENT.md)
+
+**QA Engineers:**
+- [Testing Guide](./TESTING.md)
+- [Smoke Testing](./smoke-testing.md)
+- [Performance Testing](./performance-testing.md)
+
+### By Topic
+
+**WebSocket/Real-time:**
+- [WebSocket Guide](./WEBSOCKET.md)
+- [Real-time Components](./realtime-components.md)
+- [WebSocket Testing Summary](./websocket-testing-summary.md)
+- [WebSocket Performance](./websocket-performance.md)
+- [Examples](./examples.md)
+
+**Testing:**
+- [Testing Guide](./TESTING.md)
+- [Smoke Testing](./smoke-testing.md)
+- [Performance Testing](./performance-testing.md)
+- [Local Testing](./local-testing.md)
+- [CI Validation](./ci-validation.md)
+
+**Automation & Tools:**
+- [DevOps Tools](./devops-tools.md)
+- [Automation Scripts](./automation-scripts.md)
+- [Copilot ChatModes](./copilot-chatmodes.md)
+
+## 🔍 Finding Documentation
+
+Can't find what you're looking for? Try these approaches:
+
+1. **Use the search function** in your editor or on GitHub
+2. **Check the main README** for high-level overview
+3. **Browse by category** above based on your role
+4. **Look in examples/** for practical code samples
+5. **Open an issue** if documentation is missing
+
+## 📝 Documentation Standards
+
+All documentation in this project follows these standards:
+
+- **Markdown format** for easy reading and editing
+- **Clear headings** with emoji icons for visual scanning
+- **Code examples** with syntax highlighting
+- **Links to related docs** for cross-referencing
+- **Consistent structure** across similar documents
+
+## 🔄 Recent Updates
+
+- ✅ **2025-10**: Documentation consolidation - All READMEs moved to `/docs`
+- ✅ **2025-10**: Simplified file naming - Removed complex prefixes
+- ✅ **2025-10**: Added comprehensive index with role-based navigation
+- ✅ **2025-10**: New consolidated guides for setup and testing
 
 ---
 
-**Need help?** Open an issue on [GitHub](https://github.com/rootkitoriginal/xRatEcosystem/issues)
+**Need help?** Open an issue on [GitHub](https://github.com/xLabInternet/xRatEcosystem/issues)

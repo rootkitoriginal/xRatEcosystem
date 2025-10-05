@@ -1,6 +1,10 @@
-# Real-time UI Components
+# Real-time UI Components Guide
 
-This directory contains real-time UI components for live updates, notifications, and user presence using WebSocket/Socket.IO.
+React components for WebSocket/Socket.IO real-time functionality in the xRat Ecosystem.
+
+## Overview
+
+This guide covers the real-time UI components for live updates, notifications, and user presence using WebSocket/Socket.IO.
 
 ## Components
 
@@ -257,6 +261,12 @@ When the backend WebSocket server is not available, the components run in mock m
 VITE_MOCK_WEBSOCKET=false  # Set to false to attempt real connection
 ```
 
+**Mock Behavior:**
+- Simulates connection events
+- Generates sample notifications
+- Provides test data
+- No actual WebSocket connection
+
 ## Event Reference
 
 ### Emitted Events
@@ -264,6 +274,17 @@ VITE_MOCK_WEBSOCKET=false  # Set to false to attempt real connection
 - `typing:start` - User started typing
 - `typing:stop` - User stopped typing
 - Custom events via `emit(event, data)`
+
+**Example:**
+```jsx
+const { emit } = useWebSocket();
+
+emit('custom:event', {
+  userId: '123',
+  action: 'like',
+  targetId: '456'
+});
+```
 
 ### Subscribed Events
 
@@ -275,23 +296,197 @@ VITE_MOCK_WEBSOCKET=false  # Set to false to attempt real connection
 - `data:updated` - Data updated
 - Custom events via `on(event, callback)`
 
+**Example:**
+```jsx
+const { on } = useWebSocket();
+
+useEffect(() => {
+  const unsubscribe = on('custom:event', (data) => {
+    console.log('Custom event received:', data);
+  });
+  
+  return unsubscribe; // Cleanup
+}, [on]);
+```
+
 ## Styling
 
 All components come with default CSS styles. You can customize by:
 
-1. Overriding CSS variables
-2. Importing custom CSS after component CSS
-3. Using CSS modules
+### 1. Overriding CSS Variables
+
+```css
+:root {
+  --notification-success: #4caf50;
+  --notification-error: #f44336;
+  --notification-warning: #ff9800;
+  --notification-info: #2196f3;
+  --connection-online: #4caf50;
+  --connection-offline: #f44336;
+}
+```
+
+### 2. Importing Custom CSS
+
+```jsx
+import './components/realtime/NotificationToast.css';
+import './my-custom-styles.css'; // Override default styles
+```
+
+### 3. Using CSS Modules
+
+```jsx
+import styles from './MyComponent.module.css';
+
+<NotificationToast className={styles.customToast} />
+```
 
 ## Testing
 
 Components are fully tested with Vitest and React Testing Library.
 
-Run tests:
+### Run Tests
+
 ```bash
+# Run all tests
 npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Run in watch mode
+npm run test:watch
 ```
 
-## Examples
+### Example Test
 
-See `Dashboard.jsx` for example usage of multiple real-time components.
+```jsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { NotificationToast } from './NotificationToast';
+
+describe('NotificationToast', () => {
+  it('displays notification message', () => {
+    const notification = {
+      id: 1,
+      type: 'success',
+      message: 'Test message'
+    };
+    
+    render(<NotificationToast notification={notification} />);
+    expect(screen.getByText('Test message')).toBeInTheDocument();
+  });
+  
+  it('calls onClose when dismissed', () => {
+    const onClose = jest.fn();
+    const notification = { id: 1, type: 'info', message: 'Test' };
+    
+    render(<NotificationToast notification={notification} onClose={onClose} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(onClose).toHaveBeenCalledWith(1);
+  });
+});
+```
+
+## Complete Example: Dashboard
+
+```jsx
+import {
+  WebSocketProvider,
+  NotificationContainer,
+  ConnectionStatus,
+  SystemStatus,
+  UserPresence,
+  RealtimeData
+} from './components/realtime';
+
+function Dashboard() {
+  return (
+    <WebSocketProvider>
+      <div className="dashboard">
+        <header>
+          <h1>Dashboard</h1>
+          <ConnectionStatus />
+        </header>
+        
+        <main>
+          <SystemStatus />
+          
+          <section>
+            <h2>Online Users</h2>
+            <UserPresence userId="1" userName="John Doe" />
+            <UserPresence userId="2" userName="Jane Smith" />
+          </section>
+          
+          <section>
+            <h2>Live Data</h2>
+            <RealtimeData event="data:updated">
+              {({ data, hasUpdate }) => (
+                <div className={hasUpdate ? 'pulse' : ''}>
+                  {JSON.stringify(data, null, 2)}
+                </div>
+              )}
+            </RealtimeData>
+          </section>
+        </main>
+        
+        <NotificationContainer />
+      </div>
+    </WebSocketProvider>
+  );
+}
+
+export default Dashboard;
+```
+
+## Best Practices
+
+1. **Always use WebSocketProvider**: Wrap your app in the provider
+2. **Handle disconnections gracefully**: Show user-friendly messages
+3. **Clean up subscriptions**: Use useEffect cleanup
+4. **Throttle frequent events**: Don't emit too often
+5. **Mock for development**: Use mock mode when backend is unavailable
+6. **Test thoroughly**: Write tests for all event handlers
+7. **Optimize renders**: Use React.memo for expensive components
+
+## Troubleshooting
+
+### Components not receiving updates
+
+**Problem**: Real-time updates not appearing
+
+**Solutions:**
+1. Verify WebSocketProvider wraps components
+2. Check backend is emitting events
+3. Verify event names match
+4. Check browser console for errors
+
+### Connection issues
+
+**Problem**: WebSocket won't connect
+
+**Solutions:**
+1. Check backend WebSocket server is running
+2. Verify `VITE_API_URL` is correct
+3. Check JWT token is valid
+4. Enable mock mode for development
+
+### Performance issues
+
+**Problem**: App slows down with many updates
+
+**Solutions:**
+1. Throttle event emissions
+2. Use React.memo for components
+3. Optimize event handlers
+4. Batch state updates
+
+## Related Documentation
+
+- [WebSocket API Documentation](./WEBSOCKET.md)
+- [API Documentation](./API.md)
+- [Frontend Setup](./frontend-setup.md)
+- [Testing Guide](./TESTING.md)
+
+---
+
+**Need help?** Check the [WebSocket examples](./examples.md) or open an issue on GitHub.

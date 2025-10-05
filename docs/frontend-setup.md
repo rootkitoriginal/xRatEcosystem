@@ -1,4 +1,4 @@
-# xRat Ecosystem - Frontend
+# Frontend Development Setup
 
 React + Vite frontend application for the xRat Ecosystem.
 
@@ -37,6 +37,7 @@ Create `.env` file in project root:
 
 ```bash
 VITE_API_URL=http://localhost:3000
+VITE_MOCK_WEBSOCKET=false
 ```
 
 **Note:** Vite requires environment variables to be prefixed with `VITE_`
@@ -115,7 +116,7 @@ npm run test:coverage
 - **Integration Tests:** Component interaction testing
 - **E2E Tests:** Complete user flow testing (future with Playwright)
 
-See [Testing Documentation](../docs/TESTING.md) for comprehensive testing guide.
+See [Testing Documentation](./TESTING.md) for comprehensive testing guide.
 
 ## 🎨 Styling
 
@@ -133,6 +134,21 @@ src/
 - Follow BEM naming convention (optional)
 - Keep styles modular and component-scoped
 - Use semantic class names
+
+### CSS Custom Properties
+
+```css
+:root {
+  --primary-color: #646cff;
+  --background-color: #242424;
+  --text-color: rgba(255, 255, 255, 0.87);
+}
+
+.component {
+  color: var(--text-color);
+  background: var(--background-color);
+}
+```
 
 ## 📦 Dependencies
 
@@ -165,7 +181,6 @@ npm run test:coverage # Generate coverage report
 ## 🔥 Hot Module Replacement (HMR)
 
 Vite provides instant HMR for fast development:
-
 - Changes reflect immediately
 - State is preserved during updates
 - No full page reload needed
@@ -309,7 +324,7 @@ const LazyComponent = lazy(() => import('./Component'));
 
 ## 🚀 Deployment
 
-See [Deployment Documentation](../docs/DEPLOYMENT.md) for production deployment.
+See [Deployment Documentation](./DEPLOYMENT.md) for production deployment.
 
 ### Quick Deploy
 
@@ -343,61 +358,44 @@ npm audit fix
 ## 📝 Adding New Components
 
 1. **Create component file:**
-```jsx
-// src/components/NewComponent.jsx
-import { useState } from 'react';
-import './NewComponent.css';
+   ```jsx
+   // src/components/NewComponent.jsx
+   import { useState } from 'react';
+   import './NewComponent.css';
 
-function NewComponent({ prop }) {
-  return <div>{prop}</div>;
-}
+   function NewComponent({ prop }) {
+     return <div>{prop}</div>;
+   }
 
-export default NewComponent;
-```
+   export default NewComponent;
+   ```
 
 2. **Create tests:**
-```jsx
-// __tests__/unit/NewComponent.test.jsx
-import { render, screen } from '@testing-library/react';
-import NewComponent from '../../src/components/NewComponent';
+   ```jsx
+   // __tests__/unit/NewComponent.test.jsx
+   import { render, screen } from '@testing-library/react';
+   import NewComponent from '../../src/components/NewComponent';
 
-describe('NewComponent', () => {
-  it('renders correctly', () => {
-    render(<NewComponent prop="test" />);
-    expect(screen.getByText('test')).toBeDefined();
-  });
-});
-```
+   describe('NewComponent', () => {
+     it('renders correctly', () => {
+       render(<NewComponent prop="test" />);
+       expect(screen.getByText('test')).toBeDefined();
+     });
+   });
+   ```
 
 3. **Import and use:**
-```jsx
-import NewComponent from './components/NewComponent';
+   ```jsx
+   import NewComponent from './components/NewComponent';
 
-function App() {
-  return <NewComponent prop="value" />;
-}
-```
-
-## 🎨 Theming
-
-### CSS Custom Properties
-
-```css
-:root {
-  --primary-color: #646cff;
-  --background-color: #242424;
-  --text-color: rgba(255, 255, 255, 0.87);
-}
-
-.component {
-  color: var(--text-color);
-  background: var(--background-color);
-}
-```
+   function App() {
+     return <NewComponent prop="value" />;
+   }
+   ```
 
 ## 🤝 Contributing
 
-See [Contributing Guidelines](../docs/CONTRIBUTING.md) for:
+See [Contributing Guidelines](./CONTRIBUTING.md) for:
 - Code style guidelines
 - Component patterns
 - Testing requirements
@@ -409,10 +407,6 @@ See [Contributing Guidelines](../docs/CONTRIBUTING.md) for:
 - [Vite Documentation](https://vitejs.dev/)
 - [Vitest Documentation](https://vitest.dev/)
 - [Testing Library](https://testing-library.com/react)
-
-## 📄 License
-
-MIT License - See LICENSE file in project root
 
 ---
 
