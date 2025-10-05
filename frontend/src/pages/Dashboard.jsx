@@ -87,7 +87,11 @@ function Dashboard() {
           </div>
         </section>
 
+<<<<<<< HEAD
         <section style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+=======
+        <section style={{ marginBottom: '2rem' }}>
+>>>>>>> copilot/fix-063f5fa9-59d0-402b-b5a2-30dfb9be1c49
           <Link to="/data" className="data-link">
             <button className="submit-btn">📊 Go to Data Management</button>
           </Link>
