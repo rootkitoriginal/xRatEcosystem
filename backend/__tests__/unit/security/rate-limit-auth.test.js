@@ -58,9 +58,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
     it('should block authentication after exceeding rate limit', async () => {
       // Make 5 failed login attempts
       for (let i = 0; i < 5; i++) {
-        await request(app)
-          .post('/auth/login')
-          .send({ username: 'test', password: 'wrong' });
+        await request(app).post('/auth/login').send({ username: 'test', password: 'wrong' });
       }
 
       // 6th attempt should be rate limited
@@ -141,9 +139,7 @@ describe('Rate Limiting with Authentication - Security Tests', () => {
       await request(app).post('/test-endpoint').send({ username: 'user3' });
 
       // 4th request should be rate limited regardless of username
-      const response = await request(app)
-        .post('/test-endpoint')
-        .send({ username: 'user4' });
+      const response = await request(app).post('/test-endpoint').send({ username: 'user4' });
 
       expect(response.status).toBe(429);
     });

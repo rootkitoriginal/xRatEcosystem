@@ -259,9 +259,7 @@ describe('JWT Utilities - Token Structure & Validation', () => {
   describe('JWT Security - Algorithm Manipulation', () => {
     it('should reject token with "alg: none" attack', () => {
       // Create a token with "none" algorithm
-      const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString(
-        'base64url'
-      );
+      const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
       const payload = Buffer.from(JSON.stringify(testPayload)).toString('base64url');
       const noneToken = `${header}.${payload}.`;
 
