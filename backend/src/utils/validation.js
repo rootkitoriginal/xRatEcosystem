@@ -80,6 +80,24 @@ const exportParamsSchema = Joi.object({
   endDate: Joi.date().iso().min(Joi.ref('startDate')).optional(),
 });
 
+// Schema for updating user profile
+const updateProfileSchema = Joi.object({
+  fullName: Joi.string().trim().max(100).allow('').optional().messages({
+    'string.max': 'Full name must not exceed 100 characters',
+  }),
+  bio: Joi.string().trim().max(250).allow('').optional().messages({
+    'string.max': 'Bio must not exceed 250 characters',
+  }),
+  avatarUrl: Joi.string()
+    .trim()
+    .uri({ scheme: ['http', 'https'] })
+    .allow('')
+    .optional()
+    .messages({
+      'string.uri': 'Avatar URL must be a valid URL starting with http:// or https://',
+    }),
+});
+
 /**
  * Middleware to validate request body
  */
@@ -142,6 +160,7 @@ module.exports = {
   queryParamsSchema,
   bulkOperationSchema,
   exportParamsSchema,
+  updateProfileSchema,
   validate,
   validateQuery,
 };
