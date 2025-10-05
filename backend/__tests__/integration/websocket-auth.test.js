@@ -1,5 +1,4 @@
 const http = require('http');
-const { Server } = require('socket.io');
 const Client = require('socket.io-client');
 const { SocketService } = require('../../src/websocket');
 const { generateAccessToken } = require('../../src/utils/jwt');
