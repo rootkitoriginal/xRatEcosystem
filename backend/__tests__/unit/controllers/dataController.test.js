@@ -1,3 +1,8 @@
+// Mock index.js to prevent server startup during tests
+jest.mock('../../../src/index', () => ({
+  socketService: jest.fn(() => null),
+}));
+
 const dataController = require('../../../src/controllers/dataController');
 
 describe('Data Controller', () => {

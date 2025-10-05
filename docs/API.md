@@ -707,6 +707,33 @@ curl -X POST http://localhost:3000/api/data \
 }
 ```
 
+**Real-time Notifications:**
+
+When data is created successfully, the following WebSocket events are automatically sent:
+
+1. **User Notification** (`notification` event):
+   ```json
+   {
+     "type": "success",
+     "message": "New data entry \"My Data\" has been created",
+     "data": {
+       "id": "507f1f77bcf86cd799439011",
+       "name": "My Data",
+       "type": "json"
+     },
+     "timestamp": "2025-01-04T08:00:00.000Z"
+   }
+   ```
+
+2. **Data Update Broadcast** (`data:updated` event to subscribers):
+   ```json
+   {
+     "entity": "data",
+     "data": { /* full data object */ },
+     "timestamp": "2025-01-04T08:00:00.000Z"
+   }
+   ```
+
 **Status Codes:**
 
 - `201 Created` - Data created successfully
@@ -891,6 +918,33 @@ At least one field must be provided. All fields are optional:
   "timestamp": "2025-01-04T08:30:00.000Z"
 }
 ```
+
+**Real-time Notifications:**
+
+When data is updated successfully, the following WebSocket events are automatically sent:
+
+1. **User Notification** (`notification` event):
+   ```json
+   {
+     "type": "info",
+     "message": "Data entry \"Updated Name\" has been updated",
+     "data": {
+       "id": "507f1f77bcf86cd799439011",
+       "name": "Updated Name",
+       "type": "json"
+     },
+     "timestamp": "2025-01-04T08:30:00.000Z"
+   }
+   ```
+
+2. **Data Update Broadcast** (`data:updated` event to subscribers):
+   ```json
+   {
+     "entity": "data",
+     "data": { /* full updated data object */ },
+     "timestamp": "2025-01-04T08:30:00.000Z"
+   }
+   ```
 
 **Status Codes:**
 
