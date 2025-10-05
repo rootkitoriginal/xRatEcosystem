@@ -6,7 +6,7 @@ import DataSearch from '../components/data/DataSearch';
 import BulkActions from '../components/data/BulkActions';
 import DataStats from '../components/data/DataStats';
 import DataExport from '../components/data/DataExport';
-import { mockDataService } from '../services/mockDataService';
+import { dataService } from '../services/dataService';
 import './DataManagement.css';
 
 function DataManagement() {
@@ -51,7 +51,7 @@ function DataManagement() {
         ...filters,
       };
 
-      const result = await mockDataService.getData(params);
+      const result = await dataService.getAll(params);
       setData(result.data);
       setTotalPages(result.pagination.totalPages);
       setTotalRecords(result.pagination.total);
@@ -65,8 +65,8 @@ function DataManagement() {
   // Fetch stats
   const fetchStats = useCallback(async () => {
     try {
-      const statsData = await mockDataService.getStats();
-      setStats(statsData);
+      const statsData = await dataService.getAnalytics();
+      setStats(statsData.analytics);
     } catch (err) {
       console.error('Failed to load stats:', err);
     }
@@ -105,7 +105,7 @@ function DataManagement() {
 
   // CRUD handlers
   const handleCreate = async (formData) => {
-    await mockDataService.createData(formData);
+    await dataService.create(formData);
     setShowForm(false);
     await fetchData();
     await fetchStats();
@@ -118,7 +118,7 @@ function DataManagement() {
   };
 
   const handleUpdate = async (formData) => {
-    await mockDataService.updateData(editingItem.id, formData);
+    await dataService.update(editingItem.id, formData);
     setEditingItem(null);
     setShowForm(false);
     await fetchData();
@@ -128,7 +128,7 @@ function DataManagement() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
-        await mockDataService.deleteData(id);
+        await dataService.delete(id);
         setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
         await fetchData();
         await fetchStats();
@@ -141,7 +141,7 @@ function DataManagement() {
   const handleBulkDelete = async () => {
     if (window.confirm(`Are you sure you want to delete ${selectedIds.length} records?`)) {
       try {
-        await mockDataService.bulkDelete(selectedIds);
+        await dataService.bulkOperation('delete', selectedIds);
         setSelectedIds([]);
         await fetchData();
         await fetchStats();
@@ -158,11 +158,13 @@ function DataManagement() {
       let mimeType;
 
       if (format === 'json') {
-        content = await mockDataService.exportJSON();
+        const result = await dataService.export('json');
+        content = result.data;
         filename = `data-export-${Date.now()}.json`;
         mimeType = 'application/json';
       } else if (format === 'csv') {
-        content = await mockDataService.exportCSV();
+        const result = await dataService.export('csv');
+        content = result.data;
         filename = `data-export-${Date.now()}.csv`;
         mimeType = 'text/csv';
       }

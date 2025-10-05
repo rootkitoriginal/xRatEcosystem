@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { mockDataService } from '../../services/mockDataService';
+import { dataService } from '../../services/dataService';
 import './DataSummaryWidget.css';
 
 function DataSummaryWidget() {
@@ -15,8 +15,8 @@ function DataSummaryWidget() {
     try {
       setLoading(true);
       setError(null);
-      const stats = await mockDataService.getStats();
-      setTotalCount(stats.total);
+      const result = await dataService.getAnalytics();
+      setTotalCount(result.analytics.total || 0);
     } catch (err) {
       setError('Failed to load data count');
       console.error(err);

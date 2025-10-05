@@ -1,26 +1,38 @@
 /* eslint-disable no-unused-vars */
 const request = require('supertest');
 const express = require('express');
+const { isDatabaseMockEnabled, warnMockUsage } = require('../../src/config/mockConfig');
 
-// Mock dependencies
-jest.mock('mongoose', () => ({
-  connect: jest.fn().mockResolvedValue(true),
-  connection: {
-    readyState: 1,
-    close: jest.fn(),
-  },
-}));
+// Conditional mock dependencies based on configuration
+const shouldMockMongoDB = isDatabaseMockEnabled('mongodb');
+const shouldMockRedis = isDatabaseMockEnabled('redis');
 
-jest.mock('redis', () => ({
-  createClient: jest.fn(() => ({
-    connect: jest.fn(),
-    isOpen: true,
-    set: jest.fn(),
-    get: jest.fn(),
-    quit: jest.fn(),
-    on: jest.fn(),
-  })),
-}));
+// Mock MongoDB conditionally
+if (shouldMockMongoDB) {
+  warnMockUsage('MongoDB');
+  jest.mock('mongoose', () => ({
+    connect: jest.fn().mockResolvedValue(true),
+    connection: {
+      readyState: 1,
+      close: jest.fn(),
+    },
+  }));
+}
+
+// Mock Redis conditionally  
+if (shouldMockRedis) {
+  warnMockUsage('Redis');
+  jest.mock('redis', () => ({
+    createClient: jest.fn(() => ({
+      connect: jest.fn(),
+      isOpen: true,
+      set: jest.fn(),
+      get: jest.fn(),
+      quit: jest.fn(),
+      on: jest.fn(),
+    })),
+  }));
+}
 
 describe('API Endpoints', () => {
   let app;

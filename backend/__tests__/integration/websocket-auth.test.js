@@ -149,7 +149,7 @@ describe('WebSocket Authentication Integration Tests', () => {
         done();
       });
 
-      clientSocket.on('connect_error', (error) => {
+      clientSocket.on('connect_error', (_error) => {
         // Skip this test if mock setup doesn't work properly
         clientSocket.close();
         done();

@@ -695,6 +695,7 @@ Veja também:
 - [🎨 Frontend Setup](docs/frontend-setup.md) - Configuração do frontend
 - [🛠️ DevOps Tools](docs/devops-tools.md) - Ferramentas de monitoramento
 - [🤖 Automation Scripts](docs/automation-scripts.md) - Scripts de automação
+- [🎭 Mock Configuration](docs/MOCK_CONFIGURATION.md) - **Configuração de Mocks (Frontend/Backend)**
 
 ---
 

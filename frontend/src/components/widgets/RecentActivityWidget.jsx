@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { mockDataService } from '../../services/mockDataService';
+import { dataService } from '../../services/dataService';
 import './RecentActivityWidget.css';
 
 function RecentActivityWidget() {
@@ -16,8 +16,8 @@ function RecentActivityWidget() {
       setLoading(true);
       setError(null);
       // Get data sorted by updatedAt in descending order, limit to 5
-      const result = await mockDataService.getData({
-        perPage: 5,
+      const result = await dataService.getAll({
+        limit: 5,
         sortBy: 'updatedAt',
         sortOrder: 'desc',
       });

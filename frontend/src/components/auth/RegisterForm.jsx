@@ -39,8 +39,10 @@ function RegisterForm({ onSuccess, onSwitchToLogin }) {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one letter and one number';
     }
 
     if (!formData.confirmPassword) {
@@ -65,7 +67,7 @@ function RegisterForm({ onSuccess, onSwitchToLogin }) {
 
     try {
       await register({
-        name: formData.name,
+        username: formData.name,
         email: formData.email,
         password: formData.password,
       });
@@ -121,7 +123,7 @@ function RegisterForm({ onSuccess, onSwitchToLogin }) {
             type="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters with letters and numbers"
             disabled={isSubmitting}
             aria-invalid={!!errors.password}
           />

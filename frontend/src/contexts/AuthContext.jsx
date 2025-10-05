@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { mockAuth } from '../services/mockAuth';
+import { authService, isUsingMockAuth } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -25,8 +25,8 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('authUser');
 
         if (storedToken && storedUser) {
-          // Validate token (in real app, this would call backend)
-          const validatedUser = await mockAuth.validateToken(storedToken);
+          // Validate token with backend or mock
+          const validatedUser = await authService.validateToken(storedToken);
           if (validatedUser) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await mockAuth.login(email, password);
+      const response = await authService.login(email, password);
 
       setToken(response.token);
       setUser(response.user);
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await mockAuth.register(userData);
+      const response = await authService.register(userData);
 
       setToken(response.token);
       setUser(response.user);
@@ -94,18 +94,22 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       setLoading(true);
-      await mockAuth.logout();
+      await authService.logout(token);
 
       setToken(null);
       setUser(null);
 
       localStorage.removeItem('authToken');
       localStorage.removeItem('authUser');
-    } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Logout failed. Please try again.');
+      throw error;
     }
+  };
+
+  const clearError = () => {
+    setError(null);
   };
 
   const value = {
@@ -116,7 +120,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user,
+    clearError,
+    isUsingMock: isUsingMockAuth(),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

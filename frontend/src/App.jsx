@@ -10,6 +10,7 @@ import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import DataManagement from './pages/DataManagement';
 import ProfilePage from './pages/ProfilePage';
+import MockStatusIndicator from './components/debug/MockStatusIndicator';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <WebSocketProvider>
           <ConnectionStatus />
           <NotificationContainer />
+          {import.meta.env.DEV && <MockStatusIndicator />}
           <div className="app">
             <header className="header">
               <div>
