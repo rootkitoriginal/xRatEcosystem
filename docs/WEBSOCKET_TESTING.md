@@ -4,18 +4,23 @@
 
 This document provides comprehensive guidance on testing the xRat Ecosystem WebSocket implementation, covering unit tests, integration tests, and advanced testing patterns.
 
+<<<<<<< HEAD
 **📊 For performance and stress testing, see**: [WebSocket Performance Testing Guide](./WEBSOCKET_PERFORMANCE_TESTING.md)
+
+=======
+
+> > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
 
 ## Test Coverage Summary
 
 ### Current Coverage Metrics
 
-| Metric | Coverage | Target | Status |
-|--------|----------|--------|--------|
-| **Statements** | 93.77% | 90% | ✅ EXCEEDS |
-| **Branches** | 91.04% | 90% | ✅ EXCEEDS |
-| **Functions** | 76.66% | 90% | 🟡 In Progress |
-| **Lines** | 96.55% | 90% | ✅ EXCEEDS |
+| Metric         | Coverage | Target | Status         |
+| -------------- | -------- | ------ | -------------- |
+| **Statements** | 93.77%   | 90%    | ✅ EXCEEDS     |
+| **Branches**   | 91.04%   | 90%    | ✅ EXCEEDS     |
+| **Functions**  | 76.66%   | 90%    | 🟡 In Progress |
+| **Lines**      | 96.55%   | 90%    | ✅ EXCEEDS     |
 
 **Total Tests**: 150 (140 unit + 10 integration)
 
@@ -181,10 +186,14 @@ describe('handleEventName', () => {
     const { validateEvent } = require('../../../src/websocket/validators');
     validateEvent.mockReturnValueOnce({
       valid: true,
-      sanitizedData: { /* expected data */ },
+      sanitizedData: {
+        /* expected data */
+      },
     });
 
-    const data = { /* test data */ };
+    const data = {
+      /* test data */
+    };
     socketService.handleEventName(mockSocket, data);
 
     // Verify expected behavior
@@ -198,7 +207,9 @@ describe('handleEventName', () => {
       error: 'Validation error message',
     });
 
-    socketService.handleEventName(mockSocket, { /* invalid data */ });
+    socketService.handleEventName(mockSocket, {
+      /* invalid data */
+    });
 
     expect(mockSocket.emit).toHaveBeenCalledWith('error', {
       event: 'event:name',
@@ -210,7 +221,9 @@ describe('handleEventName', () => {
   test('should handle rate limit exceeded', () => {
     socketService.checkRateLimit.mockReturnValue(false);
 
-    socketService.handleEventName(mockSocket, { /* data */ });
+    socketService.handleEventName(mockSocket, {
+      /* data */
+    });
 
     // Verify rate limit enforcement
   });
@@ -514,6 +527,7 @@ node --inspect-brk node_modules/.bin/jest --testPathPatterns="websocket" --runIn
 ### Remaining Uncovered Lines
 
 **socketService.js: Lines 55-71, 83**
+
 - Authentication middleware internals
 - Socket.IO internal connection handling
 - These are covered by integration tests but hard to unit test directly
@@ -552,9 +566,12 @@ When adding new WebSocket features:
 - [Socket.IO Client Testing](https://socket.io/docs/v4/client-api/)
 - [xRat WebSocket Documentation](./WEBSOCKET.md)
 
+<<<<<<< HEAD
+
 ## Performance & Stress Testing
 
 For comprehensive performance and stress testing documentation, including:
+
 - Connection load testing (1,000+ concurrent connections)
 - Memory leak detection and management
 - Message throughput and latency testing
@@ -578,12 +595,20 @@ npm run test:performance:resources   # Resource exhaustion tests
 
 **Note**: Performance tests are excluded from regular test runs to avoid long CI times. They should be run periodically or before major releases.
 
+=======
+
+> > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
+
 ## Conclusion
 
 The xRat Ecosystem WebSocket implementation has achieved **production-grade test coverage** with:
 
+<<<<<<< HEAD
+
 - ✅ 150 comprehensive functional tests
-- ✅ 38 performance & stress tests (NEW)
+- # ✅ 38 performance & stress tests (NEW)
+- ✅ 150 comprehensive tests
+  > > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
 - ✅ 93.77% statement coverage
 - ✅ 91.04% branch coverage
 - ✅ 96.55% line coverage
@@ -591,6 +616,8 @@ The xRat Ecosystem WebSocket implementation has achieved **production-grade test
 - ✅ Complete error recovery testing
 - ✅ Rate limiting enforcement verified
 - ✅ Real Socket.IO integration tests
-- ✅ Production-ready performance benchmarks (NEW)
+  <<<<<<< HEAD
+- # ✅ Production-ready performance benchmarks (NEW)
+  > > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
 
 This testing suite ensures **reliable, secure, and performant** real-time communication in the xRat Ecosystem.
