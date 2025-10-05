@@ -10,16 +10,11 @@ const mongoose = require('mongoose');
  * Handles circular dependency and gracefully fails if not available
  */
 const getSocketService = () => {
-  // Skip in test environment to avoid starting the server
-  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
-    return null;
-  }
-
   try {
     const { socketService } = require('../index');
     return socketService ? socketService() : null;
   } catch (error) {
-    // Service not available (e.g., during initialization)
+    // Service not available (e.g., during initialization or tests)
     return null;
   }
 };
