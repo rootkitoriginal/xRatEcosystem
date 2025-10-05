@@ -53,56 +53,62 @@ socket.on('connect', () => {
 
 ### React Example
 
+The frontend includes a complete WebSocket implementation with notification support:
+
 ```javascript
-import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+// Using the built-in WebSocketProvider
+import { WebSocketProvider, useWebSocket } from './components/realtime/WebSocketProvider';
+import NotificationContainer from './components/realtime/NotificationContainer';
 
-function useWebSocket(token) {
-  const [socket, setSocket] = useState(null);
-  const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-    const socketInstance = io('http://localhost:3000', {
-      auth: { token },
-    });
-
-    socketInstance.on('connect', () => {
-      setConnected(true);
-    });
-
-    socketInstance.on('disconnect', () => {
-      setConnected(false);
-    });
-
-    setSocket(socketInstance);
-
-    return () => {
-      socketInstance.disconnect();
-    };
-  }, [token]);
-
-  return { socket, connected };
+function App() {
+  return (
+    <WebSocketProvider>
+      <NotificationContainer />
+      <YourComponents />
+    </WebSocketProvider>
+  );
 }
 
-// Usage in component
-function App() {
-  const { socket, connected } = useWebSocket(localStorage.getItem('token'));
+// Access WebSocket in any component
+function DataComponent() {
+  const { socket, connected, notifications } = useWebSocket();
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('notification', (notification) => {
-      console.log('New notification:', notification);
+    // Listen for data updates
+    socket.on('data:updated', (update) => {
+      console.log('Data updated:', update);
+      // Handle the update in your component
     });
 
     return () => {
-      socket.off('notification');
+      socket.off('data:updated');
     };
   }, [socket]);
 
-  return <div>{connected ? 'Connected' : 'Disconnected'}</div>;
+  return (
+    <div>
+      {connected ? '🟢 Connected' : '🔴 Disconnected'}
+      <div>Notifications: {notifications.length}</div>
+    </div>
+  );
 }
 ```
+
+**Built-in Components:**
+
+- `WebSocketProvider` - Manages connection and state
+- `NotificationContainer` - Displays toast notifications (top-right)
+- `NotificationPanel` - Notification history panel
+- `ConnectionStatus` - Shows connection status indicator
+
+**Automatic Features:**
+
+- ✅ Auto-reconnection on disconnect
+- ✅ Toast notifications for data changes
+- ✅ JWT authentication integration
+- ✅ Mock mode for development (set `VITE_MOCK_WEBSOCKET=true`)
 
 ## Architecture
 
@@ -1168,32 +1174,63 @@ socket.on('notification', (notification) => {
 
 ### Broadcasting Data Changes
 
-Update the data controller to broadcast changes:
+The data controller automatically broadcasts changes when data is created or updated:
 
 ```javascript
-// In dataController.js
-const { socketService } = require('../index');
+// Example from backend/src/controllers/dataController.js
+const getSocketService = () => {
+  try {
+    const { socketService } = require('../index');
+    return socketService ? socketService() : null;
+  } catch (error) {
+    // Service not available (e.g., during initialization or tests)
+    return null;
+  }
+};
 
-async function updateData(req, res) {
-  const updated = await Data.findByIdAndUpdate(req.params.id, req.body);
+// Automatically sends notifications on data creation
+async function createData(dataService) {
+  const data = await dataService.create(dataObj, userId);
 
-  // Broadcast update to subscribers
-  const service = socketService();
+  // Send real-time notification to user
+  const service = getSocketService();
   if (service) {
-    service.broadcastDataUpdate('data', updated);
+    service.sendNotificationToUser(userId, {
+      type: 'success',
+      message: `New data entry "${data.name}" has been created`,
+      data: { id: data._id, name: data.name, type: data.type },
+    });
+
+    // Broadcast update to subscribers
+    service.broadcastDataUpdate('data', data);
   }
 
-  res.json({ success: true, data: updated });
+  return data;
 }
 ```
 
+**What gets broadcasted:**
+
+- ✅ Data creation → `success` notification + `data:updated` event
+- ✅ Data updates → `info` notification + `data:updated` event
+- ✅ Bulk operations → Individual broadcasts + summary notification
+
 ### Sending Notifications
 
-```javascript
-const { socketService } = require('../index');
+For custom notifications in your controllers:
 
-async function sendNotification(userId, notification) {
-  const service = socketService();
+```javascript
+const getSocketService = () => {
+  try {
+    const { socketService } = require('../index');
+    return socketService ? socketService() : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+async function sendCustomNotification(userId, notification) {
+  const service = getSocketService();
   if (service) {
     service.sendNotificationToUser(userId, {
       type: 'info',
@@ -1203,6 +1240,13 @@ async function sendNotification(userId, notification) {
   }
 }
 ```
+
+**Notification Types:**
+
+- `success` - Green notification for successful operations
+- `info` - Blue notification for informational messages
+- `warning` - Yellow notification for warnings
+- `error` - Red notification for errors
 
 ### Getting Statistics
 
