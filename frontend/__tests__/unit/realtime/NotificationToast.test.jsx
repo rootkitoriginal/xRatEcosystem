@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NotificationToast from '../../../src/components/realtime/NotificationToast';
 
@@ -89,10 +89,15 @@ describe('NotificationToast', () => {
     render(<NotificationToast notification={notification} onClose={mockOnClose} />);
 
     const closeButton = screen.getByLabelText('Close notification');
-    await user.click(closeButton);
+
+    await act(async () => {
+      await user.click(closeButton);
+    });
 
     // Wait for animation to complete
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    });
 
     expect(mockOnClose).toHaveBeenCalledWith(1);
   });
@@ -107,7 +112,9 @@ describe('NotificationToast', () => {
     render(<NotificationToast notification={notification} onClose={mockOnClose} duration={500} />);
 
     // Fast-forward time including animation delay
-    vi.advanceTimersByTime(850);
+    act(() => {
+      vi.advanceTimersByTime(850);
+    });
 
     expect(mockOnClose).toHaveBeenCalledWith(1);
   });
