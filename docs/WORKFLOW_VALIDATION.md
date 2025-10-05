@@ -93,7 +93,8 @@
 
 **Observações**:
 
-- Branch name validation usando regex pattern
+- Branch name validation usando regex pattern: `^(feature|fix|docs|refactor|test|chore|copilot|dependabot)/.+`
+- Suporta branches automáticas do Dependabot
 - Integração com actions/labeler@v5
 - Semantic PR title check com amannn/action-semantic-pull-request@v5
 

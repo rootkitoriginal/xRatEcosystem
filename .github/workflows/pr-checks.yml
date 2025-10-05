@@ -39,8 +39,8 @@ jobs:
       - name: Check branch name
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
-          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|docs|refactor|test|chore|copilot)/.+ ]]; then
-            echo "❌ Branch name must start with: feature/, fix/, docs/, refactor/, test/, chore/, or copilot/"
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|docs|refactor|test|chore|copilot|dependabot)/.+ ]]; then
+            echo "❌ Branch name must start with: feature/, fix/, docs/, refactor/, test/, chore/, copilot/, or dependabot/"
             echo "Current branch: $BRANCH_NAME"
             exit 1
           fi
