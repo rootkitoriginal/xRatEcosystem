@@ -11,6 +11,7 @@ Example code for integrating with the xRat Ecosystem WebSocket service.
 A complete Node.js example showing how to connect to the WebSocket server and handle all event types.
 
 **Features:**
+
 - JWT authentication
 - Data subscriptions
 - Notification handling
@@ -42,6 +43,7 @@ node examples/websocket-client-example.js
 Complete React hooks and components for integrating WebSocket functionality in a React application.
 
 **Features:**
+
 - `useWebSocket` - Main WebSocket connection hook
 - `useDataSubscription` - Subscribe to real-time data updates
 - `useNotifications` - Handle notifications
@@ -117,8 +119,8 @@ import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:3000', {
   auth: {
-    token: 'YOUR_JWT_TOKEN'
-  }
+    token: 'YOUR_JWT_TOKEN',
+  },
 });
 ```
 
@@ -128,7 +130,7 @@ const socket = io('http://localhost:3000', {
 // Subscribe to specific entity with filters
 socket.emit('data:subscribe', {
   entity: 'products',
-  filters: { category: 'electronics' }
+  filters: { category: 'electronics' },
 });
 
 // Listen for updates
@@ -144,10 +146,10 @@ socket.on('data:updated', (update) => {
 socket.on('notification', (notification) => {
   // Show notification to user
   showNotification(notification.message, notification.type);
-  
+
   // Mark as read
   socket.emit('notification:read', {
-    notificationId: notification.id
+    notificationId: notification.id,
   });
 });
 ```
@@ -191,7 +193,7 @@ socket.emit('room:join', { room: 'general' });
 // Send message to room
 socket.emit('room:message', {
   room: 'general',
-  message: 'Hello everyone!'
+  message: 'Hello everyone!',
 });
 
 // Receive room messages
@@ -273,6 +275,7 @@ node examples/websocket-client-example.js
 **Problem:** Cannot connect to WebSocket server
 
 **Solutions:**
+
 1. Check if backend is running: `curl http://localhost:3000/`
 2. Verify WebSocket URL is correct
 3. Check CORS configuration if connecting from different origin
@@ -282,6 +285,7 @@ node examples/websocket-client-example.js
 **Problem:** Connection rejected with "Authentication failed"
 
 **Solutions:**
+
 1. Verify JWT token is valid
 2. Check token hasn't expired (1 hour default)
 3. Ensure token is sent in `auth.token` field
@@ -291,6 +295,7 @@ node examples/websocket-client-example.js
 **Problem:** Connected but not receiving data updates
 
 **Solutions:**
+
 1. Verify subscription with `data:subscribed` event
 2. Check filters match your data
 3. Ensure event listener is registered before subscribing
@@ -300,6 +305,7 @@ node examples/websocket-client-example.js
 **Problem:** Getting "Rate limit exceeded" errors
 
 **Solutions:**
+
 1. Reduce message frequency (limit: 100 messages/min)
 2. Implement client-side throttling
 3. Batch operations when possible
@@ -315,19 +321,19 @@ const JWT_TOKEN = process.env.JWT_TOKEN;
 
 // Create socket connection
 const socket = io(SERVER_URL, {
-  auth: { token: JWT_TOKEN }
+  auth: { token: JWT_TOKEN },
 });
 
 // Connection events
 socket.on('connect', () => {
   console.log('✅ Connected to WebSocket server');
-  
+
   // Subscribe to data updates
   socket.emit('data:subscribe', {
     entity: 'products',
-    filters: { category: 'electronics' }
+    filters: { category: 'electronics' },
   });
-  
+
   // Join a room
   socket.emit('room:join', { room: 'general' });
 });
@@ -352,10 +358,10 @@ socket.on('data:updated', (update) => {
 // Notifications
 socket.on('notification', (notification) => {
   console.log('🔔 Notification:', notification.message);
-  
+
   // Mark as read
   socket.emit('notification:read', {
-    notificationId: notification.id
+    notificationId: notification.id,
   });
 });
 
@@ -374,7 +380,7 @@ socket.on('system:status', (status) => {
   console.log('📊 System:', {
     cpu: `${status.cpu}%`,
     memory: `${status.memory}%`,
-    uptime: `${Math.floor(status.uptime / 3600)}h`
+    uptime: `${Math.floor(status.uptime / 3600)}h`,
   });
 });
 
@@ -410,6 +416,7 @@ process.on('SIGINT', () => {
 ## Support
 
 For issues or questions:
+
 - Open an issue on GitHub
 - Check the [troubleshooting guide](./WEBSOCKET.md#troubleshooting)
 - Review the [API documentation](./API.md)
@@ -417,6 +424,7 @@ For issues or questions:
 ---
 
 **Related Files:**
+
 - Example files: `docs/examples/`
 - Component documentation: [Real-time Components](./realtime-components.md)
 - API reference: [API Documentation](./API.md)

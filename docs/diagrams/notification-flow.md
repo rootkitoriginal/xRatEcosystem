@@ -51,6 +51,7 @@
 ## Event Types
 
 ### Personal Notification
+
 ```
 notification event → Specific user
 {
@@ -61,6 +62,7 @@ notification event → Specific user
 ```
 
 ### Broadcast Update
+
 ```
 data:updated event → All subscribers
 {

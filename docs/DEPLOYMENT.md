@@ -26,12 +26,14 @@ This guide covers deploying the xRat Ecosystem in various environments.
 ### System Requirements
 
 **Minimum:**
+
 - CPU: 2 cores
 - RAM: 4 GB
 - Disk: 20 GB
 - OS: Linux, macOS, or Windows with WSL2
 
 **Recommended:**
+
 - CPU: 4 cores
 - RAM: 8 GB
 - Disk: 50 GB
@@ -97,6 +99,7 @@ RATE_LIMIT_MAX=100  # future
 ### Environment-Specific Configuration
 
 **Development:**
+
 ```bash
 NODE_ENV=development
 LOG_LEVEL=debug
@@ -104,6 +107,7 @@ FRONTEND_URL=http://localhost:5173
 ```
 
 **Staging:**
+
 ```bash
 NODE_ENV=staging
 LOG_LEVEL=info
@@ -111,6 +115,7 @@ FRONTEND_URL=https://staging.your-domain.com
 ```
 
 **Production:**
+
 ```bash
 NODE_ENV=production
 LOG_LEVEL=warn
@@ -452,6 +457,7 @@ docker-compose -f docker-compose.prod.yml up -d
 ### Deployment Files
 
 **Namespace:**
+
 ```yaml
 # k8s/namespace.yaml
 apiVersion: v1
@@ -461,6 +467,7 @@ metadata:
 ```
 
 **ConfigMap:**
+
 ```yaml
 # k8s/configmap.yaml
 apiVersion: v1
@@ -469,13 +476,14 @@ metadata:
   name: xrat-config
   namespace: xrat-ecosystem
 data:
-  NODE_ENV: "production"
-  MONGODB_URI: "mongodb://mongo-service:27017/xrat"
-  REDIS_HOST: "redis-service"
-  REDIS_PORT: "6379"
+  NODE_ENV: 'production'
+  MONGODB_URI: 'mongodb://mongo-service:27017/xrat'
+  REDIS_HOST: 'redis-service'
+  REDIS_PORT: '6379'
 ```
 
 **Secrets:**
+
 ```yaml
 # k8s/secrets.yaml
 apiVersion: v1
@@ -485,8 +493,8 @@ metadata:
   namespace: xrat-ecosystem
 type: Opaque
 stringData:
-  mongodb-password: "your-password"
-  redis-password: "your-password"
+  mongodb-password: 'your-password'
+  redis-password: 'your-password'
 ```
 
 **Deployments, Services, and Ingress** would be created similarly.

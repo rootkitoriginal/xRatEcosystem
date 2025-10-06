@@ -7,6 +7,7 @@ This directory contains performance and stress tests for the WebSocket infrastru
 ## Test Files
 
 ### 1. `websocket-stress.test.js`
+
 **Connection Load Testing**
 
 - 100+ simultaneous connections (scaled from 1,000+ target)
@@ -17,6 +18,7 @@ This directory contains performance and stress tests for the WebSocket infrastru
 **Key Metrics**: Connection success rate, cleanup effectiveness
 
 ### 2. `websocket-memory.test.js`
+
 **Memory Leak Detection**
 
 - Long-running connection memory tracking
@@ -27,6 +29,7 @@ This directory contains performance and stress tests for the WebSocket infrastru
 **Key Metrics**: Memory growth, cleanup efficiency, GC performance
 
 ### 3. `websocket-throughput.test.js`
+
 **Message Performance Testing**
 
 - High-frequency message broadcasting
@@ -37,6 +40,7 @@ This directory contains performance and stress tests for the WebSocket infrastru
 **Key Metrics**: Message throughput, latency, delivery rate
 
 ### 4. `websocket-resources.test.js`
+
 **Resource Exhaustion Testing**
 
 - CPU usage monitoring
@@ -50,11 +54,13 @@ This directory contains performance and stress tests for the WebSocket infrastru
 ## Running Tests
 
 ### All Performance Tests
+
 ```bash
 npm run test:performance
 ```
 
 ### Individual Test Suites
+
 ```bash
 # Connection stress tests
 npm run test:performance:stress
@@ -79,24 +85,26 @@ npm run test:performance:resources
 
 ## Success Criteria
 
-| Test Type | Success Threshold |
-|-----------|------------------|
-| Connection Rate | > 80% |
-| Memory Growth | < 10-20MB |
-| Message Throughput | > 500 msg/sec |
-| Average Latency | < 100ms |
-| Delivery Rate | > 90% |
-| CPU Usage | < 95% |
-| Recovery | System operational |
+| Test Type          | Success Threshold  |
+| ------------------ | ------------------ |
+| Connection Rate    | > 80%              |
+| Memory Growth      | < 10-20MB          |
+| Message Throughput | > 500 msg/sec      |
+| Average Latency    | < 100ms            |
+| Delivery Rate      | > 90%              |
+| CPU Usage          | < 95%              |
+| Recovery           | System operational |
 
 ## Scaling Notes
 
 Tests are scaled down for CI/CD environments:
+
 - Connection counts reduced (100 instead of 1,000+)
 - Timeouts adjusted for reliability
 - Resource usage optimized for standard CI runners
 
 For full-scale testing:
+
 1. Edit connection counts in test files
 2. Increase system limits (`ulimit -n 65536`)
 3. Allocate more Node.js memory (`--max-old-space-size=4096`)
@@ -105,12 +113,14 @@ For full-scale testing:
 ## Documentation
 
 For detailed documentation, see:
+
 - [WebSocket Performance Testing Guide](../../docs/websocket-performance.md)
 - [WebSocket Testing Guide](../../docs/WEBSOCKET_TESTING.md)
 
 ## Contributing
 
 When adding new performance tests:
+
 1. Use unique ports (30005+)
 2. Document expected metrics
 3. Include cleanup logic
@@ -120,21 +130,25 @@ When adding new performance tests:
 ## Troubleshooting
 
 ### Tests Timeout
+
 - Reduce connection counts
 - Increase `testTimeout` values
 - Run with `--runInBand`
 
 ### Connection Errors
+
 - Check port availability (30001-30004)
 - Close previous test processes
 - Wait between test runs
 
 ### Memory Test Failures
+
 - Run tests in isolation
 - Use `--expose-gc` flag
 - Check system memory availability
 
 ### Inconsistent Results
+
 - Use `--runInBand` for sequential execution
 - Add delays between operations
 - Check system load

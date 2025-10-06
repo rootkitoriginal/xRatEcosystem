@@ -15,6 +15,7 @@ Location: `.github/chatmodes/DevOPS.chatmode.md`
 **Purpose**: Specialized DevOps assistant with deep integration to project automation scripts.
 
 **Features:**
+
 - Script-first approach to problem solving
 - GitHub CLI integration with pre-configured aliases
 - Copilot coordination for parallel development
@@ -37,6 +38,7 @@ When you need DevOps-related assistance:
 **1. CI/CD Pipeline Troubleshooting**
 
 DevOPS mode will:
+
 - Analyze workflow failures
 - Recommend diagnostic scripts
 - Provide fix commands
@@ -45,6 +47,7 @@ DevOPS mode will:
 **2. PR Management with Conflict Analysis**
 
 DevOPS mode will:
+
 - Run PR conflict analysis scripts
 - Recommend merge strategies
 - Provide coordination commands
@@ -53,6 +56,7 @@ DevOPS mode will:
 **3. Copilot Coordination**
 
 DevOPS mode will:
+
 - Suggest appropriate Copilot invocations
 - Coordinate multiple Copilot PRs
 - Monitor Copilot progress
@@ -61,6 +65,7 @@ DevOPS mode will:
 **4. Infrastructure Monitoring**
 
 DevOPS mode will:
+
 - Run health check scripts
 - Monitor deployment status
 - Suggest rollback procedures
@@ -95,22 +100,27 @@ gh copilot-assign   # Mention Copilot
 ### Example 1: Troubleshooting CI Failure
 
 **You ask:**
+
 > "The CI pipeline is failing on PR #38. How do I fix it?"
 
 **DevOPS ChatMode responds:**
-```markdown
+
+````markdown
 ## CI/CD Troubleshooting
 
 **Issue**: CI failure on PR #38
 **Recommended Script**: `./.github/scripts/dev-automation.sh`
 
 **Diagnosis Steps:**
+
 1. Check CI logs:
    ```bash
    gh ci-logs
    ```
+````
 
 2. View PR status:
+
    ```bash
    gh pr-ready 38
    ```
@@ -122,10 +132,12 @@ gh copilot-assign   # Mention Copilot
    ```
 
 **Common Fixes:**
+
 - Update dependencies: `npm install`
 - Clear cache: `npm run test:clearCache`
 - Fix linting: `npm run lint:fix`
-```
+
+````
 
 ### Example 2: Managing Multiple PRs
 
@@ -146,14 +158,16 @@ gh copilot-assign   # Mention Copilot
 **Analysis:**
 ```bash
 ./.github/scripts/pr-manager.sh
-```
+````
 
 **Merge Order Recommendation:**
+
 1. **PR #40** (Independent, no conflicts)
 2. **PR #38** (Base functionality)
 3. **PR #39** (Depends on #38 completion)
 
 **Commands:**
+
 ```bash
 # Merge PR #40 first
 gh quick-merge 40
@@ -161,7 +175,8 @@ gh quick-merge 40
 # Then coordinate #38 and #39
 ./.github/scripts/copilot-workflow.sh
 ```
-```
+
+````
 
 ### Example 3: Invoking Copilot
 
@@ -182,9 +197,10 @@ gh pr comment 38 --body "@copilot Please implement WebSocket with:
 - Room-based messaging
 - Error handling
 - Unit tests >80% coverage"
-```
+````
 
 **Monitor Response:**
+
 ```bash
 # Watch for Copilot response
 gh pr view 38 --comments
@@ -195,10 +211,12 @@ gh pr view 38 --comments
 ```
 
 **Follow-up:**
+
 - Copilot will respond in PR #38 comments
 - Review and approve changes
 - Request modifications if needed
-```
+
+````
 
 ## 📊 Template Responses
 
@@ -211,13 +229,13 @@ DevOPS ChatMode uses structured templates:
 
 **Task**: [requirement description]
 **Recommended Script**: `./.github/scripts/[script-name].sh`
-**Command Sequence**: 
+**Command Sequence**:
   1. [step 1]
   2. [step 2]
   3. [step 3]
 **Copilot Integration**: [PR and instruction details]
 **Parallel Development Impact**: [conflict analysis]
-```
+````
 
 ### PR Management Template
 
@@ -321,20 +339,25 @@ To create a new specialized ChatMode:
 # [Name] ChatMode
 
 ## Scope
+
 [Define area of expertise]
 
 ## Features
+
 - [Feature 1]
 - [Feature 2]
 
 ## Integrated Tools
+
 - [Tool 1]
 - [Tool 2]
 
 ## Example Interactions
+
 [Provide examples]
 
 ## Related Documentation
+
 [Link to related docs]
 ```
 

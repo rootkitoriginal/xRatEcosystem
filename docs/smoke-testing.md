@@ -125,10 +125,10 @@ describe('Critical Script Smoke Tests', () => {
   it('should execute main function', async () => {
     // Mock external dependencies
     const mockAPI = jest.fn().mockResolvedValue({ data: 'test' });
-    
+
     // Execute function
     const result = await module.mainFunction(mockAPI);
-    
+
     // Verify basic behavior
     expect(result).toBeDefined();
     expect(mockAPI).toHaveBeenCalled();
@@ -137,9 +137,8 @@ describe('Critical Script Smoke Tests', () => {
   // Test error handling
   it('should handle errors gracefully', async () => {
     const mockAPI = jest.fn().mockRejectedValue(new Error('API Error'));
-    
-    await expect(module.mainFunction(mockAPI))
-      .rejects.toThrow('API Error');
+
+    await expect(module.mainFunction(mockAPI)).rejects.toThrow('API Error');
   });
 });
 ```

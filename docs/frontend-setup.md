@@ -78,6 +78,7 @@ npm run preview
 ### System Status Dashboard
 
 Real-time monitoring of:
+
 - MongoDB connection status
 - Redis connection status
 - Backend API connectivity
@@ -86,6 +87,7 @@ Real-time monitoring of:
 ### Redis Cache Testing
 
 Interactive form to:
+
 - Store key-value pairs in Redis
 - Test cache functionality
 - Receive success/error feedback
@@ -93,6 +95,7 @@ Interactive form to:
 ### Ecosystem Information
 
 Displays:
+
 - Exposed ports (Frontend: 5173, Backend: 3000)
 - Internal services (MongoDB, Redis)
 - Network isolation details
@@ -181,6 +184,7 @@ npm run test:coverage # Generate coverage report
 ## 🔥 Hot Module Replacement (HMR)
 
 Vite provides instant HMR for fast development:
+
 - Changes reflect immediately
 - State is preserved during updates
 - No full page reload needed
@@ -249,10 +253,10 @@ try {
   const response = await fetch(`${API_URL}/api/data`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key, value })
+    body: JSON.stringify({ key, value }),
   });
   const data = await response.json();
-  
+
   if (data.success) {
     // Handle success
   } else {
@@ -287,11 +291,7 @@ function Component({ prop1, prop2 }) {
   };
 
   // Render
-  return (
-    <div className="component">
-      {/* JSX */}
-    </div>
-  );
+  return <div className="component">{/* JSX */}</div>;
 }
 
 export default Component;
@@ -358,6 +358,7 @@ npm audit fix
 ## 📝 Adding New Components
 
 1. **Create component file:**
+
    ```jsx
    // src/components/NewComponent.jsx
    import { useState } from 'react';
@@ -371,6 +372,7 @@ npm audit fix
    ```
 
 2. **Create tests:**
+
    ```jsx
    // __tests__/unit/NewComponent.test.jsx
    import { render, screen } from '@testing-library/react';
@@ -385,6 +387,7 @@ npm audit fix
    ```
 
 3. **Import and use:**
+
    ```jsx
    import NewComponent from './components/NewComponent';
 
@@ -396,6 +399,7 @@ npm audit fix
 ## 🤝 Contributing
 
 See [Contributing Guidelines](./CONTRIBUTING.md) for:
+
 - Code style guidelines
 - Component patterns
 - Testing requirements

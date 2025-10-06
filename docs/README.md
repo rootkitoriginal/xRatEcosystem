@@ -14,6 +14,7 @@ Complete setup instructions for each part of the system:
 - **[Backend Setup](./backend-setup.md)** - Node.js + Express backend development
 - **[Frontend Setup](./frontend-setup.md)** - React + Vite frontend development
 - **[DevOps Tools](./devops-tools.md)** - Monitoring and automation tools
+- **[Commit Conventions](./commit-conventions.md)** - Padrões e convenções para commits
 
 ## 🏗️ Architecture & Design
 
@@ -81,22 +82,26 @@ How to contribute to the project:
 ### By Role
 
 **Backend Developers:**
+
 - [Backend Setup](./backend-setup.md)
 - [API Documentation](./API.md)
 - [Testing Guide](./TESTING.md)
 
 **Frontend Developers:**
+
 - [Frontend Setup](./frontend-setup.md)
 - [Real-time Components](./realtime-components.md)
 - [Examples](./examples.md)
 
 **DevOps Engineers:**
+
 - [DevOps Tools](./devops-tools.md)
 - [Automation Scripts](./automation-scripts.md)
 - [CI Validation](./ci-validation.md)
 - [Deployment](./DEPLOYMENT.md)
 
 **QA Engineers:**
+
 - [Testing Guide](./TESTING.md)
 - [Smoke Testing](./smoke-testing.md)
 - [Performance Testing](./performance-testing.md)
@@ -104,6 +109,7 @@ How to contribute to the project:
 ### By Topic
 
 **WebSocket/Real-time:**
+
 - [WebSocket Guide](./WEBSOCKET.md)
 - [Real-time Components](./realtime-components.md)
 - [WebSocket Testing Summary](./websocket-testing-summary.md)
@@ -111,6 +117,7 @@ How to contribute to the project:
 - [Examples](./examples.md)
 
 **Testing:**
+
 - [Testing Guide](./TESTING.md)
 - [Smoke Testing](./smoke-testing.md)
 - [Performance Testing](./performance-testing.md)
@@ -118,6 +125,7 @@ How to contribute to the project:
 - [CI Validation](./ci-validation.md)
 
 **Automation & Tools:**
+
 - [DevOps Tools](./devops-tools.md)
 - [Automation Scripts](./automation-scripts.md)
 - [Copilot ChatModes](./copilot-chatmodes.md)

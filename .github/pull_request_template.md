@@ -38,7 +38,7 @@ npm test
 Add screenshots for UI changes.
 
 | Before | After |
-|--------|-------|
+| ------ | ----- |
 | image  | image |
 
 ## ✅ Checklist

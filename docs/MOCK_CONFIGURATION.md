@@ -14,7 +14,7 @@ Configure no arquivo `.env` na raiz do projeto:
 # Mock de Autenticação
 VITE_USE_MOCK_AUTH=true      # true = usa mock, false = usa API real
 
-# Mock de Dados  
+# Mock de Dados
 VITE_USE_MOCK_DATA=true      # true = usa mock, false = usa API real
 
 # Mock de WebSocket
@@ -41,6 +41,7 @@ USE_BACKEND_MOCKS=true
 ```
 
 **Características:**
+
 - ✅ Funciona sem backend rodando
 - ✅ Dados simulados em memória
 - ✅ Resposta rápida
@@ -57,6 +58,7 @@ USE_BACKEND_MOCKS=false
 ```
 
 **Características:**
+
 - ✅ Testa integração real
 - ✅ Dados persistentes no MongoDB
 - ✅ WebSocket real com Socket.IO
@@ -130,6 +132,7 @@ VITE_USE_MOCK_WEBSOCKET=true # WebSocket mock (menos complexo)
 ### Problema: Frontend diz que está usando mock mas deveria ser real
 
 **Solução:**
+
 1. Verifique o arquivo `.env` na raiz do projeto
 2. Certifique-se que as variáveis estão com `false`
 3. Reinicie o servidor de desenvolvimento (`npm run dev`)
@@ -138,6 +141,7 @@ VITE_USE_MOCK_WEBSOCKET=true # WebSocket mock (menos complexo)
 ### Problema: Erro de conexão mesmo com mocks desabilitados
 
 **Possíveis causas:**
+
 1. Backend não está rodando (`docker-compose up` ou `npm run dev` no backend)
 2. URL da API incorreta - verifique `VITE_API_URL` no `.env`
 3. Variáveis de ambiente não carregaram - reinicie o frontend
@@ -145,6 +149,7 @@ VITE_USE_MOCK_WEBSOCKET=true # WebSocket mock (menos complexo)
 ### Problema: Mocks não desabilitam nos testes
 
 **Solução:**
+
 1. Verifique `USE_BACKEND_MOCKS` no `.env`
 2. Nos testes, use configuração específica:
    ```javascript

@@ -39,5 +39,5 @@
 	"containerEnv": {
 		"NODE_OPTIONS": "--max-old-space-size=2048"
 	},
-	"postCreateCommand": "chmod +x ./xrat.sh && echo '🐀 xRat Ecosystem DevContainer ready!'"
+	"postCreateCommand": "chmod +x ./xrat.sh && chmod +x ./.devcontainer/install-tools.sh && ./.devcontainer/install-tools.sh && echo '🐀 xRat Ecosystem DevContainer ready!'"
 }

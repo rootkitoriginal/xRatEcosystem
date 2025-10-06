@@ -110,6 +110,7 @@ npm start
 🎉 **Swagger UI is available at `/api-docs`**
 
 Access comprehensive interactive API documentation at:
+
 - Local: http://localhost:3000/api-docs
 - Try out endpoints directly from your browser
 - View request/response examples
@@ -142,6 +143,7 @@ Access comprehensive interactive API documentation at:
 - `GET /api/data/analytics` - Get data analytics (protected)
 
 **Features:**
+
 - ✅ CRUD operations with validation
 - ✅ Redis caching for read operations
 - ✅ Full-text search capability
@@ -193,6 +195,7 @@ See [Testing Documentation](./TESTING.md) for more details.
 ### Authentication Flow
 
 1. **Register:** `POST /api/auth/register`
+
    ```bash
    curl -X POST http://localhost:3000/api/auth/register \
      -H "Content-Type: application/json" \
@@ -200,6 +203,7 @@ See [Testing Documentation](./TESTING.md) for more details.
    ```
 
 2. **Login:** `POST /api/auth/login`
+
    ```bash
    curl -X POST http://localhost:3000/api/auth/login \
      -H "Content-Type: application/json" \
@@ -207,6 +211,7 @@ See [Testing Documentation](./TESTING.md) for more details.
    ```
 
 3. **Use Token:** Include in Authorization header
+
    ```bash
    curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
      http://localhost:3000/api/auth/profile
@@ -301,6 +306,7 @@ mongoose
 ```
 
 **Connection Status:**
+
 - Check via `/health` endpoint
 - Check via `/api/status` endpoint
 
@@ -316,6 +322,7 @@ const redisClient = createClient({
 ```
 
 **Cache Operations:**
+
 - Store: `POST /api/data`
 - Retrieve: `GET /api/data/:key`
 - TTL: 3600 seconds (1 hour)
@@ -340,6 +347,7 @@ docker-compose logs -f backend
 ## 📝 Adding New Endpoints
 
 1. **Define route:**
+
    ```javascript
    app.get('/api/new-endpoint', async (req, res) => {
      try {
@@ -352,6 +360,7 @@ docker-compose logs -f backend
    ```
 
 2. **Add tests:**
+
    ```javascript
    describe('GET /api/new-endpoint', () => {
      it('should return success', async () => {
@@ -369,6 +378,7 @@ docker-compose logs -f backend
 ## 🤝 Contributing
 
 See [Contributing Guidelines](./CONTRIBUTING.md) for:
+
 - Code style guidelines
 - Commit message format
 - Pull request process

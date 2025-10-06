@@ -7,6 +7,7 @@ This guide covers performance and stress tests for the WebSocket infrastructure.
 ## Test Files
 
 ### 1. `websocket-stress.test.js`
+
 **Connection Load Testing**
 
 - 100+ simultaneous connections (scaled from 1,000+ target)
@@ -17,6 +18,7 @@ This guide covers performance and stress tests for the WebSocket infrastructure.
 **Key Metrics**: Connection success rate, cleanup effectiveness
 
 ### 2. `websocket-memory.test.js`
+
 **Memory Leak Detection**
 
 - Long-running connection memory tracking
@@ -27,6 +29,7 @@ This guide covers performance and stress tests for the WebSocket infrastructure.
 **Key Metrics**: Memory growth, cleanup efficiency, GC performance
 
 ### 3. `websocket-throughput.test.js`
+
 **Message Performance Testing**
 
 - High-frequency message broadcasting
@@ -37,6 +40,7 @@ This guide covers performance and stress tests for the WebSocket infrastructure.
 **Key Metrics**: Message throughput, latency, delivery rate
 
 ### 4. `websocket-resources.test.js`
+
 **Resource Exhaustion Testing**
 
 - CPU usage monitoring
@@ -50,11 +54,13 @@ This guide covers performance and stress tests for the WebSocket infrastructure.
 ## Running Tests
 
 ### All Performance Tests
+
 ```bash
 npm run test:performance
 ```
 
 ### Individual Test Suites
+
 ```bash
 # Connection stress tests
 npm run test:performance:stress
@@ -79,24 +85,26 @@ npm run test:performance:resources
 
 ## Success Criteria
 
-| Test Type | Success Threshold |
-|-----------|------------------|
-| Connection Rate | > 80% |
-| Memory Growth | < 10-20MB |
-| Message Throughput | > 500 msg/sec |
-| Average Latency | < 100ms |
-| Delivery Rate | > 90% |
-| CPU Usage | < 95% |
-| Recovery | System operational |
+| Test Type          | Success Threshold  |
+| ------------------ | ------------------ |
+| Connection Rate    | > 80%              |
+| Memory Growth      | < 10-20MB          |
+| Message Throughput | > 500 msg/sec      |
+| Average Latency    | < 100ms            |
+| Delivery Rate      | > 90%              |
+| CPU Usage          | < 95%              |
+| Recovery           | System operational |
 
 ## Scaling Notes
 
 Tests are scaled down for CI/CD environments:
+
 - Connection counts reduced (100 instead of 1,000+)
 - Timeouts adjusted for reliability
 - Resource usage optimized for standard CI runners
 
 For full-scale testing:
+
 1. Edit connection counts in test files
 2. Increase system limits (`ulimit -n 65536`)
 3. Allocate more Node.js memory (`--max-old-space-size=4096`)
@@ -107,29 +115,28 @@ For full-scale testing:
 ```javascript
 describe('WebSocket Stress Tests', () => {
   const NUM_CONNECTIONS = 100; // Scale up for production testing
-  
+
   it('should handle multiple simultaneous connections', async () => {
     const connections = [];
-    
+
     // Create connections
     for (let i = 0; i < NUM_CONNECTIONS; i++) {
       const socket = io('http://localhost:30001', {
-        auth: { token: validToken }
+        auth: { token: validToken },
       });
       connections.push(socket);
     }
-    
+
     // Wait for all to connect
-    await Promise.all(connections.map(socket => 
-      new Promise(resolve => socket.on('connect', resolve))
-    ));
-    
+    await Promise.all(
+      connections.map((socket) => new Promise((resolve) => socket.on('connect', resolve)))
+    );
+
     // Verify connections
-    expect(connections.filter(s => s.connected).length)
-      .toBeGreaterThan(NUM_CONNECTIONS * 0.8); // 80% success rate
-    
+    expect(connections.filter((s) => s.connected).length).toBeGreaterThan(NUM_CONNECTIONS * 0.8); // 80% success rate
+
     // Cleanup
-    connections.forEach(socket => socket.disconnect());
+    connections.forEach((socket) => socket.disconnect());
   });
 });
 ```
@@ -140,26 +147,26 @@ describe('WebSocket Stress Tests', () => {
 describe('Memory Leak Detection', () => {
   it('should not leak memory over time', async () => {
     const initialMemory = process.memoryUsage().heapUsed;
-    
+
     // Simulate long-running connections
     for (let i = 0; i < 100; i++) {
       const socket = io('http://localhost:30002', {
-        auth: { token: validToken }
+        auth: { token: validToken },
       });
-      
-      await new Promise(resolve => socket.on('connect', resolve));
+
+      await new Promise((resolve) => socket.on('connect', resolve));
       socket.disconnect();
-      
+
       // Wait for cleanup
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    
+
     // Force garbage collection
     if (global.gc) global.gc();
-    
+
     const finalMemory = process.memoryUsage().heapUsed;
     const memoryGrowth = finalMemory - initialMemory;
-    
+
     // Memory growth should be minimal (< 20MB)
     expect(memoryGrowth).toBeLessThan(20 * 1024 * 1024);
   });
@@ -173,32 +180,32 @@ describe('Message Throughput Tests', () => {
   it('should handle high message volume', async () => {
     const NUM_MESSAGES = 1000;
     const socket = io('http://localhost:30003', {
-      auth: { token: validToken }
+      auth: { token: validToken },
     });
-    
-    await new Promise(resolve => socket.on('connect', resolve));
-    
+
+    await new Promise((resolve) => socket.on('connect', resolve));
+
     const startTime = Date.now();
     let receivedCount = 0;
-    
+
     socket.on('message', () => {
       receivedCount++;
     });
-    
+
     // Send messages
     for (let i = 0; i < NUM_MESSAGES; i++) {
       socket.emit('message', { data: `Message ${i}` });
     }
-    
+
     // Wait for processing
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     const duration = (Date.now() - startTime) / 1000;
     const throughput = receivedCount / duration;
-    
+
     // Should process > 500 messages/second
     expect(throughput).toBeGreaterThan(500);
-    
+
     socket.disconnect();
   });
 });
@@ -215,18 +222,18 @@ function getCPUUsage() {
   const cpus = os.cpus();
   let totalIdle = 0;
   let totalTick = 0;
-  
-  cpus.forEach(cpu => {
+
+  cpus.forEach((cpu) => {
     for (const type in cpu.times) {
       totalTick += cpu.times[type];
     }
     totalIdle += cpu.times.idle;
   });
-  
+
   return {
     idle: totalIdle / cpus.length,
     total: totalTick / cpus.length,
-    usage: 100 - (100 * totalIdle / totalTick)
+    usage: 100 - (100 * totalIdle) / totalTick,
   };
 }
 ```
@@ -240,7 +247,7 @@ function getMemoryUsage() {
     heapUsed: usage.heapUsed / 1024 / 1024, // MB
     heapTotal: usage.heapTotal / 1024 / 1024,
     external: usage.external / 1024 / 1024,
-    rss: usage.rss / 1024 / 1024
+    rss: usage.rss / 1024 / 1024,
   };
 }
 ```
@@ -248,21 +255,25 @@ function getMemoryUsage() {
 ## Troubleshooting
 
 ### Tests Timeout
+
 - Reduce connection counts
 - Increase `testTimeout` values
 - Run with `--runInBand`
 
 ### Connection Errors
+
 - Check port availability (30001-30004)
 - Close previous test processes
 - Wait between test runs
 
 ### Memory Test Failures
+
 - Run tests in isolation
 - Use `--expose-gc` flag
 - Check system memory availability
 
 ### Inconsistent Results
+
 - Use `--runInBand` for sequential execution
 - Add delays between operations
 - Check system load
@@ -287,7 +298,7 @@ name: Performance Tests
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Weekly
+    - cron: '0 0 * * 0' # Weekly
   workflow_dispatch:
 
 jobs:

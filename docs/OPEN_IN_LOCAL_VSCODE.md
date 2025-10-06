@@ -4,7 +4,6 @@ Este documento mostra formas rápidas de abrir este workspace no VS Code instala
 
 Opções disponíveis:
 
-
 Este documento mostra formas rápidas de abrir este workspace no VS Code instalado na sua máquina (desktop).
 
 Opções disponíveis:

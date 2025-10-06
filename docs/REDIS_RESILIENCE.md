@@ -28,14 +28,14 @@ async queueNotification(userId, notification) {
     logger.warn('Redis not available for notification queuing', { userId });
     return;
   }
-  
+
   try {
     const queueKey = `notifications:queue:${userId}`;
     const notificationData = JSON.stringify({
       ...notification,
       queuedAt: new Date().toISOString(),
     });
-    
+
     await this.redisClient.rPush(queueKey, notificationData);
     await this.redisClient.expire(queueKey, 7 * 24 * 60 * 60);
   } catch (error) {
@@ -48,6 +48,7 @@ async queueNotification(userId, notification) {
 ```
 
 **Tests Covered**:
+
 - Redis server unavailable on startup
 - Redis client not initialized
 - Connection state detection
@@ -63,7 +64,7 @@ async getFromCache(key) {
   if (!this.redisClient || !this.redisClient.isOpen) {
     return null;
   }
-  
+
   try {
     const cached = await this.redisClient.get(key);
     return cached ? JSON.parse(cached) : null;
@@ -75,6 +76,7 @@ async getFromCache(key) {
 ```
 
 **Tests Covered**:
+
 - Redis connection closed detection
 - Rapid connection state changes
 - Connection loss during active operations
@@ -94,7 +96,7 @@ async checkRedis() {
     if (!this.redisClient || !this.redisClient.isOpen) {
       return { status: 'error', message: 'Redis not connected', latency: null };
     }
-    
+
     await this.redisClient.ping();
     const latency = Date.now() - startTime;
     return { status: 'connected', latency: `${latency}ms` };
@@ -105,6 +107,7 @@ async checkRedis() {
 ```
 
 **Tests Covered**:
+
 - Connection timeout during health check
 - Slow Redis responses
 - Operation timeout handling
@@ -117,6 +120,7 @@ async checkRedis() {
 **Solution**: Handle large queues efficiently with proper error handling.
 
 **Tests Covered**:
+
 - Large notification queue (1000+ items)
 - Queue operation during high memory pressure
 - Operation cancellation during timeout
@@ -145,6 +149,7 @@ async getData(key) {
 ```
 
 **Tests Covered**:
+
 - Master failure and failover to replica
 - Data consistency during failover
 - Automatic recovery from transient failures
@@ -156,6 +161,7 @@ async getData(key) {
 **Solution**: Handle pool exhaustion errors gracefully.
 
 **Tests Covered**:
+
 - Connection pool exhaustion
 - Concurrent connections limit
 - Concurrent cache/queue operations
@@ -171,25 +177,25 @@ async getData(key) {
 ```javascript
 async sendQueuedNotifications(userId, socketId) {
   if (!this.redisClient) return;
-  
+
   try {
     const queueKey = `notifications:queue:${userId}`;
     const notifications = await this.redisClient.lRange(queueKey, 0, -1);
-    
+
     if (notifications.length > 0) {
       notifications.forEach((notifStr) => {
         try {
           const notification = JSON.parse(notifStr);
           this.io.to(socketId).emit('notification', notification);
         } catch (parseError) {
-          logger.error('Failed to parse notification', { 
-            userId, 
-            error: parseError.message 
+          logger.error('Failed to parse notification', {
+            userId,
+            error: parseError.message
           });
           // Continue with next notification
         }
       });
-      
+
       await this.redisClient.del(queueKey);
     }
   } catch (error) {
@@ -202,6 +208,7 @@ async sendQueuedNotifications(userId, socketId) {
 ```
 
 **Tests Covered**:
+
 - Partial queue retrieval
 - Data recovery after connection loss
 - Corrupted notification data handling
@@ -214,6 +221,7 @@ async sendQueuedNotifications(userId, socketId) {
 **Solution**: Handle partial completion gracefully and log warnings.
 
 **Tests Covered**:
+
 - Partial operation completion (rPush succeeds, expire fails)
 - Queue deletion failure after send
 - Transaction handling during failures
@@ -231,7 +239,7 @@ async setInCache(key, value, ttl = this.CACHE_TTL) {
   if (!this.redisClient || !this.redisClient.isOpen) {
     return false;
   }
-  
+
   try {
     await this.redisClient.set(key, JSON.stringify(value), { EX: ttl });
     return true;
@@ -247,6 +255,7 @@ async setInCache(key, value, ttl = this.CACHE_TTL) {
 ```
 
 **Tests Covered**:
+
 - Redis memory limit exceeded
 - Cache eviction during operations
 - Large payload handling (10KB+ messages)
@@ -259,6 +268,7 @@ async setInCache(key, value, ttl = this.CACHE_TTL) {
 **Solution**: Always check for null values and handle expiration gracefully.
 
 **Tests Covered**:
+
 - Expired key during retrieval
 - Queue expiration edge cases
 - Expire operation failure
@@ -274,12 +284,12 @@ async invalidateCache(id, userId) {
   if (!this.redisClient || !this.redisClient.isOpen) {
     return;
   }
-  
+
   try {
     if (id) {
       await this.redisClient.del(this.getCacheKey(id));
     }
-    
+
     if (userId) {
       const pattern = `${this.CACHE_PREFIX}list:${userId}:*`;
       const keys = await this.redisClient.keys(pattern);
@@ -295,6 +305,7 @@ async invalidateCache(id, userId) {
 ```
 
 **Tests Covered**:
+
 - Invalidation of non-existent keys
 - Bulk invalidation with pattern matching
 - Invalidation during connection issues
@@ -376,10 +387,10 @@ redisClient.on('connect', () => {
 });
 
 redisClient.on('error', (err) => {
-  logger.error('Redis client error', { 
-    service: 'redis', 
+  logger.error('Redis client error', {
+    service: 'redis',
     error: err.message,
-    stack: err.stack 
+    stack: err.stack,
   });
 });
 
@@ -452,7 +463,7 @@ services:
       --save 60 1
       --appendonly yes
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 30s
       timeout: 10s
       retries: 3

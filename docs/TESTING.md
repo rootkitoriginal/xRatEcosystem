@@ -343,9 +343,7 @@ Location: `backend/__tests__/unit/utils/jwt.test.js`
 ```javascript
 describe('JWT Security - Algorithm Manipulation', () => {
   it('should reject token with "alg: none" attack', () => {
-    const header = Buffer.from(
-      JSON.stringify({ alg: 'none', typ: 'JWT' })
-    ).toString('base64url');
+    const header = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
     const payload = Buffer.from(JSON.stringify(testPayload)).toString('base64url');
     const noneToken = `${header}.${payload}.`;
 
@@ -426,9 +424,7 @@ describe('Authentication Rate Limiting', () => {
   it('should block authentication after exceeding rate limit', async () => {
     // Make 5 failed login attempts
     for (let i = 0; i < 5; i++) {
-      await request(app)
-        .post('/auth/login')
-        .send({ username: 'test', password: 'wrong' });
+      await request(app).post('/auth/login').send({ username: 'test', password: 'wrong' });
     }
 
     // 6th attempt should be rate limited
@@ -437,9 +433,7 @@ describe('Authentication Rate Limiting', () => {
       .send({ username: 'test', password: 'wrong' });
 
     expect(response.status).toBe(429);
-    expect(response.body.message).toBe(
-      'Too many authentication attempts. Please try again later.'
-    );
+    expect(response.body.message).toBe('Too many authentication attempts. Please try again later.');
   });
 });
 ```

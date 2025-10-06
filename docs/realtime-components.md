@@ -13,6 +13,7 @@ This guide covers the real-time UI components for live updates, notifications, a
 Context provider for WebSocket connection management.
 
 **Features:**
+
 - Automatic connection/disconnection based on authentication
 - Mock mode for development (when backend WebSocket is not available)
 - Notification management
@@ -21,19 +22,17 @@ Context provider for WebSocket connection management.
 - Event subscription/emission
 
 **Usage:**
+
 ```jsx
 import { WebSocketProvider } from './components/realtime';
 
 function App() {
-  return (
-    <WebSocketProvider>
-      {/* Your app components */}
-    </WebSocketProvider>
-  );
+  return <WebSocketProvider>{/* Your app components */}</WebSocketProvider>;
 }
 ```
 
 **Hook Usage:**
+
 ```jsx
 import { useWebSocket } from './components/realtime';
 
@@ -65,6 +64,7 @@ function MyComponent() {
 Toast notification component with auto-dismiss.
 
 **Props:**
+
 - `notification` (object): Notification data
   - `id`: Unique identifier
   - `type`: 'success' | 'error' | 'warning' | 'info'
@@ -74,6 +74,7 @@ Toast notification component with auto-dismiss.
 - `duration` (number): Auto-dismiss duration in ms (default: 5000)
 
 **Usage:**
+
 ```jsx
 <NotificationToast
   notification={{
@@ -92,12 +93,14 @@ Toast notification component with auto-dismiss.
 Dropdown panel showing notification history.
 
 **Features:**
+
 - Unread notification badge
 - Notification history
 - Clear individual/all notifications
 - Relative timestamps
 
 **Usage:**
+
 ```jsx
 import { NotificationPanel } from './components/realtime';
 
@@ -115,6 +118,7 @@ function Header() {
 Container for displaying toast notifications (auto-managed).
 
 **Usage:**
+
 ```jsx
 import { NotificationContainer } from './components/realtime';
 
@@ -133,12 +137,14 @@ function App() {
 Visual indicator for WebSocket connection status.
 
 **Features:**
+
 - Shows mock mode indicator
 - Displays disconnection errors
 - Reconnect button
 - Auto-hides when connected
 
 **Usage:**
+
 ```jsx
 import { ConnectionStatus } from './components/realtime';
 
@@ -157,19 +163,16 @@ function App() {
 Display user online/offline status with avatar.
 
 **Props:**
+
 - `userId` (string): User identifier
 - `userName` (string): Display name
 - `showName` (boolean): Show name and status (default: true)
 - `size` (string): 'small' | 'medium' | 'large' (default: 'medium')
 
 **Usage:**
+
 ```jsx
-<UserPresence
-  userId="user-123"
-  userName="John Doe"
-  size="medium"
-  showName={true}
-/>
+<UserPresence userId="user-123" userName="John Doe" size="medium" showName={true} />
 ```
 
 ### TypingIndicator
@@ -177,14 +180,17 @@ Display user online/offline status with avatar.
 Shows typing indicators for collaborative features.
 
 **Props:**
+
 - `room` (string): Room/channel identifier
 
 **Usage:**
+
 ```jsx
 <TypingIndicator room="chat-room-1" />
 ```
 
 To indicate typing:
+
 ```jsx
 const { emit } = useWebSocket();
 
@@ -200,20 +206,17 @@ emit('typing:stop', { room: 'chat-room-1', userName: 'John' });
 Wrapper component for live data updates with visual feedback.
 
 **Props:**
+
 - `event` (string): Event name to listen for
 - `onUpdate` (function): Callback when data updates
 - `children` (function): Render function receiving `{ data, hasUpdate }`
 
 **Usage:**
+
 ```jsx
-<RealtimeData
-  event="data:updated"
-  onUpdate={(data) => console.log('Updated:', data)}
->
+<RealtimeData event="data:updated" onUpdate={(data) => console.log('Updated:', data)}>
   {({ data, hasUpdate }) => (
-    <div className={hasUpdate ? 'flash' : ''}>
-      {data ? JSON.stringify(data) : 'No data'}
-    </div>
+    <div className={hasUpdate ? 'flash' : ''}>{data ? JSON.stringify(data) : 'No data'}</div>
   )}
 </RealtimeData>
 ```
@@ -223,6 +226,7 @@ Wrapper component for live data updates with visual feedback.
 Real-time system health monitoring dashboard.
 
 **Features:**
+
 - CPU usage
 - Memory usage
 - System uptime
@@ -230,6 +234,7 @@ Real-time system health monitoring dashboard.
 - Visual indicators (good/warning/critical)
 
 **Usage:**
+
 ```jsx
 import { SystemStatus } from './components/realtime';
 
@@ -243,6 +248,7 @@ function Dashboard() {
 ```
 
 Backend should emit:
+
 ```javascript
 socket.emit('system:status', {
   cpu: 45,
@@ -257,11 +263,13 @@ socket.emit('system:status', {
 When the backend WebSocket server is not available, the components run in mock mode automatically. This allows frontend development to continue independently.
 
 **Environment Variable:**
+
 ```env
 VITE_MOCK_WEBSOCKET=false  # Set to false to attempt real connection
 ```
 
 **Mock Behavior:**
+
 - Simulates connection events
 - Generates sample notifications
 - Provides test data
@@ -276,13 +284,14 @@ VITE_MOCK_WEBSOCKET=false  # Set to false to attempt real connection
 - Custom events via `emit(event, data)`
 
 **Example:**
+
 ```jsx
 const { emit } = useWebSocket();
 
 emit('custom:event', {
   userId: '123',
   action: 'like',
-  targetId: '456'
+  targetId: '456',
 });
 ```
 
@@ -297,6 +306,7 @@ emit('custom:event', {
 - Custom events via `on(event, callback)`
 
 **Example:**
+
 ```jsx
 const { on } = useWebSocket();
 
@@ -304,7 +314,7 @@ useEffect(() => {
   const unsubscribe = on('custom:event', (data) => {
     console.log('Custom event received:', data);
   });
-  
+
   return unsubscribe; // Cleanup
 }, [on]);
 ```
@@ -338,7 +348,7 @@ import './my-custom-styles.css'; // Override default styles
 ```jsx
 import styles from './MyComponent.module.css';
 
-<NotificationToast className={styles.customToast} />
+<NotificationToast className={styles.customToast} />;
 ```
 
 ## Testing
@@ -369,17 +379,17 @@ describe('NotificationToast', () => {
     const notification = {
       id: 1,
       type: 'success',
-      message: 'Test message'
+      message: 'Test message',
     };
-    
+
     render(<NotificationToast notification={notification} />);
     expect(screen.getByText('Test message')).toBeInTheDocument();
   });
-  
+
   it('calls onClose when dismissed', () => {
     const onClose = jest.fn();
     const notification = { id: 1, type: 'info', message: 'Test' };
-    
+
     render(<NotificationToast notification={notification} onClose={onClose} />);
     fireEvent.click(screen.getByRole('button'));
     expect(onClose).toHaveBeenCalledWith(1);
@@ -396,7 +406,7 @@ import {
   ConnectionStatus,
   SystemStatus,
   UserPresence,
-  RealtimeData
+  RealtimeData,
 } from './components/realtime';
 
 function Dashboard() {
@@ -407,28 +417,26 @@ function Dashboard() {
           <h1>Dashboard</h1>
           <ConnectionStatus />
         </header>
-        
+
         <main>
           <SystemStatus />
-          
+
           <section>
             <h2>Online Users</h2>
             <UserPresence userId="1" userName="John Doe" />
             <UserPresence userId="2" userName="Jane Smith" />
           </section>
-          
+
           <section>
             <h2>Live Data</h2>
             <RealtimeData event="data:updated">
               {({ data, hasUpdate }) => (
-                <div className={hasUpdate ? 'pulse' : ''}>
-                  {JSON.stringify(data, null, 2)}
-                </div>
+                <div className={hasUpdate ? 'pulse' : ''}>{JSON.stringify(data, null, 2)}</div>
               )}
             </RealtimeData>
           </section>
         </main>
-        
+
         <NotificationContainer />
       </div>
     </WebSocketProvider>
@@ -455,6 +463,7 @@ export default Dashboard;
 **Problem**: Real-time updates not appearing
 
 **Solutions:**
+
 1. Verify WebSocketProvider wraps components
 2. Check backend is emitting events
 3. Verify event names match
@@ -465,6 +474,7 @@ export default Dashboard;
 **Problem**: WebSocket won't connect
 
 **Solutions:**
+
 1. Check backend WebSocket server is running
 2. Verify `VITE_API_URL` is correct
 3. Check JWT token is valid
@@ -475,6 +485,7 @@ export default Dashboard;
 **Problem**: App slows down with many updates
 
 **Solutions:**
+
 1. Throttle event emissions
 2. Use React.memo for components
 3. Optimize event handlers

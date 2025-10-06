@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Cores para melhor legibilidade
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
+
+# Padrão de mensagem de commit baseado no Conventional Commits
+# Referência: https://www.conventionalcommits.org/
+PATTERN="^(feat|fix|docs|style|refactor|test|chore|perf|ci)(\(.+\))?!?: .+"
+
+echo -e "${BLUE}🔍 Verificando formato da mensagem de commit...${NC}"
+
+if ! [[ $COMMIT_MSG =~ $PATTERN ]]; then
+  echo -e "${RED}❌ Mensagem de commit inválida:${NC} $COMMIT_MSG"
+  echo -e "${YELLOW}A mensagem de commit deve seguir o padrão Conventional Commits:${NC}"
+  echo -e "${GREEN}tipo(escopo opcional): descrição${NC}"
+  echo -e "${YELLOW}Onde tipo pode ser:${NC}"
+  echo -e "${BLUE}feat${NC}: Nova funcionalidade"
+  echo -e "${BLUE}fix${NC}: Correção de bug"
+  echo -e "${BLUE}docs${NC}: Documentação"
+  echo -e "${BLUE}style${NC}: Formatação (sem alteração de código)"
+  echo -e "${BLUE}refactor${NC}: Refatoração de código"
+  echo -e "${BLUE}test${NC}: Adição ou correção de testes"
+  echo -e "${BLUE}chore${NC}: Alterações em processos de build, ferramentas, etc."
+  echo -e "${BLUE}perf${NC}: Melhorias de performance"
+  echo -e "${BLUE}ci${NC}: Alterações na configuração de CI"
+  echo -e "${YELLOW}Exemplo:${NC} feat(auth): adicionar validação de token JWT"
+  exit 1
+fi
+
+# Verificar comprimento da mensagem
+TITLE=$(echo "$COMMIT_MSG" | head -n 1)
+if [[ ${#TITLE} -gt 100 ]]; then
+  echo -e "${RED}❌ A primeira linha da mensagem de commit é muito longa (${#TITLE} > 100)${NC}"
+  echo -e "${YELLOW}Por favor, mantenha a primeira linha com no máximo 100 caracteres.${NC}"
+  exit 1
+fi
+
+if [[ ${#TITLE} -lt 10 ]]; then
+  echo -e "${RED}❌ A primeira linha da mensagem de commit é muito curta (${#TITLE} < 10)${NC}"
+  echo -e "${YELLOW}Por favor, forneça uma descrição mais detalhada.${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}✅ Formato da mensagem de commit válido!${NC}"
+exit 0

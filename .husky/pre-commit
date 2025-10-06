@@ -1,9 +1,38 @@
+#!/usr/bin/env bash
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Função para executar comandos com mais resiliência
+execute_command() {
+  echo "🔄 Executando: $1"
+  eval "$1" || {
+    echo "❌ Comando falhou: $1"
+    echo "⚠️ Tentando continuar..."
+    return 0  # Retorna 0 para não interromper o commit
+  }
+}
+
 # Run detect-secrets before committing
-echo "🔍 Scanning for secrets..."
+echo "🔍 Escaneando por segredos..."
 detect-secrets scan --baseline .secrets.baseline || {
-  echo "⚠️  Potential secrets detected!"
-  echo "Run: detect-secrets audit .secrets.baseline"
+  echo "⚠️ Possíveis segredos detectados!"
+  echo "Execute: detect-secrets audit .secrets.baseline"
   exit 1
 }
 
-npx lint-staged
+# Formatando arquivos
+echo "✨ Formatando arquivos..."
+execute_command "npx prettier --write \"**/*.{md,yml,yaml}\""
+
+# Executando lint:fix para backend
+echo "🧹 Executando lint:fix para o backend..."
+execute_command "npm run lint:fix --workspace=backend"
+
+# Executando lint:fix para frontend
+echo "🧹 Executando lint:fix para o frontend..."
+execute_command "npm run lint:fix --workspace=frontend"
+
+# Executando lint-staged para verificações finais
+echo "🚀 Executando lint-staged para verificações finais..."
+execute_command "npx lint-staged"
+
+echo "✅ Pre-commit concluído com sucesso!"

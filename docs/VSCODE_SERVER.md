@@ -5,6 +5,7 @@ O **xRat Ecosystem** agora inclui um container dedicado com **VS Code Server** (
 ## 🎯 Características
 
 ### ✅ Acesso Completo aos Serviços
+
 - 🗄️ **MongoDB** - Cliente mongo instalado
 - 🔴 **Redis** - Redis CLI disponível
 - 🔧 **Backend** - Acesso direto ao código Node.js
@@ -13,6 +14,7 @@ O **xRat Ecosystem** agora inclui um container dedicado com **VS Code Server** (
 - 🐳 **Docker** - Socket montado para gerenciar containers
 
 ### ✅ Ferramentas Pré-instaladas
+
 - `docker` e `docker-compose` - Gerenciar containers
 - `mongosh` - MongoDB shell
 - `redis-cli` - Redis client
@@ -21,6 +23,7 @@ O **xRat Ecosystem** agora inclui um container dedicado com **VS Code Server** (
 - VS Code Extensions instaláveis
 
 ### ✅ Persistência
+
 - Configurações do VS Code salvas em volume
 - Extensões persistem entre reinicializações
 - Workspace completo montado
@@ -42,6 +45,7 @@ docker compose up -d
 ### 2️⃣ Acessar no Navegador
 
 Abra seu navegador em:
+
 ```
 http://localhost:8443
 ```
@@ -51,6 +55,7 @@ http://localhost:8443
 ### 3️⃣ Configurar Workspace
 
 O workspace já está montado em `/home/coder/project` com toda a estrutura:
+
 ```
 /home/coder/project/
 ├── backend/
@@ -66,6 +71,7 @@ O workspace já está montado em `/home/coder/project` com toda a estrutura:
 ## 🔧 Comandos Úteis Dentro do VS Code Server
 
 ### MongoDB
+
 ```bash
 # Conectar ao MongoDB
 mongosh mongodb://admin:xrat_secret_2025@mongodb:27017/xrat_db --authenticationDatabase admin
@@ -81,6 +87,7 @@ show collections
 ```
 
 ### Redis
+
 ```bash
 # Conectar ao Redis
 redis-cli -h redis -a xrat_redis_2025
@@ -96,6 +103,7 @@ GET key_name
 ```
 
 ### Docker
+
 ```bash
 # Listar containers
 docker ps
@@ -112,6 +120,7 @@ docker compose exec backend npm test
 ```
 
 ### Backend
+
 ```bash
 # Navegar para backend
 cd /home/coder/project/backend
@@ -127,6 +136,7 @@ tail -f logs/combined.log
 ```
 
 ### Frontend
+
 ```bash
 # Navegar para frontend
 cd /home/coder/project/frontend
@@ -148,6 +158,7 @@ npm run build
 Dentro do VS Code Server, você pode instalar extensões normalmente:
 
 ### Extensões Recomendadas:
+
 1. **ESLint** - `dbaeumer.vscode-eslint`
 2. **Prettier** - `esbenp.prettier-vscode`
 3. **Docker** - `ms-azuretools.vscode-docker`
@@ -155,6 +166,7 @@ Dentro do VS Code Server, você pode instalar extensões normalmente:
 5. **GitLens** - `eamodio.gitlens`
 
 ### Como Instalar:
+
 1. Clique no ícone de Extensions (Ctrl+Shift+X)
 2. Busque pela extensão
 3. Clique em "Install"
@@ -166,6 +178,7 @@ Dentro do VS Code Server, você pode instalar extensões normalmente:
 ### Alterar Senha
 
 **Via Environment Variable:**
+
 ```bash
 # Edite .env ou .env.example
 VSCODE_PASSWORD=sua_nova_senha_aqui
@@ -173,6 +186,7 @@ VSCODE_SUDO_PASSWORD=sua_senha_sudo_aqui
 ```
 
 **Restart o container:**
+
 ```bash
 docker compose restart vscode
 ```
@@ -182,6 +196,7 @@ docker compose restart vscode
 O container roda como `root` para ter acesso ao Docker socket, mas o VS Code Server roda como usuário `coder`.
 
 Para executar comandos sudo:
+
 ```bash
 sudo apt-get install <pacote>
 # Senha: xrat_sudo_2025 (ou sua senha customizada)
@@ -193,15 +208,16 @@ sudo apt-get install <pacote>
 
 Do VS Code Server container, você tem acesso a:
 
-| Serviço | URL Interna | Descrição |
-|---------|-------------|-----------|
-| Backend API | `http://backend:3000` | API REST |
-| Frontend | `http://frontend:5173` | React App |
-| MongoDB | `mongodb://mongodb:27017` | Database |
-| Redis | `redis://redis:6379` | Cache |
-| Nginx | `http://nginx:80` | Reverse Proxy |
+| Serviço     | URL Interna               | Descrição     |
+| ----------- | ------------------------- | ------------- |
+| Backend API | `http://backend:3000`     | API REST      |
+| Frontend    | `http://frontend:5173`    | React App     |
+| MongoDB     | `mongodb://mongodb:27017` | Database      |
+| Redis       | `redis://redis:6379`      | Cache         |
+| Nginx       | `http://nginx:80`         | Reverse Proxy |
 
 ### Exemplo de Teste:
+
 ```bash
 # Testar backend diretamente
 curl http://backend:3000/health
@@ -266,6 +282,7 @@ docker compose exec vscode chown -R coder:coder /home/coder/project
 1. **Abra VS Code Server** em `http://localhost:8080`
 
 2. **Terminal 1 - Backend:**
+
    ```bash
    cd /home/coder/project/backend
    npm run dev
@@ -273,6 +290,7 @@ docker compose exec vscode chown -R coder:coder /home/coder/project
    ```
 
 3. **Terminal 2 - Frontend:**
+
    ```bash
    cd /home/coder/project/frontend
    npm run dev
@@ -280,11 +298,12 @@ docker compose exec vscode chown -R coder:coder /home/coder/project
    ```
 
 4. **Terminal 3 - Testes:**
+
    ```bash
    # Backend tests
    cd /home/coder/project/backend
    npm test
-   
+
    # Frontend tests
    cd /home/coder/project/frontend
    npm test
@@ -306,6 +325,7 @@ Os seguintes dados são persistidos entre reinicializações:
 - ✅ **Código fonte:** Montado de `./` (host)
 
 Para limpar dados:
+
 ```bash
 # Remove volumes do VS Code
 docker volume rm xrat-vscode-data xrat-vscode-extensions
@@ -318,32 +338,37 @@ docker compose up -d vscode
 
 ## 🚀 Comparação: VS Code Local vs Server
 
-| Característica | VS Code Local | VS Code Server |
-|---------------|---------------|----------------|
-| Acesso aos containers | ✅ Via Remote-Containers | ✅ Nativo |
-| Navegador | ❌ Precisa VS Code instalado | ✅ Qualquer navegador |
-| Performance | ⚡ Máxima | 🔥 Ótima |
-| Ferramentas CLI | ⚠️ Precisa instalar | ✅ Pré-instaladas |
-| Portabilidade | ❌ Depende do host | ✅ 100% containerizado |
-| Múltiplos devs | ❌ Um por máquina | ✅ Acesso compartilhado |
+| Característica        | VS Code Local                | VS Code Server          |
+| --------------------- | ---------------------------- | ----------------------- |
+| Acesso aos containers | ✅ Via Remote-Containers     | ✅ Nativo               |
+| Navegador             | ❌ Precisa VS Code instalado | ✅ Qualquer navegador   |
+| Performance           | ⚡ Máxima                    | 🔥 Ótima                |
+| Ferramentas CLI       | ⚠️ Precisa instalar          | ✅ Pré-instaladas       |
+| Portabilidade         | ❌ Depende do host           | ✅ 100% containerizado  |
+| Múltiplos devs        | ❌ Um por máquina            | ✅ Acesso compartilhado |
 
 ---
 
 ## 🎯 Casos de Uso
 
 ### 1. Desenvolvimento Remoto
+
 Acesse seu ambiente de desenvolvimento de qualquer lugar, qualquer dispositivo com navegador.
 
 ### 2. Onboarding de Devs
+
 Novo desenvolvedor? Apenas rode `docker compose up` e acesse `localhost:8080`.
 
 ### 3. Pair Programming
+
 Compartilhe a URL do VS Code Server (com tunneling/ngrok) para colaboração remota.
 
 ### 4. CI/CD Testing
+
 Execute testes e builds dentro do container isolado.
 
 ### 5. Debugging em Produção
+
 Acesse um environment de produção idêntico ao desenvolvimento.
 
 ---

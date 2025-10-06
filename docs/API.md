@@ -712,6 +712,7 @@ curl -X POST http://localhost:3000/api/data \
 When data is created successfully, the following WebSocket events are automatically sent:
 
 1. **User Notification** (`notification` event):
+
    ```json
    {
      "type": "success",
@@ -729,7 +730,9 @@ When data is created successfully, the following WebSocket events are automatica
    ```json
    {
      "entity": "data",
-     "data": { /* full data object */ },
+     "data": {
+       /* full data object */
+     },
      "timestamp": "2025-01-04T08:00:00.000Z"
    }
    ```
@@ -924,6 +927,7 @@ At least one field must be provided. All fields are optional:
 When data is updated successfully, the following WebSocket events are automatically sent:
 
 1. **User Notification** (`notification` event):
+
    ```json
    {
      "type": "info",
@@ -941,7 +945,9 @@ When data is updated successfully, the following WebSocket events are automatica
    ```json
    {
      "entity": "data",
-     "data": { /* full updated data object */ },
+     "data": {
+       /* full updated data object */
+     },
      "timestamp": "2025-01-04T08:30:00.000Z"
    }
    ```
@@ -1589,8 +1595,8 @@ import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:3000', {
   auth: {
-    token: 'YOUR_ACCESS_TOKEN'
-  }
+    token: 'YOUR_ACCESS_TOKEN',
+  },
 });
 ```
 
@@ -1599,8 +1605,8 @@ const socket = io('http://localhost:3000', {
 ```javascript
 const socket = io('http://localhost:3000', {
   extraHeaders: {
-    Authorization: 'Bearer YOUR_ACCESS_TOKEN'
-  }
+    Authorization: 'Bearer YOUR_ACCESS_TOKEN',
+  },
 });
 ```
 
@@ -1677,6 +1683,7 @@ Push notification sent to specific user.
 ```
 
 **Notification Types:**
+
 - `info` - Informational message
 - `warning` - Warning message
 - `error` - Error notification
@@ -1705,6 +1712,7 @@ User presence status broadcast.
 ```
 
 **Status Values:**
+
 - `online` - User is connected
 - `offline` - User disconnected
 
@@ -1793,7 +1801,7 @@ Subscribe to real-time updates for a specific entity.
 ```javascript
 socket.emit('data:subscribe', {
   entity: 'products',
-  filters: { category: 'electronics' }
+  filters: { category: 'electronics' },
 });
 
 // Listen for subscription confirmation
@@ -1814,6 +1822,7 @@ socket.on('data:subscribed', (confirmation) => {
 ```
 
 **Notes:**
+
 - Filters are optional
 - Multiple subscriptions allowed per connection
 - Updates are sent to the room automatically
@@ -1826,7 +1835,7 @@ Mark a notification as read.
 
 ```javascript
 socket.emit('notification:read', {
-  notificationId: 'notif_123'
+  notificationId: 'notif_123',
 });
 
 // Listen for acknowledgment
@@ -1851,7 +1860,7 @@ Broadcast typing status to a room.
 
 ```javascript
 socket.emit('user:typing', {
-  roomId: 'chat-room-1'
+  roomId: 'chat-room-1',
 });
 ```
 
@@ -1864,6 +1873,7 @@ socket.emit('user:typing', {
 ```
 
 **Notes:**
+
 - Broadcast to all users in the room except sender
 - Typically used for chat-like features
 
@@ -1934,6 +1944,7 @@ Get real-time connection statistics.
 ```
 
 **Fields:**
+
 - `totalConnections` - Total active WebSocket connections
 - `connectedUsers` - Number of unique connected users
 - `activeRooms` - Number of active subscription rooms
@@ -1946,8 +1957,8 @@ import { io } from 'socket.io-client';
 // Connect with authentication
 const socket = io('http://localhost:3000', {
   auth: {
-    token: localStorage.getItem('accessToken')
-  }
+    token: localStorage.getItem('accessToken'),
+  },
 });
 
 // Connection events
@@ -1957,11 +1968,11 @@ socket.on('connect', () => {
 
 socket.on('connected', (data) => {
   console.log('Connection confirmed:', data);
-  
+
   // Subscribe to product updates
   socket.emit('data:subscribe', {
     entity: 'products',
-    filters: { category: 'electronics' }
+    filters: { category: 'electronics' },
   });
 });
 
@@ -1975,10 +1986,10 @@ socket.on('data:updated', (update) => {
 socket.on('notification', (notification) => {
   console.log('New notification:', notification);
   // Show notification to user
-  
+
   // Mark as read
   socket.emit('notification:read', {
-    notificationId: notification.id
+    notificationId: notification.id,
   });
 });
 
@@ -2034,16 +2045,19 @@ socket.on('disconnect', (reason) => {
 ### Troubleshooting
 
 **Connection Fails:**
+
 - Verify JWT token is valid and not expired
 - Check WebSocket URL is correct
 - Ensure CORS is configured properly
 
 **Not Receiving Updates:**
+
 - Verify subscription with `data:subscribed` event
 - Check filters match your data
 - Ensure you're in the correct room
 
 **Rate Limit Exceeded:**
+
 - Reduce message frequency
 - Implement client-side throttling
 - Check for message loops

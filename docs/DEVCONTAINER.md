@@ -7,7 +7,7 @@ O serviço foi projetado para permanecer em execução (`sleep infinity`) e pode
 - 3000: backend
 - 5173: frontend
 - 9229: node inspector (opcional)
-Como usar
+  Como usar
 
 1. Suba o container (em background):
 

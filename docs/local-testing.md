@@ -12,16 +12,19 @@ This project uses [act](https://github.com/nektos/act) to test GitHub Actions wo
 ## 🚀 Installation
 
 ### Linux/macOS
+
 ```bash
 curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 ```
 
 ### Windows (with Chocolatey)
+
 ```bash
 choco install act-cli
 ```
 
 ### Verify Installation
+
 ```bash
 act --version
 ```
@@ -29,6 +32,7 @@ act --version
 ## ⚙️ Configuration
 
 ### 1. Create `.secrets` file (not committed)
+
 ```bash
 # Copy from .env.example or create manually
 cp .env.example .secrets
@@ -38,6 +42,7 @@ nano .secrets
 ```
 
 ### 2. Secrets File Format
+
 ```properties
 GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
@@ -47,6 +52,7 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 ## 🧪 Running Workflows
 
 ### List Available Workflows
+
 ```bash
 act -l
 ```
@@ -54,26 +60,31 @@ act -l
 ### Run Specific Workflow
 
 #### Test Issue Triage
+
 ```bash
 act issues -W .github/workflows/gemini-triage.yml --secret-file .secrets
 ```
 
 #### Test PR Review
+
 ```bash
 act pull_request -W .github/workflows/gemini-review.yml --secret-file .secrets
 ```
 
 #### Test Dispatch Workflow
+
 ```bash
 act issue_comment -W .github/workflows/gemini-dispatch.yml --secret-file .secrets
 ```
 
 ### Dry Run (Don't execute, just show what would run)
+
 ```bash
 act -n
 ```
 
 ### Run with Specific Event
+
 ```bash
 # Simulate issue opened
 act issues --eventpath .github/workflows/events/issue-opened.json --secret-file .secrets
@@ -101,21 +112,25 @@ xRatEcosystem/
 ## 🎛️ Advanced Options
 
 ### Use Specific Docker Platform
+
 ```bash
 act --platform ubuntu-latest=catthehacker/ubuntu:act-latest
 ```
 
 ### Specify Container Architecture
+
 ```bash
 act --container-architecture linux/amd64
 ```
 
 ### Run Specific Job
+
 ```bash
 act -j job-name
 ```
 
 ### Pass Environment Variables
+
 ```bash
 act --env DEBUG=true --env NODE_ENV=test
 ```
@@ -123,16 +138,19 @@ act --env DEBUG=true --env NODE_ENV=test
 ## 🐛 Debugging
 
 ### Enable Verbose Output
+
 ```bash
 act -v
 ```
 
 ### Enable Step Debug
+
 ```bash
 act --secret-file .secrets --env ACTIONS_STEP_DEBUG=true
 ```
 
 ### View Container Logs
+
 ```bash
 act --verbose --secret-file .secrets
 ```
@@ -140,21 +158,27 @@ act --verbose --secret-file .secrets
 ## 🔍 Common Issues
 
 ### Issue: Docker Permission Denied
+
 **Solution**: Add your user to docker group
+
 ```bash
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
 ### Issue: Workflows Not Found
+
 **Solution**: Make sure you're in the project root directory
+
 ```bash
 cd /path/to/xRatEcosystem
 act -l
 ```
 
 ### Issue: Secrets Not Loading
+
 **Solution**: Verify `.secrets` file exists and has correct format
+
 ```bash
 cat .secrets
 # Should show: KEY=value format
@@ -163,6 +187,7 @@ cat .secrets
 ## 📚 Workflow Testing Examples
 
 ### Test Gemini Dispatch (Recommended First Test)
+
 ```bash
 # List what would run
 act -l -W .github/workflows/gemini-dispatch.yml
@@ -172,6 +197,7 @@ act issues -W .github/workflows/gemini-dispatch.yml --secret-file .secrets
 ```
 
 ### Test PR Review Workflow
+
 ```bash
 act pull_request -W .github/workflows/gemini-review.yml \
   --secret-file .secrets \
@@ -179,6 +205,7 @@ act pull_request -W .github/workflows/gemini-review.yml \
 ```
 
 ### Test Issue Triage
+
 ```bash
 act issues -W .github/workflows/gemini-triage.yml \
   --secret-file .secrets \

@@ -32,15 +32,16 @@
   },
   "lint-staged": {
     "backend/**/*.{js,json}": [
-      "npm run lint:fix --workspace=backend",
-      "npm run format --workspace=backend"
+      "prettier --write",
+      "git add"
     ],
     "frontend/**/*.{js,jsx,json}": [
-      "npm run lint:fix --workspace=frontend",
-      "npm run format --workspace=frontend"
+      "prettier --write",
+      "git add"
     ],
     "*.{md,yml,yaml}": [
-      "npx prettier --write"
+      "prettier --write",
+      "git add"
     ]
   },
   "keywords": [

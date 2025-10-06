@@ -38,17 +38,20 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 ### Frontend (React + Vite)
 
 **Technology Stack:**
+
 - React 18.2
 - Vite 5.0 (Build tool & Dev server)
 - Modern ES6+ JavaScript
 
 **Responsibilities:**
+
 - User interface rendering
 - API communication with backend
 - Real-time status monitoring
 - Data visualization
 
 **Key Features:**
+
 - Hot Module Replacement (HMR)
 - Fast refresh during development
 - Optimized production builds
@@ -59,6 +62,7 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 ### Backend (Node.js + Express)
 
 **Technology Stack:**
+
 - Node.js 20
 - Express.js 4.18
 - Mongoose (MongoDB ODM)
@@ -68,6 +72,7 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 - Compression (Response compression)
 
 **Responsibilities:**
+
 - RESTful API endpoints
 - Database operations
 - Cache management
@@ -76,6 +81,7 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 - Request validation
 
 **Key Features:**
+
 - Health check endpoints
 - Graceful shutdown handling
 - Error handling middleware
@@ -87,16 +93,19 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 ### MongoDB (Database)
 
 **Technology Stack:**
+
 - MongoDB 7.0
 - Mongoose ODM
 
 **Responsibilities:**
+
 - Data persistence
 - Document storage
 - Query optimization
 - Indexing
 
 **Key Features:**
+
 - ACID transactions
 - Replica set ready
 - Backup support
@@ -107,16 +116,19 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 ### Redis (Cache)
 
 **Technology Stack:**
+
 - Redis 7.2
 - Redis Node.js client
 
 **Responsibilities:**
+
 - Data caching
 - Session storage (future)
 - Rate limiting (future)
 - Pub/Sub messaging (future)
 
 **Key Features:**
+
 - In-memory storage
 - Fast data access
 - TTL support
@@ -133,6 +145,7 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 **Subnet:** Auto-assigned by Docker
 
 **Network Isolation:**
+
 - All containers communicate on the same internal network
 - Frontend ↔ Backend: HTTP/REST
 - Backend ↔ MongoDB: MongoDB protocol
@@ -141,12 +154,12 @@ The xRat Ecosystem is a Docker-based isolated environment featuring a modern web
 
 ### Port Mapping
 
-| Service   | Internal Port | External Port | Exposed |
-|-----------|---------------|---------------|---------|
-| Frontend  | 5173          | 5173          | ✅      |
-| Backend   | 3000          | 3000          | ✅      |
-| MongoDB   | 27017         | -             | ❌      |
-| Redis     | 6379          | -             | ❌      |
+| Service  | Internal Port | External Port | Exposed |
+| -------- | ------------- | ------------- | ------- |
+| Frontend | 5173          | 5173          | ✅      |
+| Backend  | 3000          | 3000          | ✅      |
+| MongoDB  | 27017         | -             | ❌      |
+| Redis    | 6379          | -             | ❌      |
 
 ## 🔄 Data Flow
 
@@ -260,10 +273,12 @@ xRatEcosystem/
 ### Horizontal Scaling
 
 **Current State:**
+
 - Single instance per service
 - Suitable for development and small deployments
 
 **Future Enhancements:**
+
 - Load balancer for multiple backend instances
 - MongoDB replica sets
 - Redis clustering
@@ -272,6 +287,7 @@ xRatEcosystem/
 ### Vertical Scaling
 
 **Resource Allocation:**
+
 ```yaml
 services:
   backend:
@@ -365,6 +381,7 @@ services:
 ### Health Checks
 
 **Endpoints:**
+
 - `GET /health` - Basic health status
 - `GET /health/ready` - Readiness probe (future)
 - `GET /health/live` - Liveness probe (future)
@@ -372,23 +389,27 @@ services:
 ### Logging
 
 **Backend:**
+
 - Console logging (development)
 - Structured logging with Winston (future)
 - Log aggregation (future)
 
 **Frontend:**
+
 - Console logging (development)
 - Error tracking (future)
 
 ### Metrics
 
 **Application Metrics:**
+
 - Request count
 - Response time
 - Error rate
 - Cache hit/miss ratio (future)
 
 **Infrastructure Metrics:**
+
 - CPU usage
 - Memory usage
 - Disk I/O

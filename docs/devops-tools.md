@@ -206,13 +206,13 @@ This directory contains automation scripts to facilitate development with GitHub
 
 ### Available Scripts
 
-| Script                | Description                                | Primary Use                              |
-| --------------------- | ------------------------------------------ | ---------------------------------------- |
-| `copilot-workflow.sh` | 🤖 Interactive interface for Copilot       | Invoke Copilot in PRs and issues         |
-| `dev-automation.sh`   | 🚀 Development automation                  | Complete development workflow            |
-| `copilot-helper.sh`   | 🛠️ Copilot utilities                       | Individual commands and helpers          |
-| `pr-manager.sh`       | 📋 PR management                           | Analysis of PRs #38, #39, #40            |
-| `demo-copilot.sh`     | 📺 Demonstration                           | Shows current status and examples        |
+| Script                | Description                          | Primary Use                       |
+| --------------------- | ------------------------------------ | --------------------------------- |
+| `copilot-workflow.sh` | 🤖 Interactive interface for Copilot | Invoke Copilot in PRs and issues  |
+| `dev-automation.sh`   | 🚀 Development automation            | Complete development workflow     |
+| `copilot-helper.sh`   | 🛠️ Copilot utilities                 | Individual commands and helpers   |
+| `pr-manager.sh`       | 📋 PR management                     | Analysis of PRs #38, #39, #40     |
+| `demo-copilot.sh`     | 📺 Demonstration                     | Shows current status and examples |
 
 ### Configured GitHub CLI Aliases
 
@@ -294,6 +294,7 @@ MIT License - See LICENSE for more details.
 ---
 
 **Related Documentation:**
+
 - [Automation Scripts](./automation-scripts.md)
 - [Copilot ChatModes](./copilot-chatmodes.md)
 - [Smoke Testing](./smoke-testing.md)

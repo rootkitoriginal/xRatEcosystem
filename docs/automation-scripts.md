@@ -4,13 +4,13 @@ Automation scripts to facilitate development with GitHub CLI and Copilot coding 
 
 ## 📋 Available Scripts
 
-| Script                | Description                            | Primary Use                        |
-| --------------------- | -------------------------------------- | ---------------------------------- |
-| `copilot-workflow.sh` | 🤖 Interactive interface for Copilot   | Invoke Copilot in PRs and issues   |
-| `dev-automation.sh`   | 🚀 Development automation              | Complete development workflow      |
-| `copilot-helper.sh`   | 🛠️ Copilot utilities                   | Individual commands and helpers    |
-| `pr-manager.sh`       | 📋 PR management                       | Analysis of PRs #38, #39, #40      |
-| `demo-copilot.sh`     | 📺 Demonstration                       | Shows current status and examples  |
+| Script                | Description                          | Primary Use                       |
+| --------------------- | ------------------------------------ | --------------------------------- |
+| `copilot-workflow.sh` | 🤖 Interactive interface for Copilot | Invoke Copilot in PRs and issues  |
+| `dev-automation.sh`   | 🚀 Development automation            | Complete development workflow     |
+| `copilot-helper.sh`   | 🛠️ Copilot utilities                 | Individual commands and helpers   |
+| `pr-manager.sh`       | 📋 PR management                     | Analysis of PRs #38, #39, #40     |
+| `demo-copilot.sh`     | 📺 Demonstration                     | Shows current status and examples |
 
 ## 🔧 Configured GitHub CLI Aliases
 
@@ -37,6 +37,7 @@ The primary script for daily development workflows:
 ```
 
 **Features:**
+
 - Monitor development progress
 - View PR status dashboard
 - Invoke Copilot with templates
@@ -45,6 +46,7 @@ The primary script for daily development workflows:
 - Auto-merge ready PRs
 
 **Menu Options:**
+
 1. Monitor development progress
 2. View PR dashboard
 3. Invoke Copilot
@@ -61,6 +63,7 @@ Specific interface for managing Copilot interactions:
 ```
 
 **Features:**
+
 - Interactive Copilot invocation
 - Pre-defined task templates
 - PR-specific guidance
@@ -68,6 +71,7 @@ Specific interface for managing Copilot interactions:
 - Coordinate parallel development
 
 **Use Cases:**
+
 - Request new features
 - Ask for bug fixes
 - Request test coverage improvements
@@ -82,6 +86,7 @@ Advanced PR analysis and conflict detection:
 ```
 
 **Features:**
+
 - Analyze file changes across PRs
 - Detect potential merge conflicts
 - Show overlap between PRs #38, #39, #40
@@ -89,6 +94,7 @@ Advanced PR analysis and conflict detection:
 - Display detailed PR statistics
 
 **Output Example:**
+
 ```
 === PR Conflict Analysis ===
 
@@ -114,6 +120,7 @@ Individual utility commands for quick tasks:
 ```
 
 **Available Commands:**
+
 - List Copilot PRs
 - List Copilot issues
 - Check PR readiness
@@ -130,6 +137,7 @@ Quick overview of current status:
 ```
 
 **Shows:**
+
 - Current PR status
 - Example Copilot invocations
 - Quick reference guide

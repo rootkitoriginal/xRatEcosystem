@@ -13,12 +13,14 @@ This guide demonstrates the real-time notification feature for data create and u
 ### Scenario 1: Create Data with Notification
 
 **Step 1: Open the frontend and authenticate**
+
 ```
 Navigate to: http://localhost:5173
 Login with your credentials
 ```
 
 **Step 2: Open browser console**
+
 ```javascript
 // You should see WebSocket connection logs
 // [WebSocket] Connected
@@ -28,6 +30,7 @@ Login with your credentials
 **Step 3: Create data via API or UI**
 
 Using cURL:
+
 ```bash
 curl -X POST http://localhost:3000/api/data \
   -H "Content-Type: application/json" \
@@ -45,15 +48,19 @@ curl -X POST http://localhost:3000/api/data \
 **Expected Results:**
 
 1. **API Response:**
+
    ```json
    {
      "success": true,
      "message": "Data created successfully",
-     "data": { /* created data object */ }
+     "data": {
+       /* created data object */
+     }
    }
    ```
 
 2. **WebSocket Notification (Console):**
+
    ```javascript
    notification: {
      type: 'success',
@@ -98,15 +105,19 @@ curl -X PUT http://localhost:3000/api/data/507f1f77bcf86cd799439011 \
 **Expected Results:**
 
 1. **API Response:**
+
    ```json
    {
      "success": true,
      "message": "Data updated successfully",
-     "data": { /* updated data object */ }
+     "data": {
+       /* updated data object */
+     }
    }
    ```
 
 2. **WebSocket Notification:**
+
    ```javascript
    notification: {
      type: 'info',
@@ -149,6 +160,7 @@ curl -X POST http://localhost:3000/api/data/bulk \
    - Each item triggers a `data:updated` event
 
 2. **Summary Notification:**
+
    ```javascript
    notification: {
      type: 'success',
@@ -182,7 +194,7 @@ console.log('Socket ID:', socket?.id);
 // In browser console or component
 socket.emit('data:subscribe', {
   entity: 'data',
-  filters: { status: 'active' }
+  filters: { status: 'active' },
 });
 
 socket.on('data:subscribed', (data) => {
@@ -208,12 +220,14 @@ socket.on('notification', (notification) => {
 ### No Notifications Appearing
 
 1. **Check WebSocket Connection:**
+
    ```javascript
    // Should show true
    console.log('Connected:', window.__WEBSOCKET_CONTEXT__?.connected);
    ```
 
 2. **Check Authentication:**
+
    ```javascript
    // Should have a token
    console.log('Token:', localStorage.getItem('token'));
@@ -233,6 +247,7 @@ socket.on('notification', (notification) => {
 ### Notifications Not Broadcasting to Other Users
 
 1. **Subscribe to Updates:**
+
    ```javascript
    socket.emit('data:subscribe', { entity: 'data' });
    ```
@@ -244,6 +259,7 @@ socket.on('notification', (notification) => {
 ### Testing Offline Notification Queue
 
 1. **Disconnect WebSocket:**
+
    ```javascript
    socket.disconnect();
    ```
@@ -251,6 +267,7 @@ socket.on('notification', (notification) => {
 2. **Create/Update Data** (via API)
 
 3. **Reconnect:**
+
    ```javascript
    socket.connect();
    ```
@@ -268,6 +285,7 @@ curl http://localhost:3000/api/websocket/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,

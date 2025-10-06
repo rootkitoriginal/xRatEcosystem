@@ -16,14 +16,14 @@ This document provides comprehensive guidance on the WebSocket performance and s
 
 ### Performance Targets
 
-| Metric | Target | Notes |
-|--------|--------|-------|
+| Metric                     | Target             | Notes                      |
+| -------------------------- | ------------------ | -------------------------- |
 | **Concurrent Connections** | 10,000+ per server | Scaled to 100-500 in tests |
-| **Connection Latency** | < 100ms | Under load |
-| **Message Throughput** | 10,000+ msg/sec | Varies by payload size |
-| **Memory Growth** | < 20MB per hour | During stable operation |
-| **CPU Usage** | < 80% | Under maximum load |
-| **Message Delivery Rate** | > 90% | Under normal load |
+| **Connection Latency**     | < 100ms            | Under load                 |
+| **Message Throughput**     | 10,000+ msg/sec    | Varies by payload size     |
+| **Memory Growth**          | < 20MB per hour    | During stable operation    |
+| **CPU Usage**              | < 80%              | Under maximum load         |
+| **Message Delivery Rate**  | > 90%              | Under normal load          |
 
 ## 📁 Test Suite Structure
 
@@ -44,6 +44,7 @@ backend/__tests__/performance/
 **Purpose**: Validate connection handling under high concurrent load
 
 **Test Scenarios**:
+
 - ✅ 100 simultaneous connections (scaled from 1,000+ target)
 - ✅ Connection tracking accuracy
 - ✅ Rapid connect/disconnect cycles (100 iterations)
@@ -55,6 +56,7 @@ backend/__tests__/performance/
 - ✅ Room membership cleanup validation
 
 **Key Metrics**:
+
 - Connection success rate: > 80%
 - Cleanup effectiveness: > 50% resource reclamation
 - Pool capacity: 100+ concurrent connections
@@ -64,6 +66,7 @@ backend/__tests__/performance/
 **Purpose**: Detect memory leaks and validate memory management
 
 **Test Scenarios**:
+
 - ✅ Long-running connection memory tracking (50 clients, 5 seconds)
 - ✅ Repeated connect/disconnect cycles (20 cycles, 10 clients each)
 - ✅ Event listener cleanup validation
@@ -76,6 +79,7 @@ backend/__tests__/performance/
 - ✅ Connection object cleanup validation (30 connections)
 
 **Key Metrics**:
+
 - Memory growth during session: < 10MB
 - Memory drift over cycles: < 20MB
 - Memory growth with operations: < 5-15MB (depending on test)
@@ -86,6 +90,7 @@ backend/__tests__/performance/
 **Purpose**: Measure message delivery performance and latency
 
 **Test Scenarios**:
+
 - ✅ 1,000 rapid broadcasts (throughput measurement)
 - ✅ Low latency under load (10 clients, 50 msg each)
 - ✅ 1MB+ large payload handling
@@ -97,6 +102,7 @@ backend/__tests__/performance/
 - ✅ Complex object serialization performance
 
 **Key Metrics**:
+
 - Message throughput: > 500 msg/sec
 - Average latency: < 100ms
 - Large payload delivery: 100% success
@@ -108,6 +114,7 @@ backend/__tests__/performance/
 **Purpose**: Test system behavior under resource constraints
 
 **Test Scenarios**:
+
 - ✅ CPU usage monitoring under load (50 clients with active messaging)
 - ✅ CPU-intensive broadcasting (30 clients, 500 broadcasts)
 - ✅ Memory pressure recovery (50 clients, 100KB x 100 messages)
@@ -120,6 +127,7 @@ backend/__tests__/performance/
 - ✅ System stability after stress cycles (3 cycles, 50 clients each)
 
 **Key Metrics**:
+
 - CPU usage: < 95% under load
 - Recovery: System remains operational
 - FD success rate: > 85%
@@ -183,15 +191,18 @@ npm run test:integration
 ### Success Criteria
 
 #### Connection Tests
+
 ```
 ✅ Connected 95/100 clients (95.00%)
    Note: Test scaled to 100 connections (production target: 1000+)
 ```
+
 - **Success**: > 80% connection rate
 - **Warning**: 60-80% connection rate (investigate networking)
 - **Failure**: < 60% connection rate
 
 #### Memory Tests
+
 ```
 📊 Memory Usage:
   Initial: 45.23 MB
@@ -201,11 +212,13 @@ npm run test:integration
   Growth during session: 0.45 MB
   Reclaimed after disconnect: 5.23 MB
 ```
+
 - **Success**: Memory growth < 10MB, reclamation > 30%
 - **Warning**: Memory growth 10-20MB
 - **Failure**: Memory growth > 20MB or no reclamation
 
 #### Throughput Tests
+
 ```
 📊 Throughput Test Results:
   Sent: 1000 messages
@@ -213,11 +226,13 @@ npm run test:integration
   Duration: 1234ms
   Throughput: 810 msg/sec
 ```
+
 - **Success**: > 90% delivery rate, throughput > 500 msg/sec
 - **Warning**: 80-90% delivery rate
 - **Failure**: < 80% delivery rate
 
 #### Latency Tests
+
 ```
 📊 Latency Statistics:
   Average: 45.23ms
@@ -225,6 +240,7 @@ npm run test:integration
   Max: 156ms
   Total messages: 500
 ```
+
 - **Success**: Average < 100ms, Max < 200ms
 - **Warning**: Average 100-200ms
 - **Failure**: Average > 200ms
@@ -232,14 +248,16 @@ npm run test:integration
 ### Common Performance Issues
 
 #### High Memory Growth
+
 - **Symptom**: Memory increases > 20MB during tests
-- **Causes**: 
+- **Causes**:
   - Event listeners not cleaned up
   - Room memberships not removed
   - Rate limiters accumulating
 - **Solution**: Check disconnect handlers and cleanup logic
 
 #### Low Connection Success Rate
+
 - **Symptom**: < 80% connection success
 - **Causes**:
   - File descriptor limits
@@ -248,6 +266,7 @@ npm run test:integration
 - **Solution**: Check system limits (`ulimit -n`), increase timeouts
 
 #### Poor Message Delivery
+
 - **Symptom**: < 90% message delivery rate
 - **Causes**:
   - Message queue overflow
@@ -256,6 +275,7 @@ npm run test:integration
 - **Solution**: Implement message prioritization, increase buffer sizes
 
 #### CPU Saturation
+
 - **Symptom**: CPU usage > 90%
 - **Causes**:
   - Inefficient serialization
@@ -270,12 +290,14 @@ npm run test:integration
 Performance tests are scaled down for CI/CD environments. To run full-scale tests:
 
 1. Edit test files to increase connection counts:
+
 ```javascript
 // In websocket-stress.test.js
 const connectionCount = 1000; // Change from 100 to 1000
 ```
 
 2. Increase system limits:
+
 ```bash
 # Increase file descriptor limit
 ulimit -n 65536
@@ -285,6 +307,7 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 ```
 
 3. Run with extended timeout:
+
 ```bash
 jest __tests__/performance --testTimeout=300000 --runInBand
 ```
@@ -319,17 +342,20 @@ export PERF_TEST_PORT_START=30000
 ### Establishing Baselines
 
 1. **Run tests on reference hardware**:
+
 ```bash
 npm run test:performance > baseline-results.txt 2>&1
 ```
 
 2. **Extract key metrics**:
+
 - Connection success rate
 - Memory usage patterns
 - Message throughput
 - Latency statistics
 
 3. **Document system configuration**:
+
 - CPU: cores, speed
 - RAM: total, available
 - Network: bandwidth, latency
@@ -375,6 +401,7 @@ jobs:
 **Problem**: Tests exceed timeout limits
 
 **Solutions**:
+
 1. Reduce connection counts in test files
 2. Increase `testTimeout` in jest.config.js
 3. Run tests with `--runInBand` to prevent parallel execution issues
@@ -385,6 +412,7 @@ jobs:
 **Problem**: "ECONNREFUSED" or "EADDRINUSE" errors
 
 **Solutions**:
+
 1. Ensure ports 30001-30004 are available
 2. Close previous test processes
 3. Wait between test runs for port cleanup
@@ -395,6 +423,7 @@ jobs:
 **Problem**: Memory growth exceeds thresholds
 
 **Solutions**:
+
 1. Run tests in isolation
 2. Increase GC frequency with `--expose-gc`
 3. Check for background processes consuming memory
@@ -405,6 +434,7 @@ jobs:
 **Problem**: Tests pass/fail intermittently
 
 **Solutions**:
+
 1. Increase wait times between operations
 2. Use `--runInBand` for sequential execution
 3. Add retries for network-dependent operations
@@ -434,7 +464,7 @@ describe('New Performance Test', () => {
     httpServer = http.createServer();
     socketService = new SocketService(httpServer, mockRedisClient);
     testToken = generateAccessToken({ userId: 'test-user-id' });
-    
+
     await new Promise((resolve) => {
       httpServer.listen(PORT, resolve);
     });
@@ -450,18 +480,18 @@ describe('New Performance Test', () => {
   test('should validate performance metric', async () => {
     // Arrange: Setup test scenario
     const clients = [];
-    
+
     // Act: Execute performance test
     const startTime = Date.now();
     // ... test logic ...
     const duration = Date.now() - startTime;
-    
+
     // Assert: Validate metrics
     expect(duration).toBeLessThan(expectedThreshold);
-    
+
     // Cleanup: Disconnect clients
-    clients.forEach(c => c.disconnect());
-    
+    clients.forEach((c) => c.disconnect());
+
     // Log: Report metrics
     console.log(`📊 Metric: ${value} (target: ${threshold})`);
   }, 30000);
@@ -471,12 +501,14 @@ describe('New Performance Test', () => {
 ## 📚 Additional Resources
 
 ### Related Documentation
+
 - [WebSocket Testing Guide](./WEBSOCKET_TESTING.md) - Functional testing patterns
 - [Phase 4 Summary](./PHASE4_WEBSOCKET_TESTING_SUMMARY.md) - Previous testing phase results
 - [Architecture](./ARCHITECTURE.md) - System architecture overview
 - [API Documentation](./API.md) - API endpoint documentation
 
 ### External Resources
+
 - [Socket.IO Performance Tuning](https://socket.io/docs/v4/performance-tuning/)
 - [Node.js Performance Best Practices](https://nodejs.org/en/docs/guides/simple-profiling/)
 - [Jest Performance Tips](https://jestjs.io/docs/troubleshooting#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server)
@@ -484,6 +516,7 @@ describe('New Performance Test', () => {
 ## 🔄 Changelog
 
 ### Version 1.0.0 (2025-01-05)
+
 - Initial performance testing suite implementation
 - 4 test files with 38 performance tests
 - Connection, memory, throughput, and resource tests
