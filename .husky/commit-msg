@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/bash
 
 # Cores para melhor legibilidade
 RED='\033[0;31m'
@@ -13,11 +12,11 @@ COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
 
 # Padrão de mensagem de commit baseado no Conventional Commits
 # Referência: https://www.conventionalcommits.org/
-PATTERN="^(feat|fix|docs|style|refactor|test|chore|perf|ci)(\(.+\))?!?: .+"
-
+# Usar grep em vez de [[ =~ ]] para maior compatibilidade
 echo -e "${BLUE}🔍 Verificando formato da mensagem de commit...${NC}"
 
-if ! [[ $COMMIT_MSG =~ $PATTERN ]]; then
+COMMIT_FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1)
+if ! echo "$COMMIT_FIRST_LINE" | grep -E "^(feat|fix|docs|style|refactor|test|chore|perf|ci)(\(.+\))?!?: .+" > /dev/null; then
   echo -e "${RED}❌ Mensagem de commit inválida:${NC} $COMMIT_MSG"
   echo -e "${YELLOW}A mensagem de commit deve seguir o padrão Conventional Commits:${NC}"
   echo -e "${GREEN}tipo(escopo opcional): descrição${NC}"
@@ -37,14 +36,15 @@ fi
 
 # Verificar comprimento da mensagem
 TITLE=$(echo "$COMMIT_MSG" | head -n 1)
-if [[ ${#TITLE} -gt 100 ]]; then
-  echo -e "${RED}❌ A primeira linha da mensagem de commit é muito longa (${#TITLE} > 100)${NC}"
+TITLE_LENGTH=${#TITLE}
+if [ "$TITLE_LENGTH" -gt 100 ]; then
+  echo -e "${RED}❌ A primeira linha da mensagem de commit é muito longa ($TITLE_LENGTH > 100)${NC}"
   echo -e "${YELLOW}Por favor, mantenha a primeira linha com no máximo 100 caracteres.${NC}"
   exit 1
 fi
 
-if [[ ${#TITLE} -lt 10 ]]; then
-  echo -e "${RED}❌ A primeira linha da mensagem de commit é muito curta (${#TITLE} < 10)${NC}"
+if [ "$TITLE_LENGTH" -lt 10 ]; then
+  echo -e "${RED}❌ A primeira linha da mensagem de commit é muito curta ($TITLE_LENGTH < 10)${NC}"
   echo -e "${YELLOW}Por favor, forneça uma descrição mais detalhada.${NC}"
   exit 1
 fi

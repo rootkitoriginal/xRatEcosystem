@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/bash
 
 # Função para executar comandos com mais resiliência
 execute_command() {
