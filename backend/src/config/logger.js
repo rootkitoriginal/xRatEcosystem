@@ -3,91 +3,100 @@ const DailyRotateFile = require('winston-daily-rotate-file');
 const path = require('path');
 
 // Define log levels
-const levels = {
+const logLevels = {
   error: 0,
   warn: 1,
   info: 2,
-  debug: 3,
+  http: 3,
+  debug: 4,
 };
 
-// Define colors for each level
-const colors = {
+// Define log colors
+const logColors = {
   error: 'red',
   warn: 'yellow',
   info: 'green',
+  http: 'magenta',
   debug: 'blue',
 };
 
-// Add colors to winston
-winston.addColors(colors);
+winston.addColors(logColors);
 
-// Define log format
-const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.splat(),
-  winston.format.json()
-);
+// Create logs directory if it doesn't exist
+const logsDir = path.join(__dirname, '../../logs');
 
-// Define console format (for development)
-const consoleFormat = winston.format.combine(
-  winston.format.colorize(),
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.printf((info) => {
-    const { timestamp, level, message, ...meta } = info;
-    const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
-    return `${timestamp} [${level}]: ${message} ${metaStr}`;
-  })
-);
-
-// Create logs directory path
-const logsDir = path.join(process.cwd(), 'logs');
-
-// Daily rotate file transport for errors
-const errorFileTransport = new DailyRotateFile({
-  filename: path.join(logsDir, 'error-%DATE%.log'),
-  datePattern: 'YYYY-MM-DD',
-  level: 'error',
-  maxFiles: '14d', // Keep logs for 14 days
-  format: logFormat,
-  zippedArchive: true, // Compress old logs
+// Console transport
+const consoleTransport = new winston.transports.Console({
+  format: winston.format.combine(
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.colorize({ all: true }),
+    winston.format.printf(({ timestamp, level, message, ...meta }) => {
+      let metaStr = '';
+      if (Object.keys(meta).length > 0) {
+        metaStr = ` ${JSON.stringify(meta)}`;
+      }
+      return `${timestamp} [${level}]: ${message}${metaStr}`;
+    })
+  ),
 });
 
-// Daily rotate file transport for combined logs
+// File transport for combined logs
 const combinedFileTransport = new DailyRotateFile({
   filename: path.join(logsDir, 'combined-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
-  maxFiles: '14d', // Keep logs for 14 days
-  format: logFormat,
-  zippedArchive: true, // Compress old logs
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
 });
 
-// Create transports array
-const transports = [errorFileTransport, combinedFileTransport];
-
-// Add console transport for non-production environments
-if (process.env.NODE_ENV !== 'production') {
-  transports.push(
-    new winston.transports.Console({
-      format: consoleFormat,
-    })
-  );
-}
+// File transport for error logs
+const errorFileTransport = new DailyRotateFile({
+  filename: path.join(logsDir, 'error-%DATE%.log'),
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '30d',
+  level: 'error',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+});
 
 // Create logger instance
+const transports = [consoleTransport];
+
+// Only add file transports in production
+if (process.env.NODE_ENV === 'production') {
+  transports.push(combinedFileTransport);
+  transports.push(errorFileTransport);
+}
+
 const logger = winston.createLogger({
-  levels,
-  level: process.env.LOG_LEVEL || 'info',
-  format: logFormat,
-  transports,
-  exitOnError: false,
+  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  levels: logLevels,
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  defaultMeta: { service: 'xrat-backend' },
+  transports: transports,
 });
 
-// Create a stream object for Morgan or other middleware
-logger.stream = {
-  write: (message) => {
-    logger.info(message.trim());
-  },
-};
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', { promise, reason });
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception:', { error: error.message, stack: error.stack });
+  process.exit(1);
+});
 
 module.exports = logger;

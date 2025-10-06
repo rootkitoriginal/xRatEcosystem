@@ -1,0 +1,106 @@
+{
+	"name": "🐀 xRat Ecosystem - Dev Container",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+	"workspaceFolder": "/workspace",
+	
+	// Features adicionais
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": true,
+			"azureDnsAutoDetection": true,
+			"installDockerBuildx": true,
+			"version": "latest",
+			"dockerDashComposeVersion": "v2"
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "20"
+		},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": false,
+			"installOhMyZsh": true,
+			"upgradePackages": true,
+			"username": "vscode",
+			"userUid": "automatic",
+			"userGid": "automatic"
+		}
+	},
+	
+	// Configurações do VS Code dentro do container
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+						"path": "/bin/bash",
+						"args": ["-c", "echo '🐀 xRat Ecosystem DevContainer'; echo '🐳 Docker + Ubuntu 22.04'; echo '📦 Node.js 20 + Express'; echo ''; bash"]
+					}
+				},
+				"docker.showStartPage": false
+			},
+			"extensions": [
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"mongodb.mongodb-vscode",
+				"ms-vscode.vscode-docker",
+				"ms-vscode.vscode-json",
+				"bradlc.vscode-tailwindcss"
+			]
+		}
+	},
+	
+	// Portas a serem encaminhadas
+	"forwardPorts": [3000, 5173, 80, 27017, 6379],
+	"portsAttributes": {
+		"3000": {
+			"label": "Backend API",
+			"onAutoForward": "notify"
+		},
+		"5173": {
+			"label": "Frontend Dev Server",
+			"onAutoForward": "notify"
+		},
+		"80": {
+			"label": "Nginx",
+			"onAutoForward": "notify"
+		},
+		"27017": {
+			"label": "MongoDB",
+			"onAutoForward": "silent"
+		},
+		"6379": {
+			"label": "Redis",
+			"onAutoForward": "silent"
+		}
+	},
+	
+	// Comandos a executar após criar o container
+	"postCreateCommand": "chmod +x ./xrat.sh && echo '🐀 xRat Ecosystem DevContainer ready!'",
+	
+	// Manter container rodando
+	"overrideCommand": false,
+	
+	// Usuário remoto
+	"remoteUser": "vscode",
+	
+	// Environment variables
+	"remoteEnv": {
+		"HOME": "/home/vscode",
+		"DOCKER_BUILDKIT": "1",
+		"COMPOSE_DOCKER_CLI_BUILD": "1"
+	},
+	
+	// Montagens
+	"mounts": [
+		"source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+	],
+	
+	// Comandos init
+	"initializeCommand": "echo 'Preparando xRat Ecosystem DevContainer...'",
+	"postStartCommand": "sudo chown vscode:vscode /var/run/docker-host.sock 2>/dev/null || true"
+}

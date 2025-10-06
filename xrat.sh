@@ -14,9 +14,12 @@ case "$1" in
     echo "✅ xRat Ecosystem started!"
     echo ""
     echo "📍 Access points:"
-    echo "   Frontend: http://localhost:5173"
-    echo "   Backend:  http://localhost:3000"
-    echo "   Health:   http://localhost:3000/health"
+    echo "   Production:  http://localhost        (Nginx)"
+    echo "   Frontend:    http://localhost:5173   (Development)"
+    echo "   Backend:     http://localhost:3000   (API)"
+    echo "   Health:      http://localhost:3000/health"
+    echo "   MongoDB:     mongodb://localhost:27017"
+    echo "   Redis:       redis://localhost:6379"
     echo ""
     echo "📊 View logs: ./xrat.sh logs"
     ;;
@@ -72,12 +75,12 @@ case "$1" in
   
   shell-mongo)
     echo "🐚 Opening MongoDB shell..."
-    docker compose exec mongodb mongosh -u admin -p xrat_secret_2025
+    docker compose exec mongodb mongosh -u admin -p xratpassword
     ;;
   
   shell-redis)
     echo "🐚 Opening Redis CLI..."
-    docker compose exec redis redis-cli -a xrat_redis_2025
+    docker compose exec redis redis-cli -a xratredispass
     ;;
   
   *)

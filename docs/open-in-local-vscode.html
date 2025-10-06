@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Abrir no VS Code (local)</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#0f1724; color:#e6eef8 }
+      .card { background:#0b1220; padding:28px; border-radius:12px; box-shadow:0 8px 30px rgba(2,6,23,.6); max-width:720px }
+      h1 { margin:0 0 8px 0; font-size:20px }
+      p { margin:0 0 18px 0; color:#9fb0cc }
+      a.button { display:inline-block; padding:12px 18px; border-radius:8px; text-decoration:none; color:#06283d; background:#9ae6b4; font-weight:600 }
+      a.alt { margin-left:12px; color:#93c5fd }
+      .muted { color:#6b7c8f; font-size:13px; margin-top:12px }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Abrir este workspace no VS Code (local)</h1>
+      <p>Use o botão abaixo para abrir a workspace do projeto na sua instalação do VS Code no desktop. Isso usa o esquema de URL <code>vscode://file</code> — o VS Code deve estar instalado e registrar o esquema.</p>
+
+      <!-- IMPORTANT: adjust the path if your workspace is located elsewhere on your machine -->
+      <a class="button" id="openBtn" href="#">Abrir no VS Code</a>
+      <a class="alt" id="cliLink" href="#">Ou usar CLI</a>
+
+      <div class="muted">Se o clique não funcionar, copie o comando que aparece ao lado e cole no seu terminal local.</div>
+      <pre id="cmd" style="background:#071126;padding:12px;border-radius:6px;margin-top:10px">code -r /home/rootkit/Apps/xRatEcosystem/xRatEcosystem.code-workspace</pre>
+    </div>
+
+    <!doctype html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Abrir no VS Code (local)</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#0f1724; color:#e6eef8 }
+          .card { background:#0b1220; padding:28px; border-radius:12px; box-shadow:0 8px 30px rgba(2,6,23,.6); max-width:720px }
+          h1 { margin:0 0 8px 0; font-size:20px }
+          p { margin:0 0 18px 0; color:#9fb0cc }
+          a.button { display:inline-block; padding:12px 18px; border-radius:8px; text-decoration:none; color:#06283d; background:#9ae6b4; font-weight:600 }
+          a.alt { margin-left:12px; color:#93c5fd }
+          .muted { color:#6b7c8f; font-size:13px; margin-top:12px }
+          .tip { position:fixed; left:16px; bottom:16px; font-size:13px; color:#9fb0cc }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h1>Abrir este workspace no VS Code (local)</h1>
+          <p>Use o botão abaixo para abrir a workspace do projeto na sua instalação do VS Code no desktop. Isso usa o esquema de URL <code>vscode://file</code> — o VS Code deve estar instalado e registrar o esquema.</p>
+
+          <!-- IMPORTANT: adjust the path if your workspace is located elsewhere on your machine -->
+          <a class="button" id="openBtn" href="#">Abrir no VS Code</a>
+          <a class="alt" id="cliLink" href="#">Ou usar CLI</a>
+
+          <div class="muted">Se o clique não funcionar, copie o comando que aparece ao lado e cole no seu terminal local.</div>
+          <pre id="cmd" style="background:#071126;padding:12px;border-radius:6px;margin-top:10px">code -r /home/rootkit/Apps/xRatEcosystem/xRatEcosystem.code-workspace</pre>
+        </div>
+
+        <script>
+          (function(){
+            // Build a vscode://file URL that opens the workspace file via desktop VS Code
+            // NOTE: The path must be absolute on the user's machine. We provide a sensible default.
+            const defaultPath = '/home/rootkit/Apps/xRatEcosystem/xRatEcosystem.code-workspace';
+            // Allow overriding via querystring: ?path=/home/you/...
+            function getQueryParam(name){
+              const params = new URLSearchParams(window.location.search);
+              return params.get(name);
+            }
+            const override = getQueryParam('path');
+            const workspacePath = override || defaultPath;
+            // Create the vscode URI and CLI command
+            const vscodeUrl = `vscode://file/${workspacePath}`;
+            const cliCmd = `code -r ${workspacePath}`;
+
+            const btn = document.getElementById('openBtn');
+      btn.setAttribute('href', vscodeUrl);
+            btn.addEventListener('click', function(){
+              // Attempt to open the registered URL scheme. In many browsers this will prompt or directly open VS Code.
+              // If the scheme isn't registered this will do nothing.
+            });
+
+            const cliLink = document.getElementById('cliLink');
+            cliLink.setAttribute('href', '#');
+            cliLink.addEventListener('click', function(e){
+              e.preventDefault();
+              const cmd = document.getElementById('cmd').textContent;
+              // Try to copy to clipboard for convenience
+              navigator.clipboard && navigator.clipboard.writeText(cmd).then(function(){
+                alert('Comando copiado para a área de transferência:\n' + cmd);
+              }, function(){
+                alert('Não foi possível copiar automaticamente. Copie manualmente:\n' + cmd);
+              });
+            });
+
+            // Update displayed CLI command to match workspacePath
+            document.getElementById('cmd').textContent = cliCmd;
+
+            // If page was loaded with file:// scheme, show a small hint recommending a local HTTP server
+            if(window.location.protocol === 'file:'){
+              const tip = document.querySelector('.tip');
+              tip.innerHTML = '<strong>Dica:</strong> Você abriu o arquivo localmente (file://). Alguns navegadores bloqueiam esquemas personalizados a partir de páginas locais. Recomendo executar no terminal do host: <code>python3 -m http.server 8000</code>, e abrir <a style="color:#9ae6b4" href="http://localhost:8000/docs/open-in-local-vscode.html">http://localhost:8000/docs/open-in-local-vscode.html</a> no navegador.';
+            }
+          })();
+        </script>
+
+        <div class="tip">
+          <strong>Dica:</strong> se o botão não abrir o VS Code, abra este diretório no terminal do seu host e execute <code>python3 -m http.server 8000</code> e depois acesse <a style="color:#9ae6b4" href="http://localhost:8000/docs/open-in-local-vscode.html">http://localhost:8000/docs/open-in-local-vscode.html</a> no navegador. Isso evita restrições que alguns navegadores aplicam a páginas locais (file://).
+        </div>
+      </body>
+    </html>
