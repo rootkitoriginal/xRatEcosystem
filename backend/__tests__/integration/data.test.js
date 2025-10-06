@@ -48,7 +48,7 @@ describe('Data Management API', () => {
 
     // Mount data routes
     const dataRoutes = createDataRoutes(dataService, dataController);
-    app.use('/api/data', dataRoutes);
+    app.use('/api/v1/data', dataRoutes);
 
     // Error handler
     app.use((err, req, res, _next) => {
@@ -131,7 +131,7 @@ describe('Data Management API', () => {
         tags: ['test', 'example'],
       };
 
-      const response = await request(app).post('/api/data').send(newData);
+      const response = await request(app).post('/api/v1/data').send(newData);
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
@@ -144,7 +144,7 @@ describe('Data Management API', () => {
         description: 'Missing name and content',
       };
 
-      const response = await request(app).post('/api/data').send(invalidData);
+      const response = await request(app).post('/api/v1/data').send(invalidData);
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -158,7 +158,7 @@ describe('Data Management API', () => {
         type: 'invalid_type',
       };
 
-      const response = await request(app).post('/api/data').send(invalidData);
+      const response = await request(app).post('/api/v1/data').send(invalidData);
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -193,7 +193,7 @@ describe('Data Management API', () => {
     });
 
     it('should list all data with pagination', async () => {
-      const response = await request(app).get('/api/data').query({ page: 1, limit: 10 });
+      const response = await request(app).get('/api/v1/data').query({ page: 1, limit: 10 });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -204,14 +204,14 @@ describe('Data Management API', () => {
     });
 
     it('should filter data by status', async () => {
-      const response = await request(app).get('/api/data').query({ status: 'active' });
+      const response = await request(app).get('/api/v1/data').query({ status: 'active' });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
     });
 
     it('should filter data by type', async () => {
-      const response = await request(app).get('/api/data').query({ type: 'json' });
+      const response = await request(app).get('/api/v1/data').query({ type: 'json' });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -235,7 +235,7 @@ describe('Data Management API', () => {
     it('should get data by valid ID', async () => {
       mockRedisClient.get.mockResolvedValue(null);
 
-      const response = await request(app).get('/api/data/507f1f77bcf86cd799439011');
+      const response = await request(app).get('/api/v1/data/507f1f77bcf86cd799439011');
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -246,7 +246,7 @@ describe('Data Management API', () => {
       mockRedisClient.get.mockResolvedValue(null);
       Data.findOne.mockResolvedValue(null);
 
-      const response = await request(app).get('/api/data/507f1f77bcf86cd799439099');
+      const response = await request(app).get('/api/v1/data/507f1f77bcf86cd799439099');
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
@@ -254,11 +254,11 @@ describe('Data Management API', () => {
     });
 
     it('should return 400 for invalid ID format', async () => {
-      const response = await request(app).get('/api/data/invalid-id');
+      const response = await request(app).get('/api/v1/data/invalid-id');
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Invalid data ID format');
+      expect(response.body.message).toBe('Invalid ID format');
     });
   });
 
@@ -281,7 +281,9 @@ describe('Data Management API', () => {
         description: 'Updated description',
       };
 
-      const response = await request(app).put('/api/data/507f1f77bcf86cd799439011').send(updates);
+      const response = await request(app)
+        .put('/api/v1/data/507f1f77bcf86cd799439011')
+        .send(updates);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -292,7 +294,7 @@ describe('Data Management API', () => {
       Data.findOneAndUpdate.mockResolvedValue(null);
 
       const response = await request(app)
-        .put('/api/data/507f1f77bcf86cd799439099')
+        .put('/api/v1/data/507f1f77bcf86cd799439099')
         .send({ name: 'Updated' });
 
       expect(response.status).toBe(404);
@@ -300,7 +302,7 @@ describe('Data Management API', () => {
     });
 
     it('should reject empty update', async () => {
-      const response = await request(app).put('/api/data/507f1f77bcf86cd799439011').send({});
+      const response = await request(app).put('/api/v1/data/507f1f77bcf86cd799439011').send({});
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -319,7 +321,7 @@ describe('Data Management API', () => {
     });
 
     it('should delete data successfully', async () => {
-      const response = await request(app).delete('/api/data/507f1f77bcf86cd799439011');
+      const response = await request(app).delete('/api/v1/data/507f1f77bcf86cd799439011');
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -329,7 +331,7 @@ describe('Data Management API', () => {
     it('should return 404 for non-existent data', async () => {
       Data.findOneAndDelete.mockResolvedValue(null);
 
-      const response = await request(app).delete('/api/data/507f1f77bcf86cd799439099');
+      const response = await request(app).delete('/api/v1/data/507f1f77bcf86cd799439099');
 
       expect(response.status).toBe(404);
       expect(response.body.success).toBe(false);
@@ -347,7 +349,7 @@ describe('Data Management API', () => {
       ];
 
       const response = await request(app)
-        .get('/api/data/search')
+        .get('/api/v1/data/search')
         .query({ search: 'test', page: 1, limit: 10 });
 
       expect(response.status).toBe(200);
@@ -356,7 +358,7 @@ describe('Data Management API', () => {
     });
 
     it('should return 400 without search query', async () => {
-      const response = await request(app).get('/api/data/search');
+      const response = await request(app).get('/api/v1/data/search');
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -373,7 +375,7 @@ describe('Data Management API', () => {
         ],
       };
 
-      const response = await request(app).post('/api/data/bulk').send(bulkData);
+      const response = await request(app).post('/api/v1/data/bulk').send(bulkData);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -386,7 +388,7 @@ describe('Data Management API', () => {
         data: [],
       };
 
-      const response = await request(app).post('/api/data/bulk').send(invalidBulk);
+      const response = await request(app).post('/api/v1/data/bulk').send(invalidBulk);
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -410,7 +412,7 @@ describe('Data Management API', () => {
     });
 
     it('should export data as JSON', async () => {
-      const response = await request(app).get('/api/data/export').query({ format: 'json' });
+      const response = await request(app).get('/api/v1/data/export').query({ format: 'json' });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -418,7 +420,7 @@ describe('Data Management API', () => {
     });
 
     it('should export data as CSV', async () => {
-      const response = await request(app).get('/api/data/export').query({ format: 'csv' });
+      const response = await request(app).get('/api/v1/data/export').query({ format: 'csv' });
 
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toContain('text/csv');
@@ -433,7 +435,7 @@ describe('Data Management API', () => {
         { _id: 'json', count: 5 },
       ]);
 
-      const response = await request(app).get('/api/data/analytics');
+      const response = await request(app).get('/api/v1/data/analytics');
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
