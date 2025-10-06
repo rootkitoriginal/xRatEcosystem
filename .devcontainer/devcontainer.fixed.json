@@ -2,17 +2,23 @@
 	"name": "🐀 xRat Ecosystem - Dev Container",
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 	"workspaceFolder": "/workspace",
+	
+	// Configurações de recursos
 	"hostRequirements": {
 		"cpus": 2,
 		"memory": "4gb",
 		"storage": "32gb"
 	},
+	
+	// Features essenciais
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "20"
 		},
 		"ghcr.io/devcontainers/features/git:1": {}
 	},
+	
+	// VS Code settings
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -20,24 +26,36 @@
 			},
 			"extensions": [
 				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode",
+				"esbenp.prettier-vscode", 
 				"ms-vscode.vscode-json"
 			]
 		}
 	},
+	
+	// Portas
 	"forwardPorts": [3000, 5173, 80, 27017, 6379],
+	
+	// Recursos Docker
 	"runArgs": [
 		"--memory=4g",
 		"--memory-swap=6g",
 		"--cpus=2",
 		"--shm-size=512m"
 	],
+	
+	// User
 	"remoteUser": "vscode",
+	
+	// Montagens - CORRIGIDO para evitar duplicação
 	"mounts": [
 		"source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
 	],
+	
+	// Environment variables
 	"containerEnv": {
 		"NODE_OPTIONS": "--max-old-space-size=2048"
 	},
+	
+	// Commands
 	"postCreateCommand": "chmod +x ./xrat.sh && echo '🐀 xRat Ecosystem DevContainer ready!'"
 }

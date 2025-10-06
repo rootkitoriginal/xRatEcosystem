@@ -4,13 +4,14 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const WebSocketContext = createContext(null);
 
-export const useWebSocket = () => {
+// eslint-disable-next-line react-refresh/only-export-components
+export function useWebSocket() {
   const context = useContext(WebSocketContext);
   if (!context) {
     throw new Error('useWebSocket must be used within a WebSocketProvider');
   }
   return context;
-};
+}
 
 const MOCK_MODE = import.meta.env.VITE_MOCK_WEBSOCKET !== 'false';
 

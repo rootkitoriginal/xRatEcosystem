@@ -9,5 +9,16 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
+  },
+  // Configurações para container
+  optimizeDeps: {
+    force: true
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   }
 })

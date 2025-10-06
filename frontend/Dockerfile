@@ -1,3 +1,14 @@
+
+
+
+
+
+
+
+
+
+
+
 # Multi-stage Dockerfile for xRat Frontend (React + Vite)
 FROM node:20-alpine AS base
 
@@ -25,13 +36,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodeuser -u 1001
-
-# Change ownership of the app directory
-RUN chown -R nodeuser:nodejs /app
-USER nodeuser
+# Ensure Vite cache directory exists
+RUN mkdir -p /app/node_modules/.vite
 
 # Expose port
 EXPOSE 5173
