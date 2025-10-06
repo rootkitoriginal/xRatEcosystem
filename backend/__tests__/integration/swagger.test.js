@@ -35,7 +35,7 @@ describe('Swagger API Documentation', () => {
         endpoints: {
           health: '/health',
           api: '/api',
-          auth: '/api/auth',
+          auth: '/api/v1/auth',
           docs: '/api-docs',
         },
       });
@@ -98,18 +98,18 @@ describe('Swagger API Documentation', () => {
       expect(openApiSpec.paths['/health/complete']).toBeDefined();
 
       // Status endpoint
-      expect(openApiSpec.paths['/api/status']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/status']).toBeDefined();
 
       // Auth endpoints
-      expect(openApiSpec.paths['/api/auth/register']).toBeDefined();
-      expect(openApiSpec.paths['/api/auth/login']).toBeDefined();
-      expect(openApiSpec.paths['/api/auth/refresh']).toBeDefined();
-      expect(openApiSpec.paths['/api/auth/logout']).toBeDefined();
-      expect(openApiSpec.paths['/api/auth/profile']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/auth/register']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/auth/login']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/auth/refresh']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/auth/logout']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/auth/profile']).toBeDefined();
 
       // Data endpoints
-      expect(openApiSpec.paths['/api/data']).toBeDefined();
-      expect(openApiSpec.paths['/api/data/{key}']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/data']).toBeDefined();
+      expect(openApiSpec.paths['/api/v1/data/{key}']).toBeDefined();
     });
 
     it('should define security schemes for authentication', () => {
@@ -155,15 +155,15 @@ describe('Swagger API Documentation', () => {
       const openApiSpec = YAML.load(fs.readFileSync(openApiPath, 'utf8'));
 
       // Check register endpoint has examples
-      const registerEndpoint = openApiSpec.paths['/api/auth/register'].post;
+      const registerEndpoint = openApiSpec.paths['/api/v1/auth/register'].post;
       expect(registerEndpoint.requestBody.content['application/json'].examples).toBeDefined();
 
       // Check login endpoint has examples
-      const loginEndpoint = openApiSpec.paths['/api/auth/login'].post;
+      const loginEndpoint = openApiSpec.paths['/api/v1/auth/login'].post;
       expect(loginEndpoint.requestBody.content['application/json'].examples).toBeDefined();
 
       // Check data store endpoint has examples
-      const dataStoreEndpoint = openApiSpec.paths['/api/data'].post;
+      const dataStoreEndpoint = openApiSpec.paths['/api/v1/data'].post;
       expect(dataStoreEndpoint.requestBody.content['application/json'].examples).toBeDefined();
     });
 
@@ -172,7 +172,7 @@ describe('Swagger API Documentation', () => {
       const openApiSpec = YAML.load(fs.readFileSync(openApiPath, 'utf8'));
 
       // Check login endpoint has proper error codes
-      const loginEndpoint = openApiSpec.paths['/api/auth/login'].post;
+      const loginEndpoint = openApiSpec.paths['/api/v1/auth/login'].post;
       expect(loginEndpoint.responses['200']).toBeDefined(); // Success
       expect(loginEndpoint.responses['400']).toBeDefined(); // Bad Request
       expect(loginEndpoint.responses['401']).toBeDefined(); // Unauthorized
@@ -180,7 +180,7 @@ describe('Swagger API Documentation', () => {
       expect(loginEndpoint.responses['500']).toBeDefined(); // Server Error
 
       // Check protected endpoint has authentication error
-      const logoutEndpoint = openApiSpec.paths['/api/auth/logout'].post;
+      const logoutEndpoint = openApiSpec.paths['/api/v1/auth/logout'].post;
       expect(logoutEndpoint.security).toBeDefined();
       expect(logoutEndpoint.responses['401']).toBeDefined();
     });

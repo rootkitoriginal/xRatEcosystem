@@ -19,7 +19,7 @@ if (shouldMockMongoDB) {
   }));
 }
 
-// Mock Redis conditionally  
+// Mock Redis conditionally
 if (shouldMockRedis) {
   warnMockUsage('Redis');
   jest.mock('redis', () => ({
@@ -65,7 +65,7 @@ describe('API Endpoints', () => {
       });
     });
 
-    app.get('/api/status', (req, res) => {
+    app.get('/api/v1/status', (req, res) => {
       res.json({
         success: true,
         ecosystem: 'xRat',
@@ -78,7 +78,7 @@ describe('API Endpoints', () => {
       });
     });
 
-    app.post('/api/data', (req, res) => {
+    app.post('/api/v1/data', (req, res) => {
       const { key, value } = req.body;
 
       if (!key || !value) {
@@ -96,7 +96,7 @@ describe('API Endpoints', () => {
       });
     });
 
-    app.get('/api/data/:key', (req, res) => {
+    app.get('/api/v1/data/:key', (req, res) => {
       const { key } = req.params;
       res.json({
         success: true,
@@ -138,7 +138,7 @@ describe('API Endpoints', () => {
 
   describe('GET /api/status', () => {
     it('should return ecosystem status', async () => {
-      const response = await request(app).get('/api/status');
+      const response = await request(app).get('/api/v1/status');
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -155,7 +155,7 @@ describe('API Endpoints', () => {
         value: 'test-value',
       };
 
-      const response = await request(app).post('/api/data').send(testData);
+      const response = await request(app).post('/api/v1/data').send(testData);
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -164,7 +164,7 @@ describe('API Endpoints', () => {
     });
 
     it('should return 400 if key is missing', async () => {
-      const response = await request(app).post('/api/data').send({
+      const response = await request(app).post('/api/v1/data').send({
         value: 'test-value',
       });
 
@@ -174,7 +174,7 @@ describe('API Endpoints', () => {
     });
 
     it('should return 400 if value is missing', async () => {
-      const response = await request(app).post('/api/data').send({
+      const response = await request(app).post('/api/v1/data').send({
         key: 'test-key',
       });
 
@@ -186,7 +186,7 @@ describe('API Endpoints', () => {
 
   describe('GET /api/data/:key', () => {
     it('should retrieve data by key', async () => {
-      const response = await request(app).get('/api/data/test-key');
+      const response = await request(app).get('/api/v1/data/test-key');
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);

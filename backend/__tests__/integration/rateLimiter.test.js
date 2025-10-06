@@ -37,11 +37,11 @@ describe('Rate Limiter Integration Tests', () => {
 
   describe('authLimiter - Authentication Rate Limiting', () => {
     beforeEach(() => {
-      app.post('/api/auth/login', authLimiter, (req, res) => {
+      app.post('/api/v1/auth/login', authLimiter, (req, res) => {
         res.json({ success: true, message: 'Login successful' });
       });
 
-      app.post('/api/auth/register', authLimiter, (req, res) => {
+      app.post('/api/v1/auth/register', authLimiter, (req, res) => {
         res.json({ success: true, message: 'Registration successful' });
       });
     });
@@ -52,7 +52,7 @@ describe('Rate Limiter Integration Tests', () => {
       // Make 5 login attempts (the limit)
       for (let i = 0; i < 5; i++) {
         const response = await request(app)
-          .post('/api/auth/login')
+          .post('/api/v1/auth/login')
           .send({ username: 'testuser', password: 'password123' });
 
         responses.push(response);
@@ -69,12 +69,14 @@ describe('Rate Limiter Integration Tests', () => {
     it('should block authentication attempts after limit is exceeded', async () => {
       // Make 5 successful attempts
       for (let i = 0; i < 5; i++) {
-        await request(app).post('/api/auth/login').send({ username: 'testuser', password: 'pass' });
+        await request(app)
+          .post('/api/v1/auth/login')
+          .send({ username: 'testuser', password: 'pass' });
       }
 
       // 6th attempt should be blocked
       const response = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'testuser', password: 'pass' });
 
       expect(response.status).toBe(429);
@@ -88,19 +90,19 @@ describe('Rate Limiter Integration Tests', () => {
     it('should apply rate limit across different auth endpoints', async () => {
       // Make 3 login attempts
       for (let i = 0; i < 3; i++) {
-        await request(app).post('/api/auth/login').send({ username: 'user', password: 'pass' });
+        await request(app).post('/api/v1/auth/login').send({ username: 'user', password: 'pass' });
       }
 
       // Make 2 register attempts
       for (let i = 0; i < 2; i++) {
         await request(app)
-          .post('/api/auth/register')
+          .post('/api/v1/auth/register')
           .send({ username: 'user', email: 'test@example.com', password: 'pass' });
       }
 
       // 6th attempt (across both endpoints) should be blocked
       const response = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'user', password: 'pass' });
 
       expect(response.status).toBe(429);
@@ -109,12 +111,12 @@ describe('Rate Limiter Integration Tests', () => {
     it('should provide retry-after information in headers when rate limited', async () => {
       // Exhaust the rate limit
       for (let i = 0; i < 5; i++) {
-        await request(app).post('/api/auth/login').send({ username: 'user', password: 'pass' });
+        await request(app).post('/api/v1/auth/login').send({ username: 'user', password: 'pass' });
       }
 
       // Next request should be rate limited
       const response = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'user', password: 'pass' });
 
       expect(response.status).toBe(429);
@@ -123,7 +125,7 @@ describe('Rate Limiter Integration Tests', () => {
 
     it('should return proper rate limit headers on success', async () => {
       const response = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'user', password: 'pass' });
 
       expect(response.status).toBe(200);
@@ -135,11 +137,11 @@ describe('Rate Limiter Integration Tests', () => {
 
   describe('apiLimiter - General API Rate Limiting', () => {
     beforeEach(() => {
-      app.get('/api/data', apiLimiter, (req, res) => {
+      app.get('/api/v1/data', apiLimiter, (req, res) => {
         res.json({ success: true, data: { id: 1, value: 'test' } });
       });
 
-      app.post('/api/data', apiLimiter, (req, res) => {
+      app.post('/api/v1/data', apiLimiter, (req, res) => {
         res.json({ success: true, message: 'Data created' });
       });
     });
@@ -149,7 +151,7 @@ describe('Rate Limiter Integration Tests', () => {
 
       // Make 10 requests (well under the 100 limit)
       for (let i = 0; i < 10; i++) {
-        const response = await request(app).get('/api/data');
+        const response = await request(app).get('/api/v1/data');
         responses.push(response);
       }
 
@@ -168,11 +170,11 @@ describe('Rate Limiter Integration Tests', () => {
     it('should block API requests after limit is exceeded', async () => {
       // Make 100 requests (the limit)
       for (let i = 0; i < 100; i++) {
-        await request(app).get('/api/data');
+        await request(app).get('/api/v1/data');
       }
 
       // 101st request should be blocked
-      const response = await request(app).get('/api/data');
+      const response = await request(app).get('/api/v1/data');
 
       expect(response.status).toBe(429);
       expect(response.body.success).toBe(false);
@@ -183,25 +185,25 @@ describe('Rate Limiter Integration Tests', () => {
     it('should apply rate limit across different API endpoints', async () => {
       // Make 50 GET requests
       for (let i = 0; i < 50; i++) {
-        await request(app).get('/api/data');
+        await request(app).get('/api/v1/data');
       }
 
       // Make 49 POST requests
       for (let i = 0; i < 49; i++) {
-        await request(app).post('/api/data').send({ value: 'test' });
+        await request(app).post('/api/v1/data').send({ value: 'test' });
       }
 
       // 100th request should still work
-      let response = await request(app).get('/api/data');
+      let response = await request(app).get('/api/v1/data');
       expect(response.status).toBe(200);
 
       // 101st request should be blocked
-      response = await request(app).post('/api/data').send({ value: 'test' });
+      response = await request(app).post('/api/v1/data').send({ value: 'test' });
       expect(response.status).toBe(429);
     });
 
     it('should return proper rate limit headers on success', async () => {
-      const response = await request(app).get('/api/data');
+      const response = await request(app).get('/api/v1/data');
 
       expect(response.status).toBe(200);
       expect(response.headers['ratelimit-limit']).toBe('100');
@@ -212,11 +214,11 @@ describe('Rate Limiter Integration Tests', () => {
 
   describe('Separate rate limits for auth and API', () => {
     beforeEach(() => {
-      app.post('/api/auth/login', authLimiter, (req, res) => {
+      app.post('/api/v1/auth/login', authLimiter, (req, res) => {
         res.json({ success: true, message: 'Login successful' });
       });
 
-      app.get('/api/data', apiLimiter, (req, res) => {
+      app.get('/api/v1/data', apiLimiter, (req, res) => {
         res.json({ success: true, data: 'test' });
       });
     });
@@ -224,17 +226,17 @@ describe('Rate Limiter Integration Tests', () => {
     it('should maintain separate counters for auth and API limiters', async () => {
       // Exhaust auth limiter
       for (let i = 0; i < 5; i++) {
-        await request(app).post('/api/auth/login').send({ username: 'user', password: 'pass' });
+        await request(app).post('/api/v1/auth/login').send({ username: 'user', password: 'pass' });
       }
 
       // Auth should be blocked
       const authResponse = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'user', password: 'pass' });
       expect(authResponse.status).toBe(429);
 
       // But API should still work
-      const apiResponse = await request(app).get('/api/data');
+      const apiResponse = await request(app).get('/api/v1/data');
       expect(apiResponse.status).toBe(200);
       expect(apiResponse.headers['ratelimit-remaining']).toBe('99');
     });
@@ -242,16 +244,16 @@ describe('Rate Limiter Integration Tests', () => {
     it('should not affect auth limiter when API limiter is exhausted', async () => {
       // Make 100 API requests
       for (let i = 0; i < 100; i++) {
-        await request(app).get('/api/data');
+        await request(app).get('/api/v1/data');
       }
 
       // API should be blocked
-      const apiResponse = await request(app).get('/api/data');
+      const apiResponse = await request(app).get('/api/v1/data');
       expect(apiResponse.status).toBe(429);
 
       // But auth should still work
       const authResponse = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'user', password: 'pass' });
       expect(authResponse.status).toBe(200);
       expect(authResponse.headers['ratelimit-remaining']).toBe('4');

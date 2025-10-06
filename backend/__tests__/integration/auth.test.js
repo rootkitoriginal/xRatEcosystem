@@ -37,12 +37,12 @@ describe('Auth API Endpoints', () => {
     });
 
     // Apply rate limiter specifically to sensitive auth endpoints
-    app.post('/api/auth/register', authLimiter, authController.register);
-    app.post('/api/auth/login', authLimiter, authController.login);
-    app.post('/api/auth/refresh', authLimiter, authController.refresh);
+    app.post('/api/v1/auth/register', authLimiter, authController.register);
+    app.post('/api/v1/auth/login', authLimiter, authController.login);
+    app.post('/api/v1/auth/refresh', authLimiter, authController.refresh);
     // Other endpoints (logout/profile) typically don't need limiting, but could add if desired
-    app.post('/api/auth/logout', authenticate, authController.logout);
-    app.get('/api/auth/profile', authenticate, authController.getProfile);
+    app.post('/api/v1/auth/logout', authenticate, authController.logout);
+    app.get('/api/v1/auth/profile', authenticate, authController.getProfile);
   });
 
   beforeEach(() => {
@@ -120,7 +120,7 @@ describe('Auth API Endpoints', () => {
         password: 'Password123',
       };
 
-      const response = await request(app).post('/api/auth/register').send(userData);
+      const response = await request(app).post('/api/v1/auth/register').send(userData);
 
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
@@ -133,7 +133,9 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject registration with missing fields', async () => {
-      const response = await request(app).post('/api/auth/register').send({ username: 'testuser' });
+      const response = await request(app)
+        .post('/api/v1/auth/register')
+        .send({ username: 'testuser' });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -141,7 +143,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject registration with weak password', async () => {
-      const response = await request(app).post('/api/auth/register').send({
+      const response = await request(app).post('/api/v1/auth/register').send({
         username: 'testuser',
         email: 'test@example.com',
         password: 'weak',
@@ -153,7 +155,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject registration with password without complexity', async () => {
-      const response = await request(app).post('/api/auth/register').send({
+      const response = await request(app).post('/api/v1/auth/register').send({
         username: 'testuser',
         email: 'test@example.com',
         password: 'password',
@@ -174,7 +176,7 @@ describe('Auth API Endpoints', () => {
         role: 'user',
       });
 
-      const response = await request(app).post('/api/auth/register').send({
+      const response = await request(app).post('/api/v1/auth/register').send({
         username: 'newuser',
         email: 'test@example.com',
         password: 'Password123',
@@ -199,7 +201,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should login user successfully', async () => {
-      const response = await request(app).post('/api/auth/login').send({
+      const response = await request(app).post('/api/v1/auth/login').send({
         email: 'test@example.com',
         password: 'Password123',
       });
@@ -214,7 +216,7 @@ describe('Auth API Endpoints', () => {
 
     it('should reject login with missing fields', async () => {
       const response = await request(app)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ email: 'test@example.com' });
 
       expect(response.status).toBe(400);
@@ -223,7 +225,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject login with invalid email', async () => {
-      const response = await request(app).post('/api/auth/login').send({
+      const response = await request(app).post('/api/v1/auth/login').send({
         email: 'wrong@example.com',
         password: 'Password123',
       });
@@ -242,7 +244,7 @@ describe('Auth API Endpoints', () => {
         })
       );
 
-      const response = await request(app).post('/api/auth/login').send({
+      const response = await request(app).post('/api/v1/auth/login').send({
         email: 'test@example.com',
         password: 'WrongPassword123',
       });
@@ -266,7 +268,7 @@ describe('Auth API Endpoints', () => {
         refreshToken,
       });
 
-      const response = await request(app).post('/api/auth/refresh').send({ refreshToken });
+      const response = await request(app).post('/api/v1/auth/refresh').send({ refreshToken });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -275,7 +277,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject refresh with missing token', async () => {
-      const response = await request(app).post('/api/auth/refresh').send({});
+      const response = await request(app).post('/api/v1/auth/refresh').send({});
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
@@ -284,7 +286,7 @@ describe('Auth API Endpoints', () => {
 
     it('should reject refresh with invalid token', async () => {
       const response = await request(app)
-        .post('/api/auth/refresh')
+        .post('/api/v1/auth/refresh')
         .send({ refreshToken: 'invalid_token' });
 
       expect(response.status).toBe(401);
@@ -307,7 +309,7 @@ describe('Auth API Endpoints', () => {
       });
 
       const response = await request(app)
-        .post('/api/auth/logout')
+        .post('/api/v1/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
@@ -316,7 +318,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject logout without token', async () => {
-      const response = await request(app).post('/api/auth/logout');
+      const response = await request(app).post('/api/v1/auth/logout');
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -337,7 +339,7 @@ describe('Auth API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/auth/profile')
+        .get('/api/v1/auth/profile')
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
@@ -347,7 +349,7 @@ describe('Auth API Endpoints', () => {
     });
 
     it('should reject profile request without token', async () => {
-      const response = await request(app).get('/api/auth/profile');
+      const response = await request(app).get('/api/v1/auth/profile');
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -356,7 +358,7 @@ describe('Auth API Endpoints', () => {
 
     it('should reject profile request with invalid token', async () => {
       const response = await request(app)
-        .get('/api/auth/profile')
+        .get('/api/v1/auth/profile')
         .set('Authorization', 'Bearer invalid_token');
 
       expect(response.status).toBe(401);

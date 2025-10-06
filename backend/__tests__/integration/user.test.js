@@ -29,9 +29,9 @@ describe('User Profile API Endpoints', () => {
     app.use(express.json());
 
     // Set up routes
-    app.get('/api/users/profile', authenticate, userController.getUserProfile);
+    app.get('/api/v1/users/profile', authenticate, userController.getUserProfile);
     app.put(
-      '/api/users/profile',
+      '/api/v1/users/profile',
       authenticate,
       validate(updateProfileSchema),
       userController.updateUserProfile
@@ -89,7 +89,7 @@ describe('User Profile API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/users/profile')
+        .get('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
@@ -116,7 +116,7 @@ describe('User Profile API Endpoints', () => {
       });
 
       const response = await request(app)
-        .get('/api/users/profile')
+        .get('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toBe(200);
@@ -127,7 +127,7 @@ describe('User Profile API Endpoints', () => {
     });
 
     it('should reject profile request without token', async () => {
-      const response = await request(app).get('/api/users/profile');
+      const response = await request(app).get('/api/v1/users/profile');
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -139,7 +139,7 @@ describe('User Profile API Endpoints', () => {
       const accessToken = generateAccessToken({ userId, role: 'user' });
 
       const response = await request(app)
-        .get('/api/users/profile')
+        .get('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`);
 
       expect(response.status).toBe(401);
@@ -175,7 +175,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(updateData);
 
@@ -212,7 +212,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(updateData);
 
@@ -240,7 +240,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(updateData);
 
@@ -267,7 +267,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(updateData);
 
@@ -298,7 +298,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const httpResponse = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(httpData);
 
@@ -310,7 +310,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const httpsResponse = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(httpsData);
 
@@ -343,7 +343,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(updateData);
 
@@ -359,7 +359,7 @@ describe('User Profile API Endpoints', () => {
         fullName: 'New Name',
       };
 
-      const response = await request(app).put('/api/users/profile').send(updateData);
+      const response = await request(app).put('/api/v1/users/profile').send(updateData);
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
@@ -375,7 +375,7 @@ describe('User Profile API Endpoints', () => {
       };
 
       const response = await request(app)
-        .put('/api/users/profile')
+        .put('/api/v1/users/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .send(updateData);
 

@@ -13,7 +13,7 @@ describe('Request Logger Middleware', () => {
   beforeEach(() => {
     req = {
       method: 'GET',
-      url: '/api/test',
+      url: '/api/v1/test',
       ip: '127.0.0.1',
       connection: { remoteAddress: '127.0.0.1' },
       get: jest.fn().mockReturnValue('Test User Agent'),
@@ -43,7 +43,7 @@ describe('Request Logger Middleware', () => {
         expect.objectContaining({
           requestId: expect.any(String),
           method: 'GET',
-          url: '/api/test',
+          url: '/api/v1/test',
           ip: '127.0.0.1',
           userAgent: 'Test User Agent',
         })
@@ -66,7 +66,7 @@ describe('Request Logger Middleware', () => {
         expect.objectContaining({
           requestId: expect.any(String),
           method: 'GET',
-          url: '/api/test',
+          url: '/api/v1/test',
           statusCode: 200,
           responseTime: expect.stringMatching(/\d+ms/),
         })
@@ -83,7 +83,7 @@ describe('Request Logger Middleware', () => {
         expect.objectContaining({
           requestId: expect.any(String),
           method: 'GET',
-          url: '/api/test',
+          url: '/api/v1/test',
           ip: '127.0.0.1', // Should use connection.remoteAddress
           userAgent: 'Test User Agent',
         })
@@ -105,7 +105,7 @@ describe('Request Logger Middleware', () => {
         expect.objectContaining({
           requestId: 'test-request-id',
           method: 'GET',
-          url: '/api/test',
+          url: '/api/v1/test',
           error: 'Test error',
           stack: 'Error stack trace',
         })
