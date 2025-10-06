@@ -10,10 +10,12 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: http://localhost:3000
-    description: Development server
-  - url: http://localhost:3000
-    description: Local development
+  - url: https://localhost/api/v1
+    description: Production server via nginx proxy (HTTPS)
+  - url: http://localhost/api/v1
+    description: Local development via nginx proxy (HTTP)
+  - url: http://localhost:3000/api/v1
+    description: Direct backend access (development only)
 
 tags:
   - name: Root

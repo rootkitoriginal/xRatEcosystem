@@ -91,7 +91,7 @@ let redisClient;
     const dataRoutes = createDataRoutes(dataService, dataController);
 
     // Data Management Routes (protected)
-    app.use('/api/data', dataRoutes);
+    app.use('/api/v1/data', dataRoutes);
 
     // Initialize WebSocket service
     socketService = new SocketService(server, redisClient);
@@ -102,7 +102,7 @@ let redisClient;
 })();
 
 // Health check endpoints
-app.use('/health', createHealthRouter(mongoose.connection.getClient(), redisClient));
+app.use('/api/v1/health', createHealthRouter(mongoose.connection.getClient(), redisClient));
 
 // API Documentation with Swagger UI
 app.use(
@@ -120,29 +120,29 @@ app.get('/', (req, res) => {
     message: 'Welcome to xRat Ecosystem API',
     version: '1.0.0',
     endpoints: {
-      health: '/health',
-      api: '/api',
-      auth: '/api/auth',
-      users: '/api/users',
+      health: '/api/v1/health',
+      api: '/api/v1',
+      auth: '/api/v1/auth',
+      users: '/api/v1/users',
       docs: '/api-docs',
-      data: '/api/data',
+      data: '/api/v1/data',
       websocket: 'ws://localhost:' + PORT,
     },
   });
 });
 
 // Auth Routes (public)
-app.use('/api/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 // User Routes (protected)
-app.use('/api/users', userRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // API Routes
 // Apply general rate limiting to API routes
-app.use('/api', apiLimiter);
+app.use('/api/v1', apiLimiter);
 
 // WebSocket stats endpoint
-app.get('/api/websocket/stats', (req, res) => {
+app.get('/api/v1/websocket/stats', (req, res) => {
   if (!socketService) {
     return res.status(503).json({
       success: false,
@@ -157,37 +157,13 @@ app.get('/api/websocket/stats', (req, res) => {
   });
 });
 
-app.get('/api/status', async (req, res) => {
-  try {
-    // Test MongoDB
-    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-
-    // Test Redis
-    let redisStatus = 'disconnected';
-    let cacheTest = null;
-
-    if (redisClient && redisClient.isOpen) {
-      await redisClient.set('test_key', 'xRat Ecosystem is running!');
-      cacheTest = await redisClient.get('test_key');
-      redisStatus = 'connected';
-    }
-
-    res.json({
-      success: true,
-      ecosystem: 'xRat',
-      database: {
-        mongodb: dbStatus,
-        redis: redisStatus,
-      },
-      cache_test: cacheTest,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
+// Status endpoint
+app.get('/api/v1/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // 404 handler
