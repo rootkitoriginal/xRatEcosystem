@@ -86,12 +86,15 @@ We are committed to providing a welcoming and inclusive environment for all cont
 6. **Start the development environment:**
 
    ```bash
-   docker-compose up -d
+   # Use o script xrat.sh - NÃO use docker-compose diretamente
+   ./xrat.sh start
    ```
 
 7. **Verify everything works:**
-   - Frontend: http://localhost:5173
-   - Backend: http://localhost:3000/health
+   - Frontend: <http://localhost:5173>
+   - Backend: <http://localhost:3000/health>
+
+> ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar os containers. Não use comandos `docker-compose` diretamente.
 
 ---
 

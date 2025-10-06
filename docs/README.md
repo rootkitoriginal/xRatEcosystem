@@ -5,7 +5,10 @@ Welcome to the xRat Ecosystem documentation! All project documentation is organi
 ## 🚀 Quick Start
 
 - **[Main README](../README.md)** - Project overview and getting started
-- **[Quick Start Guide](../QUICKSTART.md)** - Get up and running in 5 minutes
+- **[Quick Start Guide](./QUICKSTART.md)** - Get up and running in 5 minutes
+- **[xrat.sh Guide](./XRAT_SCRIPT_GUIDE.md)** - Complete guide for using xrat.sh script
+
+> ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar os containers, não use `docker-compose` diretamente.
 
 ## 📖 Setup Guides
 

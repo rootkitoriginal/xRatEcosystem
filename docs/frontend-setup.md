@@ -47,15 +47,17 @@ VITE_MOCK_WEBSOCKET=false
 ### With Docker (Recommended)
 
 ```bash
-# From project root
-docker-compose up -d
+# Use o script xrat.sh - NÃO use docker-compose diretamente
+./xrat.sh start
 
 # View frontend logs
-docker-compose logs -f frontend
+./xrat.sh logs frontend
 
 # Access frontend shell
 docker-compose exec frontend sh
 ```
+
+> ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar containers. O script garante configuração e logs corretos.
 
 ### Without Docker
 

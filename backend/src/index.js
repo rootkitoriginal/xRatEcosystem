@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const compression = require('compression');
 const mongoose = require('mongoose');
 const { createClient } = require('redis');
-const { createHealthRouter } = require('./health');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('js-yaml');
 const fs = require('fs');
@@ -19,13 +18,15 @@ require('dotenv').config();
 const logger = require('./config/logger');
 
 // Import routes and middleware
-const authRoutes = require('./auth/authRoutes');
 const createDataRoutes = require('./routes/dataRoutes');
-const userRoutes = require('./routes/userRoutes');
 const DataService = require('./services/dataService');
 const dataController = require('./controllers/dataController');
-const { apiLimiter } = require('./middleware/rateLimiter');
 const { requestLogger, errorLogger } = require('./middleware/requestLogger');
+
+// Import API version management
+const { setupVersionRouting } = require('./api/versionManager');
+const { initV1Routes } = require('./api/v1');
+const { initV2Routes } = require('./api/v2');
 
 // Load OpenAPI specification
 const openApiPath = path.join(__dirname, 'openapi.yaml');
@@ -66,15 +67,16 @@ mongoose
     logger.error('MongoDB connection error', { service: 'mongodb', error: err.message });
   });
 
-// Redis Connection
-let redisClient;
+// Initialize application
+async function initializeApp() {
+  let redisClient = null;
 
-(async () => {
   try {
     redisClient = createClient({
       socket: {
         host: process.env.REDIS_HOST || 'redis',
         port: process.env.REDIS_PORT || 6379,
+        connectTimeout: 5000,
       },
       password: process.env.REDIS_PASSWORD,
     });
@@ -87,25 +89,74 @@ let redisClient;
       logger.info('Redis connected successfully', { service: 'redis' });
     });
 
-    await redisClient.connect();
+    // Attempt connection with timeout
+    const connectWithTimeout = Promise.race([
+      redisClient.connect(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Redis connection timeout after 5s')), 5000)
+      ),
+    ]);
+
+    await connectWithTimeout;
 
     // Initialize data service after Redis connection
     const dataService = new DataService(redisClient);
     const dataRoutes = createDataRoutes(dataService, dataController);
 
-    // Data Management Routes (protected)
-    app.use('/api/v1/data', dataRoutes);
-
     // Initialize WebSocket service
     socketService = new SocketService(server, redisClient);
     logger.info('WebSocket service initialized and ready');
+
+    // Initialize version routers after all dependencies are ready
+    const v1Router = initV1Routes({
+      mongoose,
+      redisClient,
+      dataRoutes,
+      socketService,
+    });
+
+    const v2Router = initV2Routes({
+      mongoose,
+      redisClient,
+      dataRoutes,
+      socketService,
+    });
+
+    // Setup API versioning
+    setupVersionRouting(app, {
+      v1: v1Router,
+      v2: v2Router,
+    });
+
+    logger.info('API version routing initialized with Redis');
   } catch (err) {
     logger.error('Redis connection error', { service: 'redis', error: err.message });
-  }
-})();
 
-// Health check endpoints
-app.use('/api/v1/health', createHealthRouter(mongoose.connection.getClient(), redisClient));
+    // Initialize in degraded mode without Redis
+    logger.warn('Initializing API routes without Redis (degraded mode)');
+
+    const v1Router = initV1Routes({
+      mongoose,
+      redisClient: null,
+      dataRoutes: null,
+      socketService: null,
+    });
+
+    const v2Router = initV2Routes({
+      mongoose,
+      redisClient: null,
+      dataRoutes: null,
+      socketService: null,
+    });
+
+    setupVersionRouting(app, {
+      v1: v1Router,
+      v2: v2Router,
+    });
+
+    logger.info('API version routing initialized (degraded mode)');
+  }
+}
 
 // Legacy health check endpoint for compatibility (Docker healthchecks, etc.)
 app.get('/health', (req, res) => {
@@ -130,9 +181,15 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to xRat Ecosystem API',
     version: '1.0.0',
+    apiVersions: {
+      current: 'v1',
+      available: ['v1', 'v2'],
+      versionInfo: '/api/versions',
+    },
     endpoints: {
       health: '/api/v1/health',
-      api: '/api/v1',
+      apiV1: '/api/v1',
+      apiV2: '/api/v2',
       auth: '/api/v1/auth',
       users: '/api/v1/users',
       docs: '/api-docs',
@@ -142,76 +199,45 @@ app.get('/', (req, res) => {
   });
 });
 
-// Auth Routes (public)
-app.use('/api/v1/auth', authRoutes);
+// Start server after initializing routes
+(async () => {
+  await initializeApp();
 
-// User Routes (protected)
-app.use('/api/v1/users', userRoutes);
-
-// API Routes
-// Apply general rate limiting to API routes
-app.use('/api/v1', apiLimiter);
-
-// WebSocket stats endpoint
-app.get('/api/v1/websocket/stats', (req, res) => {
-  if (!socketService) {
-    return res.status(503).json({
-      success: false,
-      message: 'WebSocket service not initialized',
+  // 404 handler - MUST be registered AFTER all routes
+  app.use((req, res) => {
+    logger.warn('Route not found', {
+      requestId: req.requestId,
+      method: req.method,
+      url: req.url,
     });
-  }
-
-  const stats = socketService.getStats();
-  res.json({
-    success: true,
-    stats,
+    res.status(404).json({
+      success: false,
+      message: 'Route not found',
+    });
   });
-});
 
-// Status endpoint
-app.get('/api/v1/status', (req, res) => {
-  res.json({
-    status: 'ok',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
+  // Error logging middleware
+  app.use(errorLogger);
 
-// 404 handler
-app.use((req, res) => {
-  logger.warn('Route not found', {
-    requestId: req.requestId,
-    method: req.method,
-    url: req.url,
+  // Error handler
+  app.use((err, req, res, _next) => {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    });
   });
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-  });
-});
 
-// Error logging middleware
-app.use(errorLogger);
-
-// Error handler
-app.use((err, req, res, _next) => {
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  server.listen(PORT, '0.0.0.0', () => {
+    logger.info('xRat Backend server started', {
+      port: PORT,
+      environment: process.env.NODE_ENV || 'development',
+      healthCheckUrl: `http://localhost:${PORT}/health`,
+      apiDocsUrl: `http://localhost:${PORT}/api-docs`,
+      websocketUrl: `ws://localhost:${PORT}`,
+    });
   });
-});
-
-// Start server
-server.listen(PORT, '0.0.0.0', () => {
-  logger.info('xRat Backend server started', {
-    port: PORT,
-    environment: process.env.NODE_ENV || 'development',
-    healthCheckUrl: `http://localhost:${PORT}/health`,
-    apiDocsUrl: `http://localhost:${PORT}/api-docs`,
-    websocketUrl: `ws://localhost:${PORT}`,
-  });
-});
+})();
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {

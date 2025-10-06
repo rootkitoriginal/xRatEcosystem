@@ -78,15 +78,17 @@ openssl rand -base64 64
 ### With Docker (Recommended)
 
 ```bash
-# From project root
-docker-compose up -d
+# Use o script xrat.sh - NÃO use docker-compose diretamente
+./xrat.sh start
 
 # View backend logs
-docker-compose logs -f backend
+./xrat.sh logs backend
 
 # Access backend shell
 docker-compose exec backend sh
 ```
+
+> ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar containers. O script garante configuração e logs corretos.
 
 ### Without Docker
 

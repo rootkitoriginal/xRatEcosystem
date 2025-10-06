@@ -6,9 +6,14 @@
 # Iniciar o ecosystem
 ./xrat.sh start
 
-# Ou manualmente:
-docker compose up -d --build
+# Ver logs em tempo real
+./xrat.sh logs
+
+# Ver status dos serviços
+./xrat.sh status
 ```
+
+> ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` ao invés de comandos Docker diretos. O script garante configuração correta e logs organizados.
 
 ## 📍 URLs de Acesso
 
