@@ -33,7 +33,7 @@ RUN addgroup -g 1001 -S nodejs && \
 RUN mkdir -p /app/logs && \
     chown -R nodeuser:nodejs /app
 
-USER nodeuser
+# USER nodeuser  # Commented out for development to allow volume writes
 
 # Expose port
 EXPOSE 3000

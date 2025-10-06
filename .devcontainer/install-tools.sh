@@ -28,6 +28,8 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githu
 sudo apt update
 sudo apt install gh -y
 
+echo "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" | gemini auth login --auth-method=token
+
 echo "✅ Instalação de ferramentas adicionais concluída!"
 echo ""
 echo ""

@@ -224,7 +224,7 @@ components:
             - type: string
             - type: object
             - type: array
-          example: { data: "myValue" }
+          example: { data: 'myValue' }
 
     DataStoreResponse:
       type: object
