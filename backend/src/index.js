@@ -35,6 +35,9 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - we're behind nginx
+app.set('trust proxy', 1);
+
 // WebSocket service will be initialized after Redis connection
 let socketService;
 
@@ -103,6 +106,14 @@ let redisClient;
 
 // Health check endpoints
 app.use('/api/v1/health', createHealthRouter(mongoose.connection.getClient(), redisClient));
+
+// Legacy health check endpoint for compatibility (Docker healthchecks, etc.)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // API Documentation with Swagger UI
 app.use(
