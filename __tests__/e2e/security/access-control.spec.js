@@ -97,11 +97,17 @@ test.describe('Security and Access Control', () => {
 
     const results = await Promise.all(requests);
 
-    // Some requests should be rate limited
+    // Some requests should be rate limited if enabled
     const failedCount = results.filter(r => !r.success).length;
     
-    // May or may not have rate limiting enforced in E2E
-    expect(failedCount >= 0).toBeTruthy();
+    // Check if rate limiting is enabled in environment
+    if (process.env.RATE_LIMIT_ENABLED === 'true' || failedCount > 0) {
+      expect(failedCount).toBeGreaterThan(0);
+    } else {
+      // Log warning if rate limiting is not enabled
+      console.warn('⚠️ Rate limiting does not appear to be enabled in E2E environment');
+      expect(failedCount).toBeGreaterThanOrEqual(0);
+    }
   });
 
   test('should sanitize search queries to prevent injection', async ({ page }) => {

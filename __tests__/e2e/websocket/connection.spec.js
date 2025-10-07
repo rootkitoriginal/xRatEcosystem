@@ -85,7 +85,7 @@ test.describe('WebSocket Connection', () => {
     });
 
     // Should attempt to reconnect
-    expect(reconnected || true).toBeTruthy(); // Allow for graceful degradation
+    expect(reconnected).toBeTruthy();
   });
 
   test('should maintain WebSocket connection across page navigation', async ({ page }) => {

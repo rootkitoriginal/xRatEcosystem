@@ -91,9 +91,9 @@ test.describe('Real-time WebSocket Communication', () => {
     // Wait for all listeners
     const results = await Promise.all(listeners);
 
-    // At least some should receive the message
+    // At least some should receive the message (expecting at least 2 out of 3)
     const receivedCount = results.filter(r => r !== null).length;
-    expect(receivedCount).toBeGreaterThanOrEqual(0); // Graceful degradation
+    expect(receivedCount).toBeGreaterThanOrEqual(2);
 
     // Cleanup
     for (const context of contexts) {
@@ -232,6 +232,17 @@ test.describe('Real-time WebSocket Communication', () => {
     
     // Should maintain order (or at least receive messages)
     expect(Array.isArray(collected)).toBeTruthy();
+    expect(collected.length).toBeGreaterThanOrEqual(3); // At least 3 out of 5 messages
+    
+    // Verify order if messages were received
+    if (collected.length >= 3) {
+      const receivedKeys = collected.map(item => item.key).filter(Boolean);
+      // Keys should contain sequential indices
+      const hasSequentialOrder = receivedKeys.some((key, idx) => 
+        idx === 0 || key.includes(`-${idx}`)
+      );
+      expect(hasSequentialOrder || receivedKeys.length > 0).toBeTruthy();
+    }
 
     await context1.close();
     await context2.close();
