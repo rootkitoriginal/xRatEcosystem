@@ -44,7 +44,6 @@ Comprehensive testing guides and strategies:
 - **[WebSocket Testing Summary](./websocket-testing-summary.md)** - WebSocket test results
 - **[Redis Testing](./redis-testing.md)** - Redis resilience testing results
 - **[WebSocket Performance](./websocket-performance.md)** - Performance benchmarks
-- **[Implementation Summary](./implementation-summary.md)** - Feature implementation status
 
 ## 💻 Development Guides
 

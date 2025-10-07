@@ -136,15 +136,17 @@ cd xRatEcosystem
 # Setup environment
 cp .env.example .env
 
-# Start services
-docker-compose up -d
+# Start services (use xrat.sh - DO NOT use `docker compose` directly)
+./xrat.sh start
 
 # Check status
-docker-compose ps
+./xrat.sh status
 
 # View logs
-docker-compose logs -f
+./xrat.sh logs
 ```
+
+> ⚠️ **IMPORTANT**: Always use `./xrat.sh` to manage containers. The script ensures correct configuration and logging.
 
 ### Access Services
 
@@ -156,13 +158,13 @@ docker-compose logs -f
 
 ```bash
 # Stop services
-docker-compose stop
+./xrat.sh stop
 
-# Stop and remove containers
-docker-compose down
+# Restart services
+./xrat.sh restart
 
 # Stop and remove everything (including volumes)
-docker-compose down -v
+./xrat.sh clean
 ```
 
 ---
@@ -233,18 +235,17 @@ sudo nano .env
 #### Start Services
 
 ```bash
-# Pull latest images
-sudo docker-compose pull
-
-# Start in detached mode
-sudo docker-compose up -d
+# Start services using xrat.sh
+sudo ./xrat.sh start
 
 # Check status
-sudo docker-compose ps
+sudo ./xrat.sh status
 
 # View logs
-sudo docker-compose logs -f
+sudo ./xrat.sh logs
 ```
+
+> ⚠️ **IMPORTANT**: Use `./xrat.sh` instead of calling `docker compose` manually.
 
 ### 3. Reverse Proxy Setup (Nginx)
 
@@ -332,8 +333,8 @@ After=docker.service
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/xRatEcosystem
-ExecStart=/usr/local/bin/docker-compose up -d
-ExecStop=/usr/local/bin/docker-compose down
+ExecStart=/opt/xRatEcosystem/xrat.sh start
+ExecStop=/opt/xRatEcosystem/xrat.sh stop
 TimeoutStartSec=0
 
 [Install]
@@ -348,6 +349,8 @@ sudo systemctl start xrat
 # Check status
 sudo systemctl status xrat
 ```
+
+> **Note**: The systemd service uses `xrat.sh` for consistent management.
 
 ---
 
@@ -441,8 +444,11 @@ networks:
 ### Deploy with Production Config
 
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+# For production deployments with custom compose file
+docker compose -f docker-compose.prod.yml up -d
 ```
+
+> **Note**: For standard deployments, use `./xrat.sh start`, which wraps the default `docker-compose.yml`.
 
 ---
 
@@ -516,20 +522,20 @@ kubectl apply -f k8s/
 curl http://localhost:3000/health
 
 # Check all services
-docker-compose ps
+./xrat.sh status
 ```
 
 ### Logs
 
 ```bash
 # View all logs
-docker-compose logs -f
+./xrat.sh logs
 
-# View specific service
-docker-compose logs -f backend
+# View specific service (backend/frontend)
+docker compose logs -f backend
 
 # Last 100 lines
-docker-compose logs --tail=100 backend
+docker compose logs --tail=100 backend
 ```
 
 ### Resource Usage
@@ -559,27 +565,27 @@ docker stats xrat-backend
 
 ```bash
 # Check logs
-docker-compose logs
+./xrat.sh logs
 
 # Check port conflicts
 sudo netstat -tulpn | grep :3000
 sudo netstat -tulpn | grep :5173
 
 # Restart services
-docker-compose restart
+./xrat.sh restart
 ```
 
 #### Database Connection Issues
 
 ```bash
 # Check MongoDB is running
-docker-compose ps mongo
+./xrat.sh status
 
 # Check MongoDB logs
-docker-compose logs mongo
+docker compose logs mongodb
 
-# Test connection
-docker-compose exec backend mongo mongodb://mongo:27017
+# Access MongoDB shell
+./xrat.sh shell-mongo
 ```
 
 #### Permission Issues
@@ -599,27 +605,27 @@ newgrp docker
 
 ```bash
 # Create backup
-docker-compose exec mongo mongodump --out=/backup
+docker compose exec mongodb mongodump --out=/backup
 
 # Copy to host
-docker cp xrat-mongo:/backup ./mongodb-backup-$(date +%Y%m%d)
+docker cp xrat-mongodb:/backup ./mongodb-backup-$(date +%Y%m%d)
 ```
 
 #### Restore MongoDB
 
 ```bash
 # Copy backup to container
-docker cp ./mongodb-backup xrat-mongo:/backup
+docker cp ./mongodb-backup xrat-mongodb:/backup
 
 # Restore
-docker-compose exec mongo mongorestore /backup
+docker compose exec mongodb mongorestore /backup
 ```
 
 #### Backup Redis
 
 ```bash
 # Create snapshot
-docker-compose exec redis redis-cli BGSAVE
+docker compose exec redis redis-cli -a xratredispass BGSAVE
 
 # Copy snapshot
 docker cp xrat-redis:/data/dump.rdb ./redis-backup-$(date +%Y%m%d).rdb
@@ -659,11 +665,8 @@ maxmemory-policy allkeys-lru
 # Pull latest code
 git pull origin main
 
-# Rebuild images
-docker-compose build
-
-# Restart services
-docker-compose up -d
+# Rebuild and restart services
+./xrat.sh rebuild
 
 # Clean up old images
 docker image prune -a

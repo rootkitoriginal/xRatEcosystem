@@ -83,19 +83,25 @@ Acesse **[docs/README.md](./docs/README.md)** para o índice completo da documen
 ```bash
 ./xrat.sh start          # Iniciar todos os serviços
 ./xrat.sh stop           # Parar todos os serviços
-./xrat.sh restart        # Reiniciar todos (ou específico: restart backend)
-./xrat.sh logs           # Ver logs em tempo real (ou específico: logs backend)
+./xrat.sh restart        # Reiniciar todos os serviços
+./xrat.sh logs           # Ver logs combinados em tempo real
 ./xrat.sh status         # Ver status de todos os serviços
 ./xrat.sh clean          # Limpar tudo (⚠️ remove dados!)
 ./xrat.sh rebuild        # Reconstruir imagens Docker
-./xrat.sh help           # Ver ajuda completa
+./xrat.sh                # Ver ajuda rápida
 ```
 
 **Documentação completa**: [XRAT_SCRIPT_GUIDE.md](./docs/XRAT_SCRIPT_GUIDE.md)
 
+Para operações específicas, utilize diretamente o Docker Compose:
+
+- `docker compose restart backend` – Reinicia somente o backend
+- `docker compose logs -f backend` – Exibe apenas os logs do backend
+- `docker compose logs -f frontend` – Exibe apenas os logs do frontend
+
 ## 🏗️ Arquitetura
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │                     Cliente                          │
 │              (Browser / Mobile App)                  │
@@ -195,7 +201,7 @@ A API usa versionamento por URL:
 
 #### Autenticação
 
-```
+```text
 POST   /api/v1/auth/register    # Registrar usuário
 POST   /api/v1/auth/login        # Login
 POST   /api/v1/auth/refresh      # Refresh token
@@ -205,7 +211,7 @@ GET    /api/v1/auth/profile      # Perfil do usuário
 
 #### Gerenciamento de Dados
 
-```
+```text
 GET    /api/v1/data              # Listar dados (paginado)
 POST   /api/v1/data              # Criar dado
 GET    /api/v1/data/:id          # Obter por ID (cached)
@@ -217,7 +223,7 @@ POST   /api/v1/data/bulk         # Operações em lote
 
 #### Health & Status
 
-```
+```text
 GET    /health                   # Health check simples
 GET    /api/v1/health           # Health check detalhado
 GET    /api/v1/status           # Status do sistema
@@ -300,6 +306,6 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 
 ---
 
-**Desenvolvido com ❤️ pelo time xLab Internet**
+Desenvolvido com ❤️ pelo time xLab Internet
 
-**Última atualização**: 6 de outubro de 2025
+**Última atualização**: 7 de outubro de 2025
