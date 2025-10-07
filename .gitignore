@@ -33,6 +33,13 @@ coverage/
 __snapshots__/
 .vitest/
 
+# E2E test artifacts
+e2e-report/
+e2e-results.json
+test-results/
+playwright-report/
+playwright/.cache/
+
 # Editor directories
 .vscode/*
 !.vscode/extensions.json

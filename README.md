@@ -170,8 +170,16 @@ npm run test:coverage
 
 - **Backend**: 634+ testes (unit + integration)
 - **Frontend**: Unit tests com Vitest
-- **E2E**: Playwright
+- **E2E**: 75+ testes Playwright (Chrome/Chromium)
+  - Autenticação completa (login, registro, sessões)
+  - CRUD de dados (criar, ler, atualizar, deletar)
+  - WebSocket em tempo real
+  - Perfis de usuário
+  - Segurança e controle de acesso
+  - Resiliência e tratamento de falhas
 - **Performance**: k6 load tests
+
+📖 **[Guia Completo de Testes E2E](./__tests__/e2e/README.md)**
 
 ## 📦 API Endpoints
 
