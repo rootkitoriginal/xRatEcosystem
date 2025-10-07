@@ -184,8 +184,8 @@ __tests__/e2e/
 ### Docker Compose E2E
 - **Network**: 172.22.0.0/16 (isolada)
 - **Services**:
-  - Frontend: 172.22.0.10
-  - Backend: 172.22.1.30:3000
+  - Frontend: localhost:5173 (mapped from 172.22.0.10:5173)
+  - Backend: 172.22.1.30:3000 (interno)
   - MongoDB: 172.22.1.10 (interno)
   - Redis: 172.22.1.20 (interno)
 

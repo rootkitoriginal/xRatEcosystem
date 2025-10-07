@@ -92,6 +92,8 @@ services:
       VITE_USE_MOCK_AUTH: false
       VITE_USE_MOCK_DATA: false
       VITE_USE_MOCK_WEBSOCKET: false
+    ports:
+      - "5173:5173"
     networks:
       xrat-e2e-network:
         ipv4_address: 172.22.0.10

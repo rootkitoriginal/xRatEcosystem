@@ -142,16 +142,16 @@ npx playwright show-report e2e-report
 
 Tests run in an isolated Docker environment with:
 
-- **Frontend**: http://172.22.0.10
-- **Backend**: http://172.22.1.30:3000
+- **Frontend**: http://localhost:5173 (mapped from container)
+- **Backend**: http://172.22.1.30:3000 (internal)
 - **MongoDB**: Internal (172.22.1.10)
 - **Redis**: Internal (172.22.1.20)
 
 ### Environment Variables
 
 ```bash
-# Base URL for tests (default: http://172.22.0.10)
-E2E_BASE_URL=http://172.22.0.10
+# Base URL for tests (default: http://localhost:5173)
+E2E_BASE_URL=http://localhost:5173
 
 # Keep containers running after tests for debugging
 E2E_KEEP_CONTAINERS=true
