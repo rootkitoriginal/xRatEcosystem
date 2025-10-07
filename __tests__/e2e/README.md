@@ -235,18 +235,18 @@ test.describe('With Fixtures', () => {
 
 ```javascript
 const {
-  createTestCredentials,  // Generate unique test credentials
-  registerUser,           // Register and login a user
-  loginUser,              // Login existing user
-  logoutUser,             // Logout current user
-  waitForElement,         // Wait for element with retry
-  createTestData,         // Create test data
-  cleanupTestData,        // Delete test data
-  waitForWebSocket,       // Wait for WebSocket connection
-  retryAction,            // Retry action with backoff
-  getAuthToken,           // Get auth token from localStorage
-  apiRequest,             // Make authenticated API request
-  waitForNetworkIdle,     // Wait for network to be idle
+  createTestCredentials, // Generate unique test credentials
+  registerUser, // Register and login a user
+  loginUser, // Login existing user
+  logoutUser, // Logout current user
+  waitForElement, // Wait for element with retry
+  createTestData, // Create test data
+  cleanupTestData, // Delete test data
+  waitForWebSocket, // Wait for WebSocket connection
+  retryAction, // Retry action with backoff
+  getAuthToken, // Get auth token from localStorage
+  apiRequest, // Make authenticated API request
+  waitForNetworkIdle, // Wait for network to be idle
 } = require('../setup/helpers');
 ```
 
@@ -267,6 +267,7 @@ const {
 **Problem**: Tests timeout waiting for services
 
 **Solutions**:
+
 ```bash
 # Check if Docker containers are healthy
 cd __tests__/e2e/setup
@@ -285,6 +286,7 @@ timeout: 120_000, // 2 minutes
 **Problem**: Docker services fail to start
 
 **Solutions**:
+
 ```bash
 # Clean up old containers
 docker compose -f __tests__/e2e/setup/docker-compose.e2e.yml down -v
@@ -302,12 +304,13 @@ docker compose -f __tests__/e2e/setup/docker-compose.e2e.yml build --no-cache
 **Problem**: Tests fail to authenticate
 
 **Solutions**:
+
 ```javascript
 // Check if backend is responding
 const health = await page.evaluate(() => {
   return fetch('http://172.22.1.30:3000/health')
-    .then(res => res.json())
-    .catch(err => ({ error: err.message }));
+    .then((res) => res.json())
+    .catch((err) => ({ error: err.message }));
 });
 
 // Verify JWT token is stored
@@ -324,6 +327,7 @@ console.log('Auth Storage:', storage);
 **Problem**: WebSocket tests fail to connect
 
 **Solutions**:
+
 ```javascript
 // Check WebSocket connection manually
 await page.evaluate(() => {
@@ -347,6 +351,7 @@ await page.evaluate(() => {
 **Problem**: Tests pass sometimes but fail other times
 
 **Solutions**:
+
 ```javascript
 // Use retries in playwright.config.js
 retries: 2,
@@ -373,6 +378,7 @@ E2E_KEEP_CONTAINERS=true npm run test:e2e
 ```
 
 Then manually inspect:
+
 ```bash
 # View logs
 docker compose -f __tests__/e2e/setup/docker-compose.e2e.yml logs -f
@@ -399,21 +405,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Install Playwright
         run: npx playwright install chromium
-      
+
       - name: Run E2E tests
         run: npm run test:e2e
-      
+
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v3
@@ -433,12 +439,14 @@ npx playwright show-report e2e-report
 ### Performance Tips for CI
 
 1. **Parallel Execution**: Enable in `playwright.config.js`
+
    ```javascript
    workers: process.env.CI ? 2 : 3,
    fullyParallel: true,
    ```
 
 2. **Retry Failed Tests**: Automatic retries on failure
+
    ```javascript
    retries: process.env.CI ? 2 : 1,
    ```
@@ -506,5 +514,5 @@ For issues or questions:
 
 ---
 
-**Last Updated**: 2024
+**Last Updated**: 2025
 **Maintained By**: xRat Ecosystem Team
