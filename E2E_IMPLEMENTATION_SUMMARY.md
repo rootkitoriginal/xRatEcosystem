@@ -45,12 +45,14 @@ __tests__/e2e/
 ## ✅ Funcionalidades Implementadas
 
 ### 1. Infraestrutura de Testes E2E ✅
+
 - [x] Ambiente E2E isolado com Docker Compose
 - [x] Configuração Playwright (Chrome/Chromium)
 - [x] Fixtures e helpers customizados
 - [x] Setup e teardown globais
 
 ### 2. Fluxos de Autenticação ✅
+
 - [x] Registro de usuário completo (6 testes)
 - [x] Login/Logout (6 testes)
 - [x] Gerenciamento de sessões (7 testes)
@@ -58,6 +60,7 @@ __tests__/e2e/
 - [x] Expiração de token
 
 ### 3. Fluxos de Dados (CRUD) ✅
+
 - [x] Criar dados (7 testes)
 - [x] Listar com paginação
 - [x] Editar dados existentes
@@ -66,6 +69,7 @@ __tests__/e2e/
 - [x] Operações em lote (5 testes)
 
 ### 4. Comunicação WebSocket ✅
+
 - [x] Conexão após login (7 testes)
 - [x] Notificações em tempo real
 - [x] Subscrição a rooms/canais
@@ -74,12 +78,14 @@ __tests__/e2e/
 - [x] Múltiplos clientes simultâneos
 
 ### 5. Perfil de Usuário ✅
+
 - [x] Visualizar perfil (8 testes)
 - [x] Editar perfil
 - [x] Validações de campos
 - [x] Atualização de dados
 
 ### 6. Resiliência ✅
+
 - [x] Backend offline (8 testes)
 - [x] MongoDB/Redis offline
 - [x] Recuperação automática
@@ -87,6 +93,7 @@ __tests__/e2e/
 - [x] Tratamento de timeouts
 
 ### 7. Segurança E2E ✅
+
 - [x] Acesso sem autenticação (10 testes)
 - [x] Prevenção XSS
 - [x] Prevenção CSRF
@@ -94,7 +101,8 @@ __tests__/e2e/
 - [x] Validação de permissões
 
 ### 8. Documentação ✅
-- [x] README completo (__tests__/e2e/README.md - 12KB)
+
+- [x] README completo (**tests**/e2e/README.md - 12KB)
 - [x] Quick Reference (docs/E2E_QUICK_REFERENCE.md - 5.8KB)
 - [x] CI Integration (docs/E2E_CI_INTEGRATION.md - 7.8KB)
 - [x] Guia de troubleshooting
@@ -114,6 +122,7 @@ __tests__/e2e/
 ## 🤖 Integração CI/CD
 
 ### GitHub Actions Workflow
+
 - **Arquivo**: `.github/workflows/e2e-tests.yml`
 - **Triggers**: Push para main/develop, Pull Requests
 - **Recursos**:
@@ -126,6 +135,7 @@ __tests__/e2e/
   - ✅ Retries: 2 em caso de falha
 
 ### Artifacts Gerados
+
 - HTML report (`e2e-report/`)
 - JSON results (`e2e-results.json`)
 - Playwright traces (em caso de falha)
@@ -134,6 +144,7 @@ __tests__/e2e/
 ## 📋 Detalhamento dos Testes
 
 ### Autenticação (19 testes)
+
 - Registro com validações
 - Login com credenciais válidas/inválidas
 - Logout e prevenção de acesso
@@ -142,6 +153,7 @@ __tests__/e2e/
 - Token tampering e expiração
 
 ### Dados (17 testes)
+
 - CRUD completo via API
 - Paginação e filtros
 - Operações bulk (criar, atualizar, deletar)
@@ -149,6 +161,7 @@ __tests__/e2e/
 - Prevenção de acesso não autorizado
 
 ### WebSocket (13 testes)
+
 - Estabelecimento de conexão
 - Autenticação via token
 - Notificações em tempo real
@@ -157,6 +170,7 @@ __tests__/e2e/
 - Reconexão automática
 
 ### Perfil (8 testes)
+
 - Visualização de perfil
 - Atualização de dados
 - Validações de campos
@@ -164,6 +178,7 @@ __tests__/e2e/
 - Updates concorrentes
 
 ### Segurança (10 testes)
+
 - Acesso sem autenticação
 - XSS prevention
 - CSRF protection
@@ -172,6 +187,7 @@ __tests__/e2e/
 - Token validation
 
 ### Resiliência (8 testes)
+
 - Backend offline
 - Timeouts de rede
 - Retry logic
@@ -182,6 +198,7 @@ __tests__/e2e/
 ## 🔧 Configuração do Ambiente E2E
 
 ### Docker Compose E2E
+
 - **Network**: 172.22.0.0/16 (isolada)
 - **Services**:
   - Frontend: localhost:5173 (mapped from 172.22.0.10:5173)
@@ -190,12 +207,14 @@ __tests__/e2e/
   - Redis: 172.22.1.20 (interno)
 
 ### Health Checks
+
 - Todos os serviços com health checks
 - Timeout: 5s
 - Retries: 5
 - Intervalo: 10s
 
 ### Credenciais de Teste
+
 - MongoDB: admin/e2etestpass
 - Redis: e2eredispass
 - JWT: e2e-test-jwt-secret-key
@@ -223,20 +242,21 @@ __tests__/e2e/
 
 ## 🎯 Critérios de Aceitação
 
-| Critério | Status | Detalhes |
-|----------|--------|----------|
-| Todos os fluxos principais cobertos | ✅ | 75 testes, 8 categorias |
-| Testes em ambiente isolado | ✅ | Docker Compose dedicado |
-| Executável em CI/CD | ✅ | GitHub Actions configurado |
-| Relatórios claros de falhas | ✅ | HTML + JSON + Traces |
-| Documentação completa | ✅ | 3 guias + README |
-| Tempo < 10 minutos | ✅ | Estimado 8-9 minutos |
-| Cobertura > 80% | ✅ | 80%+ dos fluxos críticos |
-| Chrome/Chromium apenas | ✅ | Configurado no Playwright |
+| Critério                            | Status | Detalhes                   |
+| ----------------------------------- | ------ | -------------------------- |
+| Todos os fluxos principais cobertos | ✅     | 75 testes, 8 categorias    |
+| Testes em ambiente isolado          | ✅     | Docker Compose dedicado    |
+| Executável em CI/CD                 | ✅     | GitHub Actions configurado |
+| Relatórios claros de falhas         | ✅     | HTML + JSON + Traces       |
+| Documentação completa               | ✅     | 3 guias + README           |
+| Tempo < 10 minutos                  | ✅     | Estimado 8-9 minutos       |
+| Cobertura > 80%                     | ✅     | 80%+ dos fluxos críticos   |
+| Chrome/Chromium apenas              | ✅     | Configurado no Playwright  |
 
 ## 🚀 Como Usar
 
 ### Executar Localmente
+
 ```bash
 # Instalar dependências
 npm install
@@ -253,11 +273,13 @@ npm run test:e2e:report
 ```
 
 ### Executar em CI
+
 - Push para `main` ou `develop`: execução automática
 - Pull Request: execução automática + comentário com resultados
 - Manual: GitHub Actions → E2E Tests → Run workflow
 
 ### Debug
+
 ```bash
 # Manter containers rodando
 E2E_KEEP_CONTAINERS=true npm run test:e2e
@@ -273,6 +295,7 @@ npm run test:e2e:debug
 ## 📈 Próximos Passos (Fora do Escopo)
 
 Conforme especificado na issue, os seguintes itens ficam para issues futuras:
+
 - ❌ Testes de performance/carga
 - ❌ Testes mobile/responsivo
 - ❌ Testes cross-browser (Firefox, Safari, Edge)

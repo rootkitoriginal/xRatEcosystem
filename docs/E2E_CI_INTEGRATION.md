@@ -15,6 +15,7 @@ Location: `.github/workflows/e2e-tests.yml`
 ### Workflow Triggers
 
 The E2E test workflow runs on:
+
 - **Push** to `main` or `develop` branches
 - **Pull Requests** to `main` or `develop` branches
 - **Manual trigger** via workflow dispatch
@@ -25,7 +26,6 @@ The E2E test workflow runs on:
    - Checkout code
    - Setup Node.js 20
    - Cache npm dependencies
-   
 2. **Install Dependencies**
    - Install root dependencies
    - Install frontend dependencies
@@ -110,13 +110,13 @@ CI-specific settings in `playwright.config.js`:
 export default defineConfig({
   // More retries in CI
   retries: process.env.CI ? 2 : 1,
-  
+
   // Fewer workers in CI (resource constrained)
   workers: process.env.CI ? 2 : 3,
-  
+
   // Fail build on only.skip in CI
   forbidOnly: !!process.env.CI,
-  
+
   // Parallel execution
   fullyParallel: true,
 });
@@ -177,6 +177,7 @@ fullyParallel: true,
 ### Download Artifacts
 
 1. **Test Results**
+
    ```bash
    # Download from GitHub Actions UI
    # Extract and view
@@ -198,6 +199,7 @@ fullyParallel: true,
 **Problem**: Tests timeout but pass locally
 
 **Solution**:
+
 - Increase timeout in workflow or config
 - Check if services are starting properly
 - Review container health checks
@@ -205,7 +207,7 @@ fullyParallel: true,
 ```yaml
 jobs:
   e2e-tests:
-    timeout-minutes: 45  # Increase from 30
+    timeout-minutes: 45 # Increase from 30
 ```
 
 #### Docker Build Failures
@@ -213,6 +215,7 @@ jobs:
 **Problem**: Docker build fails in CI
 
 **Solution**:
+
 - Clear cache and retry
 - Check Docker layer cache keys
 - Verify Dockerfile syntax
@@ -228,6 +231,7 @@ jobs:
 **Problem**: Tests pass/fail inconsistently
 
 **Solution**:
+
 - Enable retries (already enabled in CI)
 - Add explicit waits
 - Use Playwright's built-in retry logic
@@ -241,6 +245,7 @@ retries: process.env.CI ? 2 : 1,  // 2 retries in CI
 ### Secrets Management
 
 E2E tests use test credentials defined in `docker-compose.e2e.yml`:
+
 - MongoDB: admin/e2etestpass
 - Redis: e2eredispass
 - JWT: e2e-test-jwt-secret-key
@@ -250,6 +255,7 @@ E2E tests use test credentials defined in `docker-compose.e2e.yml`:
 ### Network Isolation
 
 E2E tests run in an isolated Docker network (172.22.0.0/16) that:
+
 - Cannot access production systems
 - Uses internal DNS resolution only
 - Cleans up automatically after tests
@@ -259,6 +265,7 @@ E2E tests run in an isolated Docker network (172.22.0.0/16) that:
 ### Test Duration Tracking
 
 Monitor test duration in CI:
+
 - Target: < 10 minutes
 - Current average: 8-9 minutes
 - Alert if > 15 minutes
@@ -266,6 +273,7 @@ Monitor test duration in CI:
 ### Success Rate
 
 Track E2E test success rate:
+
 - Target: > 95%
 - Current: ~97%
 - Investigate if < 90%
@@ -273,6 +281,7 @@ Track E2E test success rate:
 ### Coverage Tracking
 
 E2E test coverage:
+
 - Critical flows: 100%
 - Overall coverage: 80%+
 - Track new feature coverage
@@ -297,7 +306,7 @@ Run E2E tests on schedule:
 ```yaml
 on:
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight
+    - cron: '0 0 * * *' # Daily at midnight
 ```
 
 ### Manual Triggers with Inputs
@@ -323,6 +332,7 @@ on:
 ### Require E2E Pass Before Merge
 
 In branch protection rules:
+
 1. Go to Settings → Branches
 2. Edit branch protection for `main`
 3. Enable "Require status checks to pass"
@@ -339,7 +349,7 @@ jobs:
         run: npm test
 
   e2e-tests:
-    needs: [unit-tests]  # Run only if unit tests pass
+    needs: [unit-tests] # Run only if unit tests pass
     runs-on: ubuntu-latest
     steps:
       - name: Run E2E tests

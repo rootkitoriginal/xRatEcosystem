@@ -49,7 +49,7 @@ test.describe('Feature Name', () => {
 
     // Assert: Verify expected behavior
     expect(result.success).toBeTruthy();
-    
+
     // Cleanup: Delete test data if needed
     if (result.data?._id) {
       await apiRequest(page, `${baseUrl}/api/v1/endpoint/${result.data._id}`, {
@@ -84,13 +84,13 @@ test('with test data', async ({ authenticatedUser, testData, page }) => {
 
 ```javascript
 const {
-  registerUser,           // Register and login a user
-  loginUser,              // Login existing user
-  logoutUser,             // Logout current user
-  createTestCredentials,  // Generate unique credentials
-  apiRequest,             // Make authenticated API request
-  waitForWebSocket,       // Wait for WebSocket connection
-  getAuthToken,           // Get auth token from localStorage
+  registerUser, // Register and login a user
+  loginUser, // Login existing user
+  logoutUser, // Logout current user
+  createTestCredentials, // Generate unique credentials
+  apiRequest, // Make authenticated API request
+  waitForWebSocket, // Wait for WebSocket connection
+  getAuthToken, // Get auth token from localStorage
 } = require('../setup/helpers');
 ```
 
@@ -210,6 +210,7 @@ cat e2e-results.json | jq '.stats'
 ### CI Reports
 
 Test reports are automatically uploaded to GitHub Actions artifacts:
+
 - HTML report: `e2e-test-results`
 - Traces: `playwright-traces` (on failure)
 
