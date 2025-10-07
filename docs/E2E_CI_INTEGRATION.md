@@ -98,8 +98,8 @@ Set in GitHub Actions workflow:
 
 ```yaml
 env:
-  CI: true                           # Enables CI mode
-  E2E_BASE_URL: http://localhost:5173  # E2E frontend URL
+  CI: true # Enables CI mode
+  E2E_BASE_URL: http://localhost:5173 # E2E frontend URL
 ```
 
 ### Playwright Configuration

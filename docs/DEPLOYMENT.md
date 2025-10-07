@@ -136,7 +136,7 @@ cd xRatEcosystem
 # Setup environment
 cp .env.example .env
 
-# Start services (use xrat.sh - DO NOT use docker-compose directly)
+# Start services (use xrat.sh - DO NOT use `docker compose` directly)
 ./xrat.sh start
 
 # Check status
@@ -245,7 +245,7 @@ sudo ./xrat.sh status
 sudo ./xrat.sh logs
 ```
 
-> ⚠️ **IMPORTANT**: Use `./xrat.sh` instead of direct docker-compose commands.
+> ⚠️ **IMPORTANT**: Use `./xrat.sh` instead of calling `docker compose` manually.
 
 ### 3. Reverse Proxy Setup (Nginx)
 
@@ -448,7 +448,7 @@ networks:
 docker compose -f docker-compose.prod.yml up -d
 ```
 
-> **Note**: For standard deployments, use `./xrat.sh start` which uses the default docker-compose.yml.
+> **Note**: For standard deployments, use `./xrat.sh start`, which wraps the default `docker-compose.yml`.
 
 ---
 
