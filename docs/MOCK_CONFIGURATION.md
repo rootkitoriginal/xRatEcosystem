@@ -193,7 +193,7 @@ Você pode criar configurações específicas por funcionalidade editando os arq
 Após alterar variáveis no `.env`:
 
 1. **Frontend:** Reinicie com `npm run dev`
-2. **Backend:** Reinicie com `npm run dev` (local) ou `./xrat.sh restart backend` (Docker)
+2. **Backend:** Reinicie com `npm run dev` (local) ou `./xrat.sh restart` (Docker)
 3. **Docker:** Use `./xrat.sh restart`
 
 As mudanças devem aparecer imediatamente no indicador visual e nos logs do console.

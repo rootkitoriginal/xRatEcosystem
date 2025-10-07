@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-O `xrat.sh` é o **script oficial** para gerenciar o xRat Ecosystem. Ele substitui comandos Docker diretos e garante configuração correta, logs organizados e operação consistente.
+O `xrat.sh` é o **script oficial** para gerenciar o xRat Ecosystem. Ele encapsula os comandos essenciais do Docker Compose e oferece uma forma padronizada de iniciar, parar e inspecionar os serviços locais.
 
 ## ⚠️ REGRA IMPORTANTE
 
@@ -11,10 +11,10 @@ O `xrat.sh` é o **script oficial** para gerenciar o xRat Ecosystem. Ele substit
 ❌ **NÃO FAÇA:**
 
 ```bash
-docker-compose up -d
-docker-compose down
-docker-compose restart backend
-docker-compose logs -f
+docker compose up -d
+docker compose down
+docker compose restart backend
+docker compose logs -f
 ```
 
 ✅ **FAÇA:**
@@ -22,7 +22,7 @@ docker-compose logs -f
 ```bash
 ./xrat.sh start
 ./xrat.sh stop
-./xrat.sh restart backend
+./xrat.sh restart
 ./xrat.sh logs
 ```
 
@@ -40,11 +40,9 @@ Inicia todos os serviços do ecosystem.
 
 **O que faz:**
 
-- Verifica dependências (Docker, Docker Compose)
-- Cria rede Docker se não existir
-- Inicia todos os containers em background
-- Exibe status de cada serviço
-- Mostra URLs de acesso
+- Executa `docker compose up -d --build`
+- Mantém todos os serviços principais em execução
+- Mostra pontos de acesso após a subida
 
 **Serviços iniciados:**
 
@@ -79,28 +77,19 @@ Para todos os serviços sem remover dados.
 
 ---
 
-#### `./xrat.sh restart [service]`
+#### `./xrat.sh restart`
 
-Reinicia todos os serviços ou um específico.
+Reinicia todos os serviços do ecosystem.
 
 ```bash
-# Reiniciar todos
 ./xrat.sh restart
-
-# Reiniciar apenas backend
-./xrat.sh restart backend
-
-# Reiniciar apenas frontend
-./xrat.sh restart frontend
 ```
 
-**Opções de serviço:**
+**Dica:** Para reiniciar apenas um serviço específico, utilize diretamente o Docker Compose, por exemplo:
 
-- `nginx` - Reverse proxy
-- `backend` - API Node.js
-- `frontend` - Interface React
-- `mongodb` - Banco de dados
-- `redis` - Cache
+```bash
+docker compose restart backend
+```
 
 **Use quando:**
 
@@ -112,27 +101,20 @@ Reinicia todos os serviços ou um específico.
 
 ### Monitoramento e Logs
 
-#### `./xrat.sh logs [service]`
+#### `./xrat.sh logs`
 
-Exibe logs em tempo real.
+Exibe os logs combinados de todos os serviços em tempo real.
 
 ```bash
-# Ver logs de todos os serviços
 ./xrat.sh logs
-
-# Ver apenas logs do backend
-./xrat.sh logs backend
-
-# Ver apenas logs do frontend
-./xrat.sh logs frontend
 ```
+
+**Dica:** Para focar em um serviço específico, rode `docker compose logs -f <serviço>` diretamente.
 
 **Recursos:**
 
-- Logs coloridos por serviço
-- Timestamp em cada linha
 - Acompanhamento em tempo real (tail -f)
-- Ctrl+C para sair
+- Saída contínua até pressionar `Ctrl+C`
 
 **Use quando:**
 
@@ -197,116 +179,83 @@ Remove TUDO (containers, volumes, rede).
 
 ---
 
-#### `./xrat.sh rebuild [service]`
+#### `./xrat.sh rebuild`
 
-Reconstrói imagens Docker.
+Reconstrói todas as imagens e reinicia os serviços.
 
 ```bash
-# Reconstruir tudo
 ./xrat.sh rebuild
-
-# Reconstruir apenas backend
-./xrat.sh rebuild backend
-
-# Reconstruir apenas frontend
-./xrat.sh rebuild frontend
 ```
 
 **O que faz:**
 
-- Para containers
-- Remove imagens antigas
-- Reconstrói do zero (--no-cache)
-- Reinicia serviços
+- Executa `docker compose up -d --build --force-recreate`
+- Garante que as imagens sejam atualizadas
+- Reinicia todo o ecosystem após o rebuild
+
+**Dica:** Para forçar o rebuild de um único serviço, use diretamente `docker compose up -d --build --force-recreate <serviço>`.
 
 **Use quando:**
 
 - Mudanças no Dockerfile
 - Dependências atualizadas (package.json)
 - Problemas de build
-- Forçar instalação limpa
+- Necessidade de instalação limpa
 
 ---
 
 ### Comandos Avançados
 
-#### `./xrat.sh shell <service>`
+#### Shells disponíveis
 
-Abre shell interativo no container.
+O script oferece atalhos para abrir um shell interativo em serviços específicos:
 
 ```bash
-# Shell no backend
-./xrat.sh shell backend
-
-# Shell no frontend
-./xrat.sh shell frontend
+./xrat.sh shell-backend
+./xrat.sh shell-frontend
+./xrat.sh shell-mongo
+./xrat.sh shell-redis
 ```
 
 **Use quando:**
 
 - Executar comandos npm diretamente
 - Inspecionar arquivos no container
-- Debug avançado
-- Testar comandos
+- Realizar debug avançado
 
 **Exemplos de uso:**
 
 ```bash
 # Instalar pacote no backend
-./xrat.sh shell backend
+./xrat.sh shell-backend
 > npm install axios
 
 # Rodar testes no frontend
-./xrat.sh shell frontend
+./xrat.sh shell-frontend
 > npm test
 ```
 
----
-
-#### `./xrat.sh exec <service> <command>`
-
-Executa comando único no container.
+Para executar um comando único sem abrir shell interativo, utilize diretamente o Docker Compose:
 
 ```bash
-# Rodar testes do backend
-./xrat.sh exec backend npm test
-
-# Checar versão do Node
-./xrat.sh exec backend node --version
-
-# Limpar cache npm
-./xrat.sh exec frontend npm cache clean --force
+docker compose exec backend npm test
+docker compose exec backend node --version
+docker compose exec frontend npm cache clean --force
 ```
-
-**Diferença do shell:**
-
-- Executa comando e sai
-- Não interativo
-- Útil para scripts
 
 ---
 
 ### Informações e Ajuda
 
-#### `./xrat.sh help`
+#### Ajuda rápida
 
-Exibe ajuda rápida.
-
-```bash
-./xrat.sh help
-```
-
-Mostra todos os comandos disponíveis com descrição curta.
-
----
-
-#### `./xrat.sh version`
-
-Exibe versão do ecosystem.
+Execute o script sem argumentos para exibir o resumo de comandos suportados.
 
 ```bash
-./xrat.sh version
+./xrat.sh
 ```
+
+O uso incorreto retorna o menu de ajuda padrão do script.
 
 ---
 
@@ -320,11 +269,11 @@ Exibe versão do ecosystem.
 ./xrat.sh logs
 
 # Durante desenvolvimento - Ver logs específicos
-./xrat.sh logs backend  # Em um terminal
-./xrat.sh logs frontend # Em outro terminal
+docker compose logs -f backend  # Terminal dedicado
+docker compose logs -f frontend # Outro terminal
 
 # Aplicar mudanças no código
-./xrat.sh restart backend
+./xrat.sh restart
 
 # Fim do dia - Parar
 ./xrat.sh stop
@@ -339,13 +288,13 @@ Exibe versão do ecosystem.
 ./xrat.sh status
 
 # 2. Ver logs para identificar erro
-./xrat.sh logs backend
+./xrat.sh logs
 
 # 3. Reiniciar serviço problemático
-./xrat.sh restart backend
+docker compose restart backend
 
 # 4. Se não resolver, reconstruir
-./xrat.sh rebuild backend
+docker compose up -d --build --force-recreate backend
 
 # 5. Último recurso - reset completo
 ./xrat.sh clean
@@ -358,18 +307,18 @@ Exibe versão do ecosystem.
 
 ```bash
 # Backend
-./xrat.sh shell backend
+./xrat.sh shell-backend
 > npm update
 > exit
 
-./xrat.sh rebuild backend
+docker compose up -d --build --force-recreate backend
 
 # Frontend
-./xrat.sh shell frontend
+./xrat.sh shell-frontend
 > npm update
 > exit
 
-./xrat.sh rebuild frontend
+docker compose up -d --build --force-recreate frontend
 ```
 
 ---
@@ -391,36 +340,30 @@ docker exec xrat-mongodb mongorestore /backup
 
 ## 🔍 Arquitetura do Script
 
-### Verificações Automáticas
+### Como funciona
 
-O script verifica automaticamente:
+- Executa comandos `docker compose` pré-definidos (start, stop, restart, logs, rebuild, etc.).
+- Utiliza `set -e` para interromper a execução ao primeiro erro retornado pelo Docker.
+- Força a execução a partir da raiz do repositório.
 
-- ✅ Docker instalado e rodando
-- ✅ Docker Compose disponível
-- ✅ Permissões de execução
-- ✅ Arquivo docker-compose.yml presente
-- ✅ Rede Docker existente
+### Pré-requisitos
 
-### Logs Organizados
+- Docker instalado e ativo.
+- Docker Compose (plugin v2) disponível no PATH.
+- Permissão de execução no arquivo `xrat.sh` (`chmod +x xrat.sh`).
 
-Todos os logs são salvos em:
+### Saída de logs
 
-```
-logs/
-├── xrat-operations.log  # Operações do script
-├── backend/            # Logs do backend
-├── frontend/           # Logs do frontend
-├── nginx/             # Logs do nginx
-├── mongodb/           # Logs do MongoDB
-└── redis/             # Logs do Redis
+Os logs são exibidos diretamente via `docker compose logs`. Para salvar em arquivo, redirecione a saída manualmente:
+
+```bash
+./xrat.sh logs > logs/xrat.log 2>&1
 ```
 
-### Códigos de Saída
+### Códigos de saída
 
 - `0` - Sucesso
 - `1` - Erro genérico
-- `2` - Dependência faltando
-- `3` - Serviço não encontrado
 
 ---
 
@@ -438,18 +381,17 @@ Para mais informações sobre cada componente:
 
 ## ❓ FAQ
 
-### Por que não usar docker-compose diretamente?
+### Por que não usar `docker compose` diretamente?
 
 O `xrat.sh` adiciona:
 
-- ✅ Verificações de pré-requisitos
-- ✅ Logs organizados e coloridos
-- ✅ Mensagens de erro claras
-- ✅ Comandos simplificados
-- ✅ Operações consistentes
-- ✅ Validações automáticas
+- ✅ Comandos simplificados e padronizados para o time
+- ✅ Mensagens amigáveis durante start/stop/restart
+- ✅ Atalhos para abrir shells nos serviços principais
+- ✅ Convenções alinhadas com a documentação oficial do projeto
+- ✅ Menos chance de esquecer opções (`--build`, `--force-recreate`, etc.)
 
-### Posso usar docker-compose para comandos específicos?
+### Posso usar `docker compose` para comandos específicos?
 
 Sim, para operações que o script não cobre (ex: backup, inspect), use Docker direto. Mas para operações diárias, **sempre prefira xrat.sh**.
 
@@ -498,7 +440,7 @@ watch -n 2 './xrat.sh status'
 Salvar logs em arquivo:
 
 ```bash
-./xrat.sh logs backend > backend-debug.log 2>&1
+docker compose logs -f backend > backend-debug.log 2>&1
 ```
 
 ### 4. Múltiplos Terminais
@@ -506,12 +448,12 @@ Salvar logs em arquivo:
 Configure seu terminal para:
 
 - Terminal 1: Código (VS Code/Vim)
-- Terminal 2: `./xrat.sh logs backend`
-- Terminal 3: `./xrat.sh logs frontend`
+- Terminal 2: `docker compose logs -f backend`
+- Terminal 3: `docker compose logs -f frontend`
 - Terminal 4: Comandos gerais
 
 ---
 
-**Criado com ❤️ para o xRat Ecosystem**
+Criado com ❤️ para o xRat Ecosystem
 
-**Última atualização:** 6 de outubro de 2025
+Última atualização: 6 de outubro de 2025
