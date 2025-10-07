@@ -11,7 +11,10 @@ test.describe('System Resilience and Failure Handling', () => {
 
     // Temporarily stop backend
     try {
-      execSync(`docker compose -f ${composePath} stop backend`, { timeout: 10000 });
+      execSync('docker compose -f ' + JSON.stringify(composePath) + ' stop backend', { 
+        timeout: 10000,
+        shell: '/bin/bash',
+      });
     } catch (error) {
       console.warn('Could not stop backend:', error.message);
       test.skip();
@@ -36,7 +39,10 @@ test.describe('System Resilience and Failure Handling', () => {
 
     // Restart backend
     try {
-      execSync(`docker compose -f ${composePath} start backend`, { timeout: 30000 });
+      execSync('docker compose -f ' + JSON.stringify(composePath) + ' start backend', { 
+        timeout: 30000,
+        shell: '/bin/bash',
+      });
       await page.waitForTimeout(5000); // Wait for backend to be ready
     } catch (error) {
       console.warn('Could not restart backend:', error.message);

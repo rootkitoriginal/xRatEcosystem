@@ -13,16 +13,18 @@ async function globalSetup() {
   try {
     // Stop any existing E2E containers
     console.log('🧹 Cleaning up any existing E2E containers...');
-    execSync(`docker compose -f ${composePath} down -v --remove-orphans`, {
+    execSync('docker compose -f ' + JSON.stringify(composePath) + ' down -v --remove-orphans', {
       stdio: 'inherit',
       timeout: 60000,
+      shell: '/bin/bash',
     });
 
     // Start E2E services
     console.log('🐳 Starting E2E Docker containers...');
-    execSync(`docker compose -f ${composePath} up -d --build`, {
+    execSync('docker compose -f ' + JSON.stringify(composePath) + ' up -d --build', {
       stdio: 'inherit',
       timeout: 300000,
+      shell: '/bin/bash',
     });
 
     // Wait for services to be healthy
@@ -32,9 +34,10 @@ async function globalSetup() {
 
     while (attempt < maxAttempts) {
       try {
-        const result = execSync(`docker compose -f ${composePath} ps --format json`, {
+        const result = execSync('docker compose -f ' + JSON.stringify(composePath) + ' ps --format json', {
           encoding: 'utf8',
           timeout: 10000,
+          shell: '/bin/bash',
         });
 
         const services = result
@@ -76,8 +79,9 @@ async function globalSetup() {
     // Show logs for debugging
     try {
       console.log('\n📋 Container logs:');
-      execSync(`docker compose -f ${composePath} logs --tail=50`, {
+      execSync('docker compose -f ' + JSON.stringify(composePath) + ' logs --tail=50', {
         stdio: 'inherit',
+        shell: '/bin/bash',
       });
     } catch (logError) {
       console.error('Could not fetch logs:', logError.message);

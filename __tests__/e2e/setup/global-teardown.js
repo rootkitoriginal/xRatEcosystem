@@ -15,14 +15,15 @@ async function globalTeardown() {
     if (process.env.E2E_KEEP_CONTAINERS === 'true') {
       console.log('⚠️  Keeping containers running for debugging (E2E_KEEP_CONTAINERS=true)');
       console.log('To stop manually, run:');
-      console.log(`docker compose -f ${composePath} down -v`);
+      console.log('docker compose -f ' + JSON.stringify(composePath) + ' down -v');
       return;
     }
 
     // Stop and remove containers
-    execSync(`docker compose -f ${composePath} down -v --remove-orphans`, {
+    execSync('docker compose -f ' + JSON.stringify(composePath) + ' down -v --remove-orphans', {
       stdio: 'inherit',
       timeout: 60000,
+      shell: '/bin/bash',
     });
 
     console.log('✅ E2E environment cleaned up!');
