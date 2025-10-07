@@ -12,6 +12,9 @@ jobs:
     name: Run E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -86,7 +89,7 @@ jobs:
           script: |
             const fs = require('fs');
             let comment = '## 🧪 E2E Test Results\n\n';
-            
+
             try {
               const results = JSON.parse(fs.readFileSync('e2e-results.json', 'utf8'));
               const stats = results.stats || {};
@@ -106,9 +109,9 @@ jobs:
             } catch (error) {
               comment += '⚠️ Could not parse test results.\n';
             }
-            
+
             comment += '\n📊 [View detailed report in artifacts](../../actions/runs/${{ github.run_id }})';
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -121,7 +124,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [e2e-tests]
     if: always()
-    
+    permissions: {}
+
     steps:
       - name: Check E2E test status
         run: |
