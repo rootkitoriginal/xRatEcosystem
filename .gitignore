@@ -60,3 +60,6 @@ tmp/
 temp/
 *.tmp
 *.temp
+e2e-results.json
+e2e-report/index.html
+test-results/.last-run.json
