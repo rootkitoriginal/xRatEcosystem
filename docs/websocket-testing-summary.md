@@ -31,15 +31,10 @@ Implement advanced WebSocket testing to achieve **90%+ test coverage** for the x
 ### Test Count Growth
 
 - **Before**: 51 tests
-  <<<<<<< HEAD
 - **Phase 4 Initial**: 150 tests (+99 new tests)
 - **Phase 4 + Internal Methods**: 224 tests (+84 new tests)
 - **Total Added**: **173 new tests**
-- # **Growth**: **+339% increase**
-- **After**: 150 tests
-- **Added**: **99 new tests**
-- **Growth**: **+194% increase**
-  > > > > > > > copilot/fix-09489d53-2735-44cb-85fc-8296bb2f0d0f
+- **Growth**: **+339% increase**
 
 ---
 
