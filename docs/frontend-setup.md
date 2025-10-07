@@ -54,7 +54,7 @@ VITE_MOCK_WEBSOCKET=false
 ./xrat.sh logs frontend
 
 # Access frontend shell
-docker-compose exec frontend sh
+./xrat.sh shell-frontend
 ```
 
 > ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar containers. O script garante configuração e logs corretos.
@@ -331,8 +331,8 @@ See [Deployment Documentation](./DEPLOYMENT.md) for production deployment.
 ### Quick Deploy
 
 ```bash
-# Build and start
-docker-compose up -d --build frontend
+# Rebuild frontend service
+./xrat.sh rebuild
 
 # Or build static files
 npm run build

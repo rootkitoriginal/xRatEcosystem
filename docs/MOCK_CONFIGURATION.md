@@ -142,7 +142,7 @@ VITE_USE_MOCK_WEBSOCKET=true # WebSocket mock (menos complexo)
 
 **Possíveis causas:**
 
-1. Backend não está rodando (`docker-compose up` ou `npm run dev` no backend)
+1. Backend não está rodando (`./xrat.sh start` ou `npm run dev` no backend)
 2. URL da API incorreta - verifique `VITE_API_URL` no `.env`
 3. Variáveis de ambiente não carregaram - reinicie o frontend
 
@@ -193,7 +193,7 @@ Você pode criar configurações específicas por funcionalidade editando os arq
 Após alterar variáveis no `.env`:
 
 1. **Frontend:** Reinicie com `npm run dev`
-2. **Backend:** Reinicie com `npm run dev` ou `docker-compose restart`
-3. **Docker:** Use `docker-compose down && docker-compose up`
+2. **Backend:** Reinicie com `npm run dev` (local) ou `./xrat.sh restart backend` (Docker)
+3. **Docker:** Use `./xrat.sh restart`
 
 As mudanças devem aparecer imediatamente no indicador visual e nos logs do console.

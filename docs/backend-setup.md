@@ -85,7 +85,7 @@ openssl rand -base64 64
 ./xrat.sh logs backend
 
 # Access backend shell
-docker-compose exec backend sh
+./xrat.sh shell-backend
 ```
 
 > ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar containers. O script garante configuração e logs corretos.
@@ -278,10 +278,10 @@ tail -f logs/combined-2025-10-04.log | jq .
 tail -f logs/error-2025-10-04.log | jq .
 
 # View logs in Docker
-docker-compose logs -f backend
+./xrat.sh logs
 
 # View last 100 lines
-docker-compose logs --tail=100 backend
+docker compose logs --tail=100 backend
 ```
 
 ### Node.js Debugger
@@ -336,14 +336,14 @@ See [Deployment Documentation](./DEPLOYMENT.md) for production deployment instru
 ### Quick Deploy
 
 ```bash
-# Build and start
-docker-compose up -d --build backend
+# Rebuild backend service
+./xrat.sh rebuild
 
 # Check status
-docker-compose ps backend
+./xrat.sh status
 
 # View logs
-docker-compose logs -f backend
+./xrat.sh logs
 ```
 
 ## 📝 Adding New Endpoints
