@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.E2E_BASE_URL || 'http://172.22.0.10';
+const baseURL = process.env.E2E_BASE_URL || 'http://172.22.0.10:5173';
 
 export default defineConfig({
   testDir: './__tests__/e2e',
