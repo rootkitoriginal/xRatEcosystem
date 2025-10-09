@@ -32,6 +32,8 @@ System design and technical architecture:
 Comprehensive testing guides and strategies:
 
 - **[Testing Guide](./TESTING.md)** - Testing guidelines and best practices
+- **[E2E Testing Guide](../__tests__/e2e/README.md)** - Complete E2E testing documentation
+- **[E2E Quick Reference](./E2E_QUICK_REFERENCE.md)** - Quick reference for E2E tests
 - **[Smoke Testing](./smoke-testing.md)** - Critical path smoke tests
 - **[Performance Testing](./performance-testing.md)** - Load testing and benchmarks
 - **[Local Testing](./local-testing.md)** - Test GitHub Actions locally with act
@@ -42,7 +44,6 @@ Comprehensive testing guides and strategies:
 - **[WebSocket Testing Summary](./websocket-testing-summary.md)** - WebSocket test results
 - **[Redis Testing](./redis-testing.md)** - Redis resilience testing results
 - **[WebSocket Performance](./websocket-performance.md)** - Performance benchmarks
-- **[Implementation Summary](./implementation-summary.md)** - Feature implementation status
 
 ## 💻 Development Guides
 

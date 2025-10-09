@@ -11,7 +11,7 @@ React + Vite frontend application for the xRat Ecosystem.
 
 ## 📁 Project Structure
 
-```
+```text
 frontend/
 ├── src/
 │   ├── App.jsx          # Main application component
@@ -47,14 +47,17 @@ VITE_MOCK_WEBSOCKET=false
 ### With Docker (Recommended)
 
 ```bash
-# Use o script xrat.sh - NÃO use docker-compose diretamente
+# Use o script xrat.sh - NÃO use `docker compose` diretamente
 ./xrat.sh start
 
-# View frontend logs
-./xrat.sh logs frontend
+# View logs (all services)
+./xrat.sh logs
+
+# View only frontend logs (optional)
+docker compose logs -f frontend
 
 # Access frontend shell
-docker-compose exec frontend sh
+./xrat.sh shell-frontend
 ```
 
 > ⚠️ **IMPORTANTE**: Sempre use `./xrat.sh` para gerenciar containers. O script garante configuração e logs corretos.
@@ -127,7 +130,7 @@ See [Testing Documentation](./TESTING.md) for comprehensive testing guide.
 
 ### CSS Structure
 
-```
+```text
 src/
 ├── index.css     # Global styles, resets, variables
 └── App.css       # Component-specific styles
@@ -331,8 +334,8 @@ See [Deployment Documentation](./DEPLOYMENT.md) for production deployment.
 ### Quick Deploy
 
 ```bash
-# Build and start
-docker-compose up -d --build frontend
+# Rebuild frontend service
+./xrat.sh rebuild
 
 # Or build static files
 npm run build

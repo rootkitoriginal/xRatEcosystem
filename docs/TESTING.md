@@ -57,6 +57,18 @@ The xRat Ecosystem follows the **testing pyramid** approach:
 
 **Configuration:** `frontend/vitest.config.js`
 
+### E2E Testing
+
+**Framework:** Playwright  
+**Browser:** Chrome/Chromium only  
+**Additional Tools:**
+
+- Docker Compose - Isolated test environment
+- Custom fixtures and helpers
+
+**Configuration:** `playwright.config.js`  
+**Documentation:** [E2E Testing Guide](../__tests__/e2e/README.md)
+
 ---
 
 ## 🚀 Running Tests
@@ -100,6 +112,34 @@ npm test -- App.test.jsx
 # Run tests in watch mode (default)
 npm test
 ```
+
+### E2E Tests
+
+End-to-End tests validate the entire system integration.
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run with UI mode
+npm run test:e2e:ui
+
+# Run with debug mode
+npm run test:e2e:debug
+
+# View test report
+npm run test:e2e:report
+
+# Run specific test suite
+npx playwright test __tests__/e2e/auth/
+
+# Keep containers for debugging
+E2E_KEEP_CONTAINERS=true npm run test:e2e
+```
+
+**Quick Reference:** [E2E Quick Reference](./E2E_QUICK_REFERENCE.md)  
+**Full Guide:** [E2E Testing Guide](../__tests__/e2e/README.md)  
+**CI Integration:** [E2E CI Integration](./E2E_CI_INTEGRATION.md)
 
 ### Smoke Tests
 
